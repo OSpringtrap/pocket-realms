@@ -62,6 +62,7 @@ export function renderHexMap(w: WorldView, o: HexMapOptions = {}): SVGElement {
   defs.appendChild(glow);
   root.appendChild(defs);
   const known = new Map(w.tiles.map((t) => [`${t.q},${t.r}`, t]));
+  const fogReach = new Set((w.fogReach ?? []).map((f) => `${f.q},${f.r}`));
   const colors = o.colorblind ? BIOME_COLORS_CB : BIOME_COLORS;
   const layer = svg('g');
   root.appendChild(layer);
@@ -82,9 +83,13 @@ export function renderHexMap(w: WorldView, o: HexMapOptions = {}): SVGElement {
           g.appendChild(svg('polygon', { points: hexPoints(x, y, s * 0.82), fill: 'none', stroke: '#f5c542', 'stroke-width': 3, class: 'reach-ring', filter: 'url(#glow)' }));
         }
       }
+      if (!t && o.showReach && fogReach.has(`${q},${r}`)) {
+        g.appendChild(svg('polygon', { points: hexPoints(x, y, s * 0.82), fill: 'none', stroke: '#f5c542', 'stroke-width': 3, class: 'reach-ring', filter: 'url(#glow)' }));
+        g.appendChild(svg('text', { x, y: y + s * 0.18, 'font-size': s * 0.5, 'text-anchor': 'middle', opacity: 0.6 }, '❔'));
+      }
       if (o.onTap) {
         g.addEventListener('click', () => o.onTap!(q, r, t));
-        g.style.cursor = t?.reachable !== undefined ? 'pointer' : 'default';
+        g.style.cursor = t?.reachable !== undefined || fogReach.has(`${q},${r}`) ? 'pointer' : 'default';
       }
       layer.appendChild(g);
     }

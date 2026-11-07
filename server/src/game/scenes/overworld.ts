@@ -84,13 +84,13 @@ async function chooseMove(g: Game, leaderId: string): Promise<MoveChoice> {
   for (const [k, v] of reach) {
     const [q, r] = k.split(',').map(Number) as [number, number];
     const t = tileAt(w, q, r)!;
-    const poi = t.poi && (!t.hidden || t.visited) ? t.poi : undefined;
+    const poi = t.revealed && t.poi && (!t.hidden || t.visited) ? t.poi : undefined;
     opts.push({
       id: k,
-      label: poi ? `${poi.emoji} ${poi.name}` : t.revealed ? `${t.name ?? t.biome}` : `Unexplored ${t.revealed ? t.biome : 'land'}`,
+      label: poi ? `${poi.emoji} ${poi.name}` : t.revealed ? `${t.name ?? t.biome}` : 'Unexplored land',
       desc: `${v.cost} move${v.cost === 1 ? '' : 's'}${poi?.cleared ? ' · cleared' : ''}`,
       group: poi ? 'Places' : 'Wilds',
-      emoji: poi ? poi.emoji : t.revealed ? biomeEmoji(t.biome) : '❔',
+      emoji: poi ? poi.emoji : t.revealed ? biomeEmoji(t.biome) : '🌫️',
     });
   }
   opts.sort((a, b) => Number(b.group === 'Places') - Number(a.group === 'Places'));

@@ -85,6 +85,8 @@ export interface WorldView {
   seed: string;
   radius: number;
   tiles: TileView[];
+  /** unrevealed tiles the party can reach this turn (fog, but tappable) */
+  fogReach?: { q: number; r: number; cost: number }[];
   totalTiles: number;
   party: { q: number; r: number };
   day: number;

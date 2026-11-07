@@ -654,6 +654,7 @@ export class Game {
           poi: t.poi && (!t.hidden || t.visited) ? { id: t.poi.id, kind: t.poi.kind, name: t.poi.name, emoji: t.poi.emoji, cleared: t.poi.cleared } : undefined,
           reachable: reach?.get(hexKey(t.q, t.r))?.cost,
         })),
+      fogReach: reach ? w.tiles.filter((t) => !t.revealed && reach!.has(hexKey(t.q, t.r))).map((t) => ({ q: t.q, r: t.r, cost: reach!.get(hexKey(t.q, t.r))!.cost })) : undefined,
       totalTiles: w.tiles.length,
       party: w.party,
       day: w.day,

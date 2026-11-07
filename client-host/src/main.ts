@@ -99,7 +99,7 @@ function render() {
   const sc = view.scene;
   const fullScenes = ['title', 'lobby', 'ending', 'jackbox'];
   main.classList.toggle('full', fullScenes.includes(sc.kind));
-  stageSlot.render(hash([sc, view.world && sc.kind === 'overworld' ? [view.world.tiles.length, view.world.party, view.world.tiles.map((t) => t.reachable ?? '-').join(''), view.world.doom, view.world.objective.keys] : 0, sc.kind === 'lobby' || sc.kind === 'title' ? [view.players, Object.keys(view.chars)] : 0, sc.kind === 'combat' ? view.chars : 0, sc.kind === 'event' ? view.waiting.length : 0]), () => renderStage(sc));
+  stageSlot.render(hash([sc, view.world && sc.kind === 'overworld' ? [view.world.tiles.length, view.world.party, view.world.tiles.map((t) => t.reachable ?? '-').join(''), view.world.fogReach?.length, view.world.doom, view.world.objective.keys] : 0, sc.kind === 'lobby' || sc.kind === 'title' ? [view.players, Object.keys(view.chars)] : 0, sc.kind === 'combat' ? view.chars : 0, sc.kind === 'event' ? view.waiting.length : 0]), () => renderStage(sc));
   if (!fullScenes.includes(sc.kind)) sideSlot.render(hash([view.chars, view.players, view.world?.doom, view.world?.objective, view.world?.quests, view.party.gold, view.world?.time, view.world?.weather, (sc as { combat?: { current?: string } }).combat?.current]), renderSide);
   else sideSlot.render('none', () => null);
   renderNarration();
@@ -275,7 +275,7 @@ function renderOverworld() {
     colorblind: view!.settings.colorblind,
     showReach: true,
     onTap: (q, r, t) => {
-      if (role === 'host' && t?.reachable !== undefined) cmd({ cmd: 'move', q, r });
+      if (role === 'host' && (t?.reachable !== undefined || w.fogReach?.some((f) => f.q === q && f.r === r))) cmd({ cmd: 'move', q, r });
     },
   });
   return h(

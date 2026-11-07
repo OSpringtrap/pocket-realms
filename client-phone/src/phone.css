@@ -74,3 +74,4 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .conn { position: fixed; top: 0; left: 0; right: 0; background: var(--red); color: #fff; text-align: center; padding: 4px; z-index: 999; font-size: 0.85em; }
 .tip { font-size: 0.85em; color: var(--ink-2); }
 .badge { font-size: 0.72em; border: 1px solid var(--ink-2); border-radius: 999px; padding: 1px 6px; background: rgba(255,255,255,0.6); }
+.modal .dicebox { background: linear-gradient(180deg, #fbf3dc, #efdfb4); }

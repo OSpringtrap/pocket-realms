@@ -591,7 +591,7 @@ export function actionOptions(ctx: CombatCtx, c: Character, bonusOnly: boolean):
   const out: ActionOption[] = [];
   if (!bonusOnly) {
     const wp = weaponProfile(c);
-    out.push({ key: 'attack', label: `Attack (${wp.name})`, emoji: '⚔️', desc: `${wp.dice}+${wp.damageBonus} ${wp.dmg}, ${wp.toHit >= 0 ? '+' : ''}${wp.toHit} to hit`, group: 'Actions', bonus: false, target: 'enemy', minigame: 'swing' });
+    out.push({ key: 'attack', label: `Attack (${wp.name})`, emoji: '⚔️', desc: `${wp.dice}${wp.damageBonus ? (wp.damageBonus > 0 ? `+${wp.damageBonus}` : `${wp.damageBonus}`) : ''} ${wp.dmg}, ${wp.toHit >= 0 ? '+' : ''}${wp.toHit} to hit`, group: 'Actions', bonus: false, target: 'enemy', minigame: 'swing' });
     out.push({ key: 'defend', label: 'Defend', emoji: '🛡️', desc: 'Attacks against you have disadvantage until your next turn.', group: 'Actions', bonus: false, target: 'self' });
   }
   for (const id of c.known) {

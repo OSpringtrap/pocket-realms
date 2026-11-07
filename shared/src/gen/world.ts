@@ -197,7 +197,7 @@ export function generateWorld(opts: WorldGenOptions): WorldState {
   ensureConnected(tiles, start);
 
   // Fog: reveal around start and the ominous fortress silhouette
-  for (const t of tiles) if (hexDist(t, start) <= 1) t.revealed = true;
+  for (const t of tiles) if (hexDist(t, start) <= 2) t.revealed = true;
   fortressTile.revealed = true;
   start.visited = true;
 
