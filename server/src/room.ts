@@ -147,7 +147,7 @@ export class Room {
     // --- everything below needs an identity
     if (msg.t === 'host') {
       if (conn.role !== 'host') return err('Only the main screen can do that.');
-      const res = g.hostCommandHandler?.(msg.command) ?? 'Not available';
+      const res = g.hostCommandHandler ? g.hostCommandHandler(msg.command) : 'Not available';
       return err(res);
     }
     const pid = conn.playerId;
@@ -176,7 +176,7 @@ export class Room {
       case 'input:result':
         return err(g.inputResult(pid, String(msg.id), msg.data));
       case 'intent':
-        return err(g.intentHandler?.(pid, msg.intent) ?? 'Not available');
+        return err(g.intentHandler ? g.intentHandler(pid, msg.intent) : 'Not available');
     }
   }
 

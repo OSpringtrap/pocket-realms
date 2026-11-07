@@ -73,6 +73,10 @@ async function main() {
   assert(host.view!.players.every((p) => p.connected), 'all 6 phones connected again');
   assert(dropped.every((d) => d.view?.chars[d.playerId!]?.name), 'rejoined phones see their own hero');
 
+  phones[0]!.send({ t: 'intent', intent: { kind: 'physicalDice', on: false } });
+  phones[1]!.send({ t: 'intent', intent: { kind: 'ping', q: 0, r: 0 } });
+  await sleep(200);
+  assert(phones[0]!.errors.length === 0 && phones[1]!.errors.length === 0, 'valid intents produce no errors');
   phones.forEach((p) => p.send({ t: 'ready', ready: true }));
   await sleep(300);
   host.send({ t: 'host', key: KEY, command: { cmd: 'start' } });
@@ -101,6 +105,7 @@ async function main() {
   const errs = phones.flatMap((p) => p.errors).filter((e) => !/expired|Not waiting|not your|Only the leader/i.test(e));
   if (errs.length) console.log('  phone errors:', [...new Set(errs)].slice(0, 6));
   assert(phones.every((p) => p.errors.every((e) => !/seq gap/.test(e))), 'no patch sequence gaps');
+  assert(host.errors.length === 0, `host received no errors (${host.errors.join('; ')})`);
   assert(scenes.size >= 2, 'game progressed through several scenes');
   phones.forEach((p) => p.close());
   host.close();

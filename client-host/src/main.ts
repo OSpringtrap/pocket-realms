@@ -145,7 +145,7 @@ function renderStage(sc: SceneView) {
     case 'combat':
       return renderCombat(sc.combat as never);
     case 'town':
-      return h('div', { class: 'col' }, h('div', { class: 'card center' }, h('h1', null, `🏘️ ${sc.name}`), h('div', { class: 'txt' }, sc.text), h('div', { class: 'muted' }, 'Shop, visit the shrine and take quests on your phones.')), sc.shop ? h('div', { class: 'shopgrid' }, ...sc.shop.items.slice(0, 12).map((s) => h('div', { class: 'card small' }, h('b', { class: `rarity-${s.item.rarity}` }, `${s.item.emoji} ${s.item.name}`), h('div', { class: 'muted' }, `${s.price}g · ${s.item.rarity}`)))) : null, renderMiniMap());
+      return h('div', { class: 'col' }, h('div', { class: 'card center' }, h('h1', null, `🏘️ ${sc.name}`), h('div', { class: 'txt' }, sc.text), h('div', { class: 'muted' }, 'Shop, visit the shrine and take quests on your phones.')), sc.shop ? h('div', { class: 'shopgrid' }, ...sc.shop.items.slice(0, 12).map((s) => h('div', { class: 'card small' }, h('b', { class: `rarity-${s.item.rarity}` }, `${s.item.emoji} ${s.item.name}`), h('div', { class: 'muted' }, `${s.price}g · ${s.item.rarity}`)))) : null);
     case 'camp':
       return h('div', { class: 'col center', style: 'margin-top:4vh' }, h('div', { style: 'font-size:7em' }, '🔥'), h('h1', null, sc.text), sc.prompt ? h('div', { class: 'card', style: 'max-width:900px;margin:0 auto;font-size:1.5em' }, h('div', { class: 'muted small' }, `Campfire moment — ${sc.prompt.a} & ${sc.prompt.b}`), sc.prompt.text) : null);
     case 'dungeon':
@@ -263,11 +263,6 @@ function renderLobby() {
 }
 
 // ------------------------------------------------------------ overworld
-
-function renderMiniMap() {
-  if (!view?.world) return null;
-  return h('div', { class: 'mapwrap', style: 'height:30vh' }, renderHexMap(view.world, { colorblind: view.settings.colorblind, compact: true }));
-}
 
 function renderOverworld() {
   const w = view!.world!;
