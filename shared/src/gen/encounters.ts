@@ -20,7 +20,7 @@ export const XP_THRESHOLDS: Record<number, [number, number, number, number]> = {
 };
 export const DIFF_MULT: Record<Difficulty, number> = { story: 0.65, normal: 1.0, heroic: 1.3 };
 /** Pocket Realms heroes are stronger than 5e baselines (minigames, potions, rerolls). */
-export const POCKET_SCALE = [0, 1.35, 1.5, 1.9, 2.25, 2.45, 2.65];
+export const POCKET_SCALE = [0, 1.25, 1.5, 1.9, 2.25, 2.45, 2.65];
 export const POCKET_HP = [0, 0.9, 0.95, 1.1, 1.25, 1.35, 1.45];
 export type EncounterDifficulty = 'easy' | 'medium' | 'hard' | 'deadly';
 const DIFF_IDX: Record<EncounterDifficulty, number> = { easy: 0, medium: 1, hard: 2, deadly: 3 };

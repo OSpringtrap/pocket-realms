@@ -1,6 +1,6 @@
 import { buildEncounter, content, rollLoot, type HexTile } from '@pr/shared';
 import type { Game } from '../Game.js';
-import { applyEffects, avgLevel, partyLevels } from '../effects.js';
+import { applyEffects, avgLevel, hiddenLoot, partyLevels } from '../effects.js';
 import { combatScene, type CombatOutcome } from './combat.js';
 import { dungeonScene } from './dungeon.js';
 import { finalBattle } from './ending.js';
@@ -58,6 +58,7 @@ export async function poiScene(g: Game, tile: HexTile): Promise<CombatOutcome | 
       g.narrate(`Inside: ${gold} gold and ${it.emoji} ${it.name} (${it.rarity})!`, 'good');
       g.fx({ kind: 'sound', name: 'loot' });
       poi.cleared = true;
+      if (res.degree === 'crit' || res.degree === 'success' || g.rng.chance(0.3)) await hiddenLoot(g, seeker.id);
       return;
     }
     case 'lair': {

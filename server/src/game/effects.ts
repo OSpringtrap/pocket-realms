@@ -204,3 +204,31 @@ export async function applyEffects(g: Game, effects: EventEffect[], actorId: str
   if (xpGained) await handleLevelUps(g);
   return combat;
 }
+
+/**
+ * Hidden loot: the searcher privately spots an extra item. Only their phone knows —
+ * they can keep it quietly or share it with the party stash.
+ */
+export async function hiddenLoot(g: Game, pid: string) {
+  const c = g.state.chars[pid];
+  if (!c || g.players.get(pid)?.isBot) return;
+  const it = rollLoot(g.rng, { level: avgLevel(g), boost: 15, allowCursed: true });
+  g.fxFor(pid, { kind: 'haptic', pattern: [20, 40, 20], playerId: pid });
+  const pick = await g.choose(
+    pid,
+    '🤫 Only you notice it...',
+    [
+      { id: 'keep', label: `Pocket the ${it.name}`, emoji: '🤐', desc: 'Nobody else will know.' },
+      { id: 'share', label: 'Share it with the party', emoji: '🤝', desc: 'Into the party stash.' },
+    ],
+    { text: `${it.emoji} ${it.name} (${it.rarity}) — ${it.desc}`, style: 'cards', timeoutMs: 30000, fallback: 'share' },
+  );
+  if (pick === 'keep') {
+    c.inventory.push(it);
+    (g.state.secrets[pid] ??= []).push({ id: `hl${g.rng.int(0, 1e9)}`, text: `You secretly pocketed ${it.name}.`, kind: 'loot' });
+  } else {
+    g.state.party.stash.push(it);
+    g.narrate(`${c.name} found something extra and shares it: ${it.emoji} ${it.name}!`, 'good');
+  }
+  g.dirty();
+}

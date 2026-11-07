@@ -85,14 +85,20 @@ function renderRoll(app: App, p: Extract<Prompt, { kind: 'roll' }>) {
       h('div', null, `Roll your real ${p.faces.map((f) => dieName(f)).join(', ')} and enter the result${p.faces.includes(100) ? ' (d%: 1–100, 00 = 100)' : ''}:`),
       h('div', { class: 'numpad' }, ...inputs.map((inp, i) => h('label', { class: 'col center' }, h('span', { class: 'small' }, dieName(p.faces[i]!)), inp))),
       send,
-      h('button', { class: 'ghost small', onclick: () => app.send({ t: 'roll:throw', id: p.id }) }, 'Let the app roll instead'),
+      h('button', { class: 'ghost small', onclick: () => app.send({ t: 'roll:throw', id: p.id }) }, 'Let the app roll this one'),
+      h('button', { class: 'ghost small', onclick: () => app.send({ t: 'intent', intent: { kind: 'physicalDice', on: false } }) }, 'Switch back to digital dice'),
     );
     return wrap;
   }
   const canvas = h('canvas');
   const tray = new DiceTray(canvas);
   const btn = h('button', { class: 'primary mgbig' }, '🎲 Tap or shake to roll!');
-  wrap.append(canvas, btn, h('div', { class: 'small muted center' }, 'Fair rolls: the game server rolls the dice.'));
+  wrap.append(
+    canvas,
+    btn,
+    h('div', { class: 'small muted center' }, 'Fair rolls: the game server rolls the dice.'),
+    h('button', { class: 'ghost small', onclick: () => app.send({ t: 'intent', intent: { kind: 'physicalDice', on: true } }) }, '🎲 I want to roll my real dice'),
+  );
   let thrown = false;
   const doThrow = (intensity: number) => {
     if (thrown) return;
@@ -308,6 +314,15 @@ export function renderContext(app: App) {
       return [h('div', { class: 'card col center' }, h('div', { style: 'font-size:4em' }, sc.victory ? '🏆' : '💀'), h('h1', null, sc.title), h('div', null, sc.text), h('div', { class: 'muted' }, 'Thanks for playing Pocket Realms!'))];
     case 'levelup':
       return [waitCard('⭐', 'Level up!', 'Waiting for the others to choose...'), footer];
+    case 'social':
+      return [h('div', { class: 'card col center' }, h('div', { style: 'font-size:3.5em' }, sc.npc.emoji), h('h2', null, `${sc.npc.name}`), h('div', { class: 'muted' }, `the ${sc.npc.title} — wants to ${sc.npc.motivation}`), sc.line ? h('div', { class: 'card', style: 'font-style:italic' }, sc.line) : null), footer];
+    case 'dungeon':
+      return [
+        h('div', { class: 'card col' }, h('h2', null, `🕳️ ${sc.name}`), h('div', { class: 'row wrap' }, ...sc.rooms.filter((r) => r.revealed).map((r) => h('span', { class: 'tag', style: r.id === sc.current ? 'border-width:2px;font-weight:bold' : '' }, `${r.emoji} ${r.name}${r.cleared ? ' ✔' : ''}`)))),
+        footer,
+      ];
+    case 'camp':
+      return [waitCard('🔥', 'Around the campfire', sc.prompt ? sc.prompt.text : sc.text), footer];
     default:
       return [waitCard('📜', 'Look at the TV!', ''), footer];
   }

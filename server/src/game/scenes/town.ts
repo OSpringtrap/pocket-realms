@@ -166,7 +166,7 @@ export async function townScene(g: Game, poi: Poi) {
           const q = await g.choose(
             pid,
             '📜 Quest board',
-            [...board.map((b, i) => ({ id: String(i), label: b!.title, emoji: '📜', desc: `${b!.desc} Reward: ${b!.reward.gold}g, ${b!.reward.xp} XP.` })), { id: 'back', label: 'Back', emoji: '↩️' }],
+            [...board.map((b, i) => ({ id: String(i), label: b!.title, emoji: '📜', desc: `${b!.desc} Reward: ${b!.reward.gold}g, ${b!.reward.xp} XP${b!.reward.key ? `, and a lead on a ${w.objective.keyName}! 🔑` : '.'}` })), { id: 'back', label: 'Back', emoji: '↩️' }],
             { timeoutMs: 60000, fallback: 'back' },
           );
           if (q !== 'back') {

@@ -107,6 +107,18 @@ Each entry: **decision** — why.
 - **Bosses scale to the party's level** (`scaleMonsterToLevel`), so any antagonist can be the final boss of a
   one-shot at level 4 or a campaign at level 10.
 
+## Secrets & social
+
+- **Secret goals:** each human hero gets a private objective measured from their own stats (kills, crits, healing,
+  aced minigames, damage). Completing it is announced on the TV and grants Inspiration, XP and a title.
+- **Temptations (traitor-style):** with 3+ humans, ~18% of event votes secretly ask one player to steer the party to a
+  specific option. If the party picks it: +1 Inspiration and 25 gold for them, +1 Doom for everyone.
+- **Hidden loot:** when searching caches or treasure rooms, the finder sometimes sees an extra item only on their
+  phone and can pocket it or share it.
+- **Social scenes:** NPC attitude (−3..3) and the NPC's faction reputation adjust the DC; a written line judged
+  "convincing" by the rest of the party lowers it further. Success can produce quests, map reveals and loot.
+- **Campaign side quests** sometimes reward one of the antagonist's seal-keys, tying side content to the main arc.
+
 ## Simplifications / stubs
 
 - **Camera** features were skipped (optional in the brief).

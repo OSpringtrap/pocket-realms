@@ -13,7 +13,7 @@ import {
   type Poi,
 } from '@pr/shared';
 import type { Game } from '../Game.js';
-import { applyEffects, avgLevel, partyLevels } from '../effects.js';
+import { applyEffects, avgLevel, hiddenLoot, partyLevels } from '../effects.js';
 import { combatScene, currentBiome, type CombatOutcome } from './combat.js';
 import { heroCheck, partyVote, scaledDc } from './event.js';
 
@@ -89,7 +89,8 @@ export function generateDungeon(g: Game, poi: Poi): DungeonData {
 async function trapRoom(g: Game): Promise<void> {
   const chars = g.partyChars().filter((c) => !c.dead && !c.down);
   const scout = [...chars].sort((a, b) => (b.skills.includes('perception') ? 1 : 0) - (a.skills.includes('perception') ? 1 : 0))[0]!;
-  g.narrate(`${scout.name} leads, eyes on the floor...`);
+  g.narrate(`${scout.name} leads, eyes on the floor... (tick... tick...)`);
+  for (const c of chars) g.fx({ kind: 'haptic', pattern: [15, 300, 15, 300, 15, 300], playerId: c.id });
   const spot = await heroCheck(g, scout, { skill: 'perception', label: 'Spot the trap', minigame: 'scan' }, scaledDc(g, 13));
   if (spot.degree === 'success' || spot.degree === 'crit') {
     g.narrate(`${scout.name} spots a pressure plate and guides everyone around it. (+XP)`, 'good');
@@ -187,6 +188,10 @@ export async function dungeonScene(g: Game, poi: Poi): Promise<CombatOutcome | '
           g.state.party.stash.push(it);
           g.fx({ kind: 'sound', name: 'loot' });
           g.narrate(`💰 ${gold} gold and ${it.emoji} ${it.name} (${it.rarity})!`, 'good');
+          if (g.rng.chance(0.35)) {
+            const finder = g.rng.pick(g.partyChars().filter((c) => !c.dead));
+            if (finder) await hiddenLoot(g, finder.id);
+          }
           break;
         }
         case 'rest':

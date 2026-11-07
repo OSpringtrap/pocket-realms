@@ -36,7 +36,14 @@ export function makeQuest(g: Game, type?: QuestType, opts: { privateFor?: string
     giverNpcId: giver?.id,
     targetTile: { q: tile.q, r: tile.r },
     factionId: giver?.factionId ?? (w.factions.length ? g.rng.pick(w.factions).id : undefined),
-    reward: { gold: 30 + level * 15, xp: 40 + level * 10, rep: 1, item: level >= 4 ? 'rare' : 'uncommon' },
+    reward: {
+      gold: 30 + level * 15,
+      xp: 40 + level * 10,
+      rep: 1,
+      item: level >= 4 ? 'rare' : 'uncommon',
+      // campaign side quests can lead to one of the antagonist's seal-keys (ties side quests to the main arc)
+      key: g.state.settings.length === 'campaign' && w.objective.keys + w.quests.filter((x) => x.reward.key && x.status === 'active').length < w.objective.keysNeeded - 1 && g.rng.chance(0.25),
+    },
     status: 'active',
     privateFor: opts.privateFor,
     goal: tpl.goal,
@@ -126,7 +133,10 @@ export async function questScene(g: Game, q: Quest): Promise<import('./scenes/co
     const fx: import('@pr/shared').EventEffect[] = [{ type: 'gold', amount: q.reward.gold }, { type: 'xp', amount: q.reward.xp }];
     if (q.factionId && q.reward.rep) fx.push({ type: 'rep', faction: q.factionId, amount: q.reward.rep + 1 });
     if (q.reward.item) fx.push({ type: 'item', rarity: q.reward.item });
-    if (q.reward.key) fx.push({ type: 'key' });
+    if (q.reward.key) {
+      g.narrate(`Among the rewards: a clue to a ${w.objective.keyName}!`, 'good');
+      fx.push({ type: 'key' });
+    }
     if (g.rng.chance(0.25)) fx.push({ type: 'doom', amount: -1 });
     await applyEffects(g, fx, undefined);
   } else {
