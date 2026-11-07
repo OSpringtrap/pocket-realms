@@ -730,8 +730,8 @@ export class Game {
     };
   }
 
-  phoneView(pid: string): PhoneView {
-    const pub = this.publicView();
+  phoneView(pid: string, shared?: PublicView): PhoneView {
+    const pub = shared ?? this.publicView();
     const p = this.players.get(pid)!;
     const prompts = [...this.pending.values()]
       .filter((x) => x.playerId === pid)
@@ -756,9 +756,12 @@ export class Game {
 
   /** Characters from a loaded save that no connected player has claimed yet. */
   claimable(): CreationView['claimable'] {
-    const owned = new Set([...this.players.keys()]);
+    // heroes whose player is missing or offline can be picked up from another device
     return Object.values(this.state.chars)
-      .filter((c) => !owned.has(c.id))
+      .filter((c) => {
+        const p = this.players.get(c.id);
+        return !p || (!p.connected && !p.isBot);
+      })
       .map((c) => ({ id: c.id, name: c.name, cls: c.cls, species: c.species, level: c.level }));
   }
 

@@ -15,6 +15,7 @@ import {
   sanitizeText,
   unequipItem,
   validateDraft,
+  XP_TABLE,
   type CharacterDraft,
   type HostCommand,
   type Intent,
@@ -247,7 +248,12 @@ function finishCreation(g: Game, p: PlayerRec, d: CharacterDraft) {
   const legacy = legacyIdx >= 0 ? g.legacyQueue.splice(legacyIdx, 1)[0] : undefined;
   const level = legacy?.level ?? (g.state.phase === 'playing' ? avgLevel(g) : 1);
   const fate = g.state.creation[p.id]?.fateResult;
-  const c = createCharacter(p.id, d, g.rng, fate, level);
+  // Late joiners and heirs start at level 1 and choose their own upgrades up to the party's level
+  const c = createCharacter(p.id, d, g.rng, fate, 1);
+  if (level > 1) {
+    c.xp = XP_TABLE[level - 1] ?? c.xp;
+    c.pendingLevelUps = level - 1;
+  }
   if (legacy) {
     c.inventory.push(...legacy.gear.filter((x) => !x.cursed));
     c.titles.push(`Heir of ${legacy.oldName}`);

@@ -97,6 +97,7 @@ function render() {
   applySettings(view.settings);
   renderTop();
   const sc = view.scene;
+  stage.dataset.scene = sc.kind;
   const fullScenes = ['title', 'lobby', 'ending', 'jackbox'];
   main.classList.toggle('full', fullScenes.includes(sc.kind));
   stageSlot.render(hash([sc, view.world && sc.kind === 'overworld' ? [view.world.tiles.length, view.world.party, view.world.tiles.map((t) => t.reachable ?? '-').join(''), view.world.fogReach?.length, view.world.doom, view.world.objective.keys] : 0, sc.kind === 'lobby' || sc.kind === 'title' ? [view.players, Object.keys(view.chars)] : 0, sc.kind === 'combat' ? view.chars : 0, sc.kind === 'event' ? view.waiting.length : 0]), () => renderStage(sc));

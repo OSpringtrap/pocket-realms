@@ -184,20 +184,27 @@ export class Room {
     if (this.flushTimer) return;
     this.flushTimer = setTimeout(() => {
       this.flushTimer = undefined;
-      for (const c of this.conns) this.flushConn(c);
+      this.flushAll();
     }, 40);
   }
 
-  private viewFor(conn: Conn): PublicView | PhoneView | undefined {
-    if (conn.role === 'phone' && conn.playerId && this.game.players.has(conn.playerId)) return this.game.phoneView(conn.playerId);
-    if (conn.role === 'host' || conn.role === 'spectator') return this.game.publicView();
+  /** Build the shared public view once per flush; phones extend it with their private bits. */
+  private flushAll() {
+    const pub = clone(this.game.publicView());
+    for (const c of this.conns) this.flushConn(c, pub);
+  }
+
+  private viewFor(conn: Conn, pub?: PublicView): PublicView | PhoneView | undefined {
+    if (conn.role === 'phone' && conn.playerId && this.game.players.has(conn.playerId)) return this.game.phoneView(conn.playerId, pub);
+    if (conn.role === 'host' || conn.role === 'spectator') return pub ?? this.game.publicView();
     return undefined;
   }
 
-  private flushConn(conn: Conn) {
-    const view = this.viewFor(conn);
+  private flushConn(conn: Conn, pub?: PublicView) {
+    const view = this.viewFor(conn, pub);
     if (!view) return;
-    const snapshot = clone(view);
+    // public part is already a private copy; phone views add fresh objects on top
+    const snapshot = pub && view === pub ? pub : clone(view);
     if (conn.last === undefined) {
       conn.seq++;
       this.send(conn, { t: 'state', seq: conn.seq, view: snapshot });
@@ -215,7 +222,7 @@ export class Room {
     if (this.flushTimer) {
       clearTimeout(this.flushTimer);
       this.flushTimer = undefined;
-      for (const c of this.conns) this.flushConn(c);
+      this.flushAll();
     }
     for (const c of this.conns) {
       if (c.role === 'pending') continue;

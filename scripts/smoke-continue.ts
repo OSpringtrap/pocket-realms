@@ -57,20 +57,38 @@ if (phase === 'start') {
   await sleep(400);
   assert(h.view?.campaign?.seed === saved.seed, 'continued the right campaign');
   const phones: Client[] = [];
-  for (const [i, tok] of saved.tokens.entries()) {
-    const p = new Client(`P${i}`);
-    await p.open();
-    p.send({ t: 'resume', v: PROTOCOL_VERSION, token: tok });
-    await sleep(300);
-    assert(p.playerId === saved.ids[i] && p.view?.chars[p.playerId!], `phone ${i} resumed as its old hero`);
-    phones.push(p);
-  }
+  // phone 0 comes back with its stored token
+  const p0 = new Client('P0');
+  await p0.open();
+  p0.send({ t: 'resume', v: PROTOCOL_VERSION, token: saved.tokens[0] });
+  await sleep(300);
+  assert(p0.playerId === saved.ids[0] && p0.view?.chars[p0.playerId!], 'phone 0 resumed as its old hero');
+  phones.push(p0);
+  // phone 1 is a different device: joins fresh and claims the hero from the list
+  const p1 = new Client('P1-new-device');
+  await p1.open();
+  p1.send({ t: 'join', v: PROTOCOL_VERSION, code: 'TEST', name: 'NewDevice' });
+  await sleep(300);
+  const claimable = p1.view?.me.creation?.claimable ?? [];
+  assert(claimable.some((c) => c.id === saved.ids[1]), 'new device sees the unclaimed hero');
+  p1.send({ t: 'claim', charId: saved.ids[1] });
+  await sleep(300);
+  assert(p1.playerId === saved.ids[1] && p1.view?.chars[p1.playerId!], 'new device claimed the old hero');
+  phones.push(p1);
   await sleep(300);
   assert(h.view!.players.every((p) => p.ready), 'resumed heroes are ready');
   h.send({ t: 'host', key: KEY, command: { cmd: 'start' } });
   phones.forEach((p) => ((p.auto = true), p.autoplay()));
   await sleep(4000);
   assert(h.view?.scene.kind !== 'lobby' && (h.view?.world?.turn ?? 0) >= saved.turn, `play resumed at turn ${h.view?.world?.turn}`);
+  // a brand new friend arrives mid-game
+  const late = new Client('Late');
+  await late.open();
+  late.send({ t: 'join', v: PROTOCOL_VERSION, code: 'TEST', name: 'Latecomer' });
+  await sleep(300);
+  late.send({ t: 'character:create', draft: { name: 'Tardy', species: 'human', cls: 'bard', quirks: ['human_rhymes'], personality: 'Late again' } });
+  await sleep(400);
+  assert(late.view?.chars[late.playerId!]?.name === 'Tardy', 'mid-game joiner created a hero and joined the party');
   console.log('PHASE RESUME OK');
   process.exit(0);
 }

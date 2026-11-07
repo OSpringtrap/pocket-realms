@@ -23,6 +23,7 @@ import { campScene, jackboxRound } from './jackbox.js';
 import { poiScene } from './poi.js';
 import { botUpkeep } from '../botUpkeep.js';
 import { checkGoals } from '../goals.js';
+import { handleLevelUps } from './levelup.js';
 
 const TIMES: TimeOfDay[] = ['morning', 'afternoon', 'evening', 'night'];
 const TIME_EMOJI: Record<TimeOfDay, string> = { morning: '🌅', afternoon: '☀️', evening: '🌇', night: '🌙' };
@@ -247,6 +248,7 @@ export async function overworldLoop(g: Game) {
     }
     w.turnsSincePrompt++;
     botUpkeep(g);
+    if (g.partyChars().some((c) => c.pendingLevelUps > 0)) await handleLevelUps(g);
     w.movesLeft = w.moveBudget + (w.bonusMoves ?? 0);
     w.bonusMoves = 0;
     s.scene = { kind: 'overworld' };
