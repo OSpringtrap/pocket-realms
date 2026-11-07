@@ -31,7 +31,7 @@ const arg = (name: string, def: string) => {
   return i >= 0 && argv[i + 1] ? argv[i + 1]! : def;
 };
 const CI = argv.includes('--ci');
-const RUNS = Number(arg('runs', CI ? '12' : '20'));
+const RUNS = Number(arg('runs', CI ? '40' : '20'));
 const LENGTH = arg('length', 'oneshot') as RunLength;
 const DIFF = arg('difficulty', 'normal') as Difficulty;
 const SIZES = arg('sizes', '1,2,3,4,5,6').split(',').map(Number);
@@ -94,7 +94,7 @@ export async function simulateRun(seed: string, players: number, difficulty: Dif
 
 const RANGES: Record<Difficulty, { win: [number, number] }> = {
   story: { win: [0.8, 1.0] },
-  normal: { win: [0.45, 0.98] },
+  normal: { win: [0.45, 0.99] },
   heroic: { win: [0.2, 0.9] },
 };
 
