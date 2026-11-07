@@ -46,9 +46,13 @@ const out = (cmd, args) => {
     return '';
   }
 };
+// pip stages multi-GB wheels (PyTorch is ~4.5 GB) in the temp dir; on Linux /tmp is often a small
+// RAM-backed tmpfs, so use a directory next to the venv instead.
+const TMP = path.join(VOICE, '.tmp');
+fs.mkdirSync(TMP, { recursive: true });
 const run = (cmd, args) => {
   console.log(`$ ${[cmd, ...args].join(' ')}`);
-  const r = spawnSync(cmd, args, { stdio: 'inherit' });
+  const r = spawnSync(cmd, args, { stdio: 'inherit', env: { ...process.env, TMPDIR: TMP, TEMP: TMP, TMP } });
   if (r.status !== 0) {
     console.error(`\n❌ Failed: ${cmd} ${args.join(' ')}`);
     process.exit(1);
@@ -103,4 +107,5 @@ if (backend !== 'fake') {
   if (backend === 'torch') run(venvPy, ['-c', 'import torch; print("torch", torch.__version__, "GPU:", torch.cuda.is_available() and torch.cuda.get_device_name(0))']);
 }
 fs.writeFileSync(path.join(VOICE, 'config.json'), JSON.stringify({ backend, model: backend === 'fake' ? undefined : model, flavor, gpu: card }, null, 2) + '\n');
+fs.rmSync(TMP, { recursive: true, force: true });
 console.log('\n✅ Voice ready. `npm start` now starts the voice worker by itself (set VOICE=0 to play without voices).');

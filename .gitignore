@@ -8,3 +8,4 @@ references/
 voice/.venv/
 voice/config.json
 __pycache__/
+voice/.tmp/
