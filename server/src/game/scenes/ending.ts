@@ -46,7 +46,8 @@ export async function handleDefeat(g: Game): Promise<boolean> {
   const w = g.state.world!;
   const diff = g.state.settings.difficulty;
   const rescues = w.doomRescues ?? 0;
-  if (diff === 'story' || (diff === 'normal' && rescues < 1)) {
+  const allowed = g.state.settings.length === 'campaign' ? 2 : 1;
+  if (diff === 'story' || (diff === 'normal' && rescues < allowed) || (diff === 'heroic' && g.state.settings.length === 'campaign' && rescues < 1)) {
     w.doomRescues = rescues + 1;
     g.state.stats.rescues++;
     const lost = Math.floor(g.state.party.gold / 2);
@@ -60,7 +61,7 @@ export async function handleDefeat(g: Game): Promise<boolean> {
       longRest(c);
     }
     g.fx({ kind: 'banner', text: '🌅 Rescued!', style: 'good' });
-    g.narrate(`Everything goes dark... You wake in ${home?.name ?? 'town'}, patched up by kind strangers. You lost ${lost} gold and precious time (+2 Doom).${diff === 'normal' ? " Fate won't be this generous twice." : ''}`, 'whisper');
+    g.narrate(`Everything goes dark... You wake in ${home?.name ?? 'town'}, patched up by kind strangers. You lost ${lost} gold and precious time (+2 Doom).${diff !== 'story' && rescues + 1 >= allowed ? " Fate won't be this generous again." : ''}`, 'whisper');
     g.journal('death', 'The party was defeated, but rescued and carried home.');
     await g.beat(3000);
     return true;

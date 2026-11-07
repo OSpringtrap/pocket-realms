@@ -1,5 +1,6 @@
 import { content } from '../content/index.js';
 import type { MonsterDef } from '../content/schemas.js';
+import { parseDice } from '../dice.js';
 import type { Rng } from '../rng.js';
 import { scaleMonsterToLevel, spawnMonster } from '../rules/combat.js';
 import type { Biome, Difficulty, Monster, TimeOfDay } from '../types.js';
@@ -19,8 +20,8 @@ export const XP_THRESHOLDS: Record<number, [number, number, number, number]> = {
 };
 export const DIFF_MULT: Record<Difficulty, number> = { story: 0.65, normal: 1.0, heroic: 1.3 };
 /** Pocket Realms heroes are stronger than 5e baselines (minigames, potions, rerolls). */
-export const POCKET_SCALE = [0, 1.35, 1.65, 1.95, 2.25, 2.45, 2.65];
-export const POCKET_HP = [0, 0.9, 1.0, 1.1, 1.25, 1.35, 1.45];
+export const POCKET_SCALE = [0, 1.35, 1.5, 1.9, 2.25, 2.45, 2.65];
+export const POCKET_HP = [0, 0.9, 0.95, 1.1, 1.25, 1.35, 1.45];
 export type EncounterDifficulty = 'easy' | 'medium' | 'hard' | 'deadly';
 const DIFF_IDX: Record<EncounterDifficulty, number> = { easy: 0, medium: 1, hard: 2, deadly: 3 };
 
@@ -47,7 +48,10 @@ export interface EncounterSpec {
 
 export function encounterBudget(spec: EncounterSpec): number {
   const base = spec.levels.reduce((s, l) => s + XP_THRESHOLDS[Math.max(1, Math.min(10, l))]![DIFF_IDX[spec.encounter]], 0);
-  return base * POCKET_SCALE[Math.max(1, Math.min(6, spec.levels.length))]! * DIFF_MULT[spec.difficulty] * (1 + (spec.directorMod ?? 0));
+  const avg = spec.levels.reduce((a, b) => a + b, 0) / Math.max(1, spec.levels.length);
+  // Pocket Realms heroes gain fewer tools per level than 5e characters: ease budgets as levels rise
+  const levelDamp = Math.max(0.62, 1 - 0.045 * (avg - 1));
+  return base * levelDamp * POCKET_SCALE[Math.max(1, Math.min(6, spec.levels.length))]! * DIFF_MULT[spec.difficulty] * (1 + (spec.directorMod ?? 0));
 }
 
 function candidates(spec: EncounterSpec, maxTier: number): MonsterDef[] {
@@ -77,7 +81,7 @@ export function buildEncounter(rng: Rng, spec: EncounterSpec): BuiltEncounter {
   const avg = spec.levels.reduce((a, b) => a + b, 0) / Math.max(1, size);
   const budget = encounterBudget(spec);
   const hpMult = hpMultForParty(size);
-  const maxTier = Math.max(1, Math.min(5, Math.ceil((avg + 1) / 2) + (size >= 4 ? 1 : 0)));
+  const maxTier = Math.max(1, Math.min(5, Math.ceil((avg + 1) / 2) + (size >= 4 && avg <= 4 ? 1 : 0)));
   let defs: MonsterDef[] = [];
   if (spec.monsterIds?.length) {
     defs = spec.monsterIds.map((id) => content().monsters[id]).filter((m): m is MonsterDef => !!m);
@@ -108,7 +112,7 @@ export function buildEncounter(rng: Rng, spec: EncounterSpec): BuiltEncounter {
     defs = best;
   }
   const monsters: Monster[] = [];
-  const eliteCount = size >= 6 ? 2 : size >= 4 ? 1 : 0;
+  const eliteCount = size >= 6 && spec.encounter !== 'medium' ? 2 : size >= 4 ? 1 : 0;
   const sorted = [...defs].sort((a, b) => b.xp - a.xp);
   sorted.forEach((d, i) => {
     const elite = i < eliteCount && spec.encounter !== 'easy';
@@ -137,12 +141,23 @@ export function buildBossEncounter(rng: Rng, opts: { bossId: string; levels: num
   if (!def) throw new Error(`Unknown boss ${opts.bossId}`);
   const size = opts.levels.length;
   const avg = opts.levels.reduce((a, b) => a + b, 0) / Math.max(1, size);
-  const bossHp = [0, 0.55, 0.72, 0.86, 1, 1.12, 1.25][Math.max(1, Math.min(6, size))]!;
+  const bossHp = [0, 0.55, 0.64, 0.84, 1, 1.12, 1.25][Math.max(1, Math.min(6, size))]!;
   const boss = spawnMonster(def, rng, { hpMult: bossHp * DIFF_MULT[opts.difficulty] ** 0.5 });
   scaleMonsterToLevel(boss, Math.max(1, Math.round(avg + 0.5)));
   if (size >= 5) {
     boss.legendary = (boss.legendary ?? 0) + 1;
     boss.legendaryLeft = boss.legendary;
+  }
+  // Small parties: fewer legendary actions and softer hits so a duo isn't one bad round from a wipe
+  if (size <= 2) {
+    boss.legendary = Math.max(0, (boss.legendary ?? 0) - (size === 1 ? 2 : 1));
+    boss.legendaryLeft = boss.legendary;
+    const f = size === 1 ? 0.6 : 0.75;
+    boss.attacks = boss.attacks.map((a) => {
+      if (a.damage === '0') return a;
+      const d = parseDice(a.damage);
+      return { ...a, toHit: a.toHit - (size === 1 ? 1 : 0), damage: `${Math.max(1, Math.round(d.count * f))}d${d.sides}${d.bonus ? `+${Math.round(d.bonus * f)}` : ''}` };
+    });
   }
   if (opts.empowered) {
     boss.maxHp = boss.hp = Math.round(boss.maxHp * 1.3);
@@ -150,7 +165,7 @@ export function buildBossEncounter(rng: Rng, opts: { bossId: string; levels: num
     boss.name = `${boss.name} (Empowered)`;
   }
   const minions =
-    size >= 2
+    size >= 3
       ? buildEncounter(rng, {
           levels: opts.levels.slice(0, Math.max(1, size - 1)),
           difficulty: opts.difficulty,
@@ -158,7 +173,7 @@ export function buildBossEncounter(rng: Rng, opts: { bossId: string; levels: num
           biome: opts.biome,
           families: opts.families,
           directorMod: opts.directorMod,
-        }).monsters.slice(0, Math.max(1, Math.floor(size / 2)))
+        }).monsters.slice(0, Math.max(1, Math.floor((size - 1) / 2)))
       : [];
   return { monsters: [boss, ...minions], budget: 0, adjustedXp: def.xp, title: boss.name };
 }

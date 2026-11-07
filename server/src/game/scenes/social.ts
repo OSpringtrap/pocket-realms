@@ -99,7 +99,8 @@ export async function socialScene(g: Game, npcArg?: Npc): Promise<CombatOutcome 
       g.dirty();
     }
     if (bonusLabel) g.narrate(bonusLabel, 'good');
-    const dc = scaledDc(g, 12) - npc.attitude * 2 - extraDcShift + (pick === 'intimidate' && npc.archetypeId === 'guard_captain' ? 3 : 0);
+    const factionRep = npc.factionId ? w.factions.find((f) => f.id === npc.factionId)?.rep ?? 0 : 0;
+    const dc = scaledDc(g, 12) - npc.attitude * 2 - extraDcShift - Math.trunc(factionRep / 2) + (pick === 'intimidate' && npc.archetypeId === 'guard_captain' ? 3 : 0);
     degree = (await heroCheck(g, actor, { skill: app.skill, label: `${app.label} (${npc.name})`, minigame }, dc)).degree;
   }
   // outcomes

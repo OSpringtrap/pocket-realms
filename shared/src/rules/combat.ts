@@ -197,11 +197,12 @@ export function spawnMonster(def: MonsterDef, rng: Rng, opts: { elite?: boolean;
   if (opts.elite) {
     m.elite = true;
     m.name = `Elite ${m.name}`;
-    m.hp = m.maxHp = Math.round(m.maxHp * 1.5);
+    m.hp = m.maxHp = Math.round(m.maxHp * 1.4);
     m.ac += 1;
-    m.attacks = m.attacks.map((a) => ({ ...a, toHit: a.toHit + 2 }));
-    m.multiattack = (m.multiattack ?? 1) + 1;
-    m.xp = Math.round(m.xp * 1.8);
+    m.attacks = m.attacks.map((a) => ({ ...a, toHit: a.toHit + 1 }));
+    // the extra action keeps big parties busy; only for single-attack monsters so damage doesn't double
+    if ((m.multiattack ?? 1) === 1) m.multiattack = 2;
+    m.xp = Math.round(m.xp * 1.6);
   }
   return m;
 }

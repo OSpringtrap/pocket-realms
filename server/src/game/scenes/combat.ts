@@ -296,7 +296,7 @@ async function resolveCombatEnd(g: Game, ctx: CombatCtx, opts: CombatOptions, ou
     s.stats.victories++;
     const label = opts.difficultyLabel ?? 'medium';
     const base = { easy: 45, medium: 70, hard: 100, deadly: 130, boss: 180 }[label];
-    const lengthMult = s.settings.length === 'oneshot' ? 1.6 : 1;
+    const lengthMult = s.settings.length === 'oneshot' ? 1.6 : 1.35;
     const xpEach = Math.round(base * lengthMult * (opts.rewardMult ?? 1) * (1 + Math.min(1, ctx.combat.xpPool / 2000) * 0.3));
     const goldFromMonsters = ctx.combat.monsters.filter((m) => m.side === 'enemy' && (m.dead || m.fled)).reduce((sum, m) => sum + (content().monsters[m.defId]?.gold ?? 0), 0);
     const gold = Math.round((goldFromMonsters + ctx.combat.goldPool + g.rng.int(5, 15) * chars.length) * (opts.rewardMult ?? 1));
