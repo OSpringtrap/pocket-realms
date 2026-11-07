@@ -43,7 +43,6 @@ document.body.appendChild(unlock);
 unlock.addEventListener('click', () => {
   sfx.unlock();
   unlock.remove();
-  void document.documentElement.requestFullscreen?.().catch(() => {});
 });
 
 // voices (narrator and characters) stream from the server as audio frames
@@ -74,6 +73,16 @@ const net = new Net<PublicView>({
   onError: (msg) => toast(msg, 'error'),
   onStatus: () => renderTop(true),
 });
+
+/** In-page confirmation (native confirm() is unreliable in fullscreen and can blank the page). */
+function askConfirm(text: string, okLabel: string, onOk: () => void) {
+  const box = h(
+    'div',
+    { class: 'modal', style: 'z-index:200', onclick: (e: Event) => e.target === e.currentTarget && box.remove() },
+    h('div', { class: 'card col', style: 'max-width:480px' }, h('div', null, text), h('div', { class: 'row' }, h('button', { class: 'primary', onclick: () => (box.remove(), onOk()) }, okLabel), h('button', { class: 'ghost', onclick: () => box.remove() }, 'Cancel'))),
+  );
+  document.body.appendChild(box);
+}
 
 function cmd(command: HostCommand) {
   net.send({ t: 'host', key: hostKey, command });
@@ -239,7 +248,7 @@ function renderTitle(saves: { id: string; name: string; updated: number; day: nu
                   { class: 'saverow' },
                   h('button', { class: 'savebtn', disabled: role !== 'host', onclick: () => cmd({ cmd: 'continue', saveId: sv.id }) }, h('b', null, sv.name), h('div', { class: 'small muted' }, `Day ${sv.day} — ${sv.mode} — ${new Date(sv.updated).toLocaleString()}`), h('div', { class: 'small' }, sv.heroes.join(', '))),
                   role === 'host'
-                    ? h('button', { class: 'ghost savedel', title: `Remove ${sv.name}`, 'aria-label': `Remove ${sv.name}`, onclick: () => confirm(`Remove “${sv.name}” for good? This cannot be undone.`) && cmd({ cmd: 'deleteSave', saveId: sv.id }) }, '✕')
+                    ? h('button', { class: 'ghost savedel', title: `Remove ${sv.name}`, 'aria-label': `Remove ${sv.name}`, onclick: () => askConfirm(`Remove “${sv.name}” for good? This cannot be undone.`, 'Remove', () => cmd({ cmd: 'deleteSave', saveId: sv.id })) }, '✕')
                     : null,
                 ),
               ),
@@ -671,7 +680,7 @@ function renderModal() {
         h('div', { class: 'small muted' }, voiceStatusText(view!.voice)),
         h('label', { class: 'row' }, h('input', { type: 'checkbox', checked: s.colorblind, style: 'width:auto', onchange: (e: Event) => set({ colorblind: (e.target as HTMLInputElement).checked }) }), 'Color-blind-safe palette'),
         h('label', { class: 'row' }, h('input', { type: 'checkbox', checked: s.reduceMotion, style: 'width:auto', onchange: (e: Event) => set({ reduceMotion: (e.target as HTMLInputElement).checked }) }), 'Reduce motion'),
-        role === 'host' && view!.scene.kind !== 'title' ? h('button', { class: 'ghost', onclick: () => confirm('Return to the title screen? Progress is autosaved at the end of each scene.') && (cmd({ cmd: 'title' }), close()) }, '🏰 Quit to title') : null,
+        role === 'host' && view!.scene.kind !== 'title' ? h('button', { class: 'ghost', onclick: () => askConfirm('Return to the title screen? Progress is autosaved at the end of each scene.', 'Quit to title', () => (cmd({ cmd: 'title' }), close())) }, '🏰 Quit to title') : null,
       ),
     );
   });
