@@ -18,9 +18,9 @@ let role: 'host' | 'spectator' | 'phone' = 'spectator';
 let modal: 'settings' | 'journal' | null = null;
 
 const app = document.getElementById('app')!;
-const top = h('div', { class: 'topbar' });
+const top = h('div', { class: 'topbar panel' });
 const main = h('div', { class: 'main' });
-const narr = h('div', { class: 'narration' });
+const narr = h('div', { class: 'narration panel' });
 app.append(top, main, narr);
 const topSlot = new Slot(top);
 const stage = h('div', { class: 'stage' });
@@ -36,7 +36,7 @@ document.body.appendChild(modalRoot);
 const modalSlot = new Slot(modalRoot);
 
 // sound unlock (browsers need a gesture)
-const unlock = h('div', { class: 'unlock' }, h('div', { style: 'font-size:3em' }, '🏰'), 'Pocket Realms', h('div', { class: 'small muted' }, 'Click anywhere to begin (enables sound)'));
+const unlock = h('div', { class: 'unlock' }, h('div', { style: 'font-size:2.4em;color:var(--ochre)' }, '❖'), 'Pocket Realms', h('div', { class: 'small muted' }, 'Click anywhere to begin (enables sound)'));
 document.body.appendChild(unlock);
 unlock.addEventListener('click', () => {
   sfx.unlock();
@@ -73,6 +73,15 @@ function avatar(c: Character | undefined, fallback = '🙂'): HTMLElement {
 function bar(cls: string, cur: number, max: number, label?: string) {
   return h('div', { class: `bar ${cls}`, title: label ?? `${cur}/${max}` }, h('i', { style: `width:${Math.max(0, Math.min(100, (cur / Math.max(1, max)) * 100))}%` }));
 }
+/** Icon, value and a thin meter, as in a status block. */
+function statLine(icon: string, cls: string, cur: number, max: number) {
+  return h('div', { class: 'stat-line' }, h('span', { class: 'ic' }, icon), h('span', { class: 'v' }, `${Math.max(0, cur)} / ${max}`), bar(cls, cur, max));
+}
+/** Numbered section header: "01  Status". */
+function sect(n: number, label: string) {
+  return h('div', { class: 'sect' }, h('i', null, String(n).padStart(2, '0')), h('span', null, label));
+}
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 const COND_EMOJI: Record<string, string> = { poisoned: '🤢', stunned: '💫', frightened: '😱', prone: '🛌', blinded: '🙈', charmed: '😍', burning: '🔥', slowed: '🐌', blessed: '🙏', inspired: '✨' };
 function conds(list: { id: string }[]) {
   return h('span', { class: 'conds' }, ...list.map((c) => h('span', { title: c.id }, COND_EMOJI[c.id] ?? '•')));
@@ -120,7 +129,7 @@ function renderTop(force = false) {
   if (!view) return;
   if (force) topSlot.invalidate();
   topSlot.render(hash([view.code, view.campaign?.name, view.world?.kingdomName, view.party.name, net.status, role, view.paused, view.scene.kind]), () => [
-    h('div', { class: 'logo' }, '🏰 Pocket Realms'),
+    h('div', { class: 'logo' }, h('span', { class: 'glyph' }, '❖'), 'Pocket Realms'),
     view!.campaign && view!.scene.kind !== 'title' ? h('div', { class: 'small muted' }, `${view!.party.name ? `${view!.party.name} · ` : ''}${view!.world?.kingdomName ?? ''} · seed ${view!.campaign.seed}`) : null,
     h('div', { class: 'spacer' }),
     h('div', { class: 'code' }, 'Room ', h('b', null, view!.code), h('span', { class: 'small muted' }, ` · ${view!.lanUrl.replace('https://', '')}`)),
@@ -179,7 +188,7 @@ function renderTitle(saves: { id: string; name: string; updated: number; day: nu
   return h(
     'div',
     { class: 'col' },
-    h('div', { class: 'hero-title' }, '🏰 Pocket Realms'),
+    h('div', { class: 'hero-title' }, h('span', { class: 'glyph' }, '❖'), 'Pocket Realms', h('span', { class: 'glyph' }, '❖')),
     h('div', { class: 'subtitle' }, 'A pocket-sized fantasy RPG for 1–6 heroes. Phones are your character sheets, wands and dice.'),
     h(
       'div',
@@ -201,7 +210,7 @@ function renderTitle(saves: { id: string; name: string; updated: number; day: nu
         { class: 'card col' },
         h('h2', null, '📖 Continue campaign'),
         saves.length
-          ? h('div', { class: 'col' }, ...saves.map((sv) => h('button', { disabled: role !== 'host', onclick: () => cmd({ cmd: 'continue', saveId: sv.id }), style: 'text-align:left' }, h('b', null, sv.name), h('div', { class: 'small muted' }, `Day ${sv.day} · ${sv.mode} · ${new Date(sv.updated).toLocaleString()}`), h('div', { class: 'small' }, sv.heroes.join(', ')))))
+          ? h('div', { class: 'col' }, ...saves.map((sv) => h('button', { class: 'savebtn', disabled: role !== 'host', onclick: () => cmd({ cmd: 'continue', saveId: sv.id }) }, h('b', null, sv.name), h('div', { class: 'small muted' }, `Day ${sv.day} · ${sv.mode} · ${new Date(sv.updated).toLocaleString()}`), h('div', { class: 'small' }, sv.heroes.join(', ')))))
           : h('div', { class: 'muted' }, 'No saved campaigns yet. Campaigns autosave at the end of every scene.'),
       ),
     ),
@@ -241,7 +250,7 @@ function renderLobby() {
           const cl = c ? C.classes[c.cls] : p.creating?.cls ? C.classes[p.creating.cls as never] : undefined;
           return h(
             'div',
-            { class: `card pcard${p.connected ? '' : ' offline'}`, style: `--c:${p.color}` },
+            { class: `card panel pcard${p.connected ? '' : ' offline'}`, style: `--c:${p.color}` },
             h('div', { class: 'avatar' }, c?.portrait ? h('img', { src: c.portrait }) : cl?.emoji ?? sp?.emoji ?? '🙂'),
             h('h3', null, c?.name ?? p.name),
             h('div', { class: 'small' }, c ? `${sp?.name} ${cl?.name}` : sp || cl ? `${sp?.name ?? '?'} ${cl?.name ?? '?'}...` : 'Creating a hero...'),
@@ -276,9 +285,9 @@ function renderOverworld() {
   });
   return h(
     'div',
-    { class: 'mapwrap' },
+    { class: 'card mapwrap' },
     map,
-    h('div', { class: 'card mapinfo' }, h('b', null, `🧭 ${leader?.name ?? 'The leader'} chooses the path`), h('div', { class: 'small muted' }, `${w.movesLeft} moves · glowing tiles are reachable · tap one to move for them`)),
+    h('div', { class: 'card panel mapinfo' }, h('b', null, `🧭 ${leader?.name ?? 'The leader'} chooses the path`), h('div', { class: 'small muted' }, `${w.movesLeft} moves · glowing tiles are reachable · tap one to move for them`)),
   );
 }
 
@@ -287,17 +296,25 @@ function renderSide() {
   const w = v.world;
   const current = (v.scene as { combat?: { current?: string } }).combat?.current;
   const els: HTMLElement[] = [];
+  let n = 1;
   if (w) {
     const pips = Array.from({ length: w.doomMax }, (_, i) => h('div', { class: `pip${i < w.doom ? ' on' : ''}` }));
+    const timeIcon = { morning: '🌅', afternoon: '☀️', evening: '🌇', night: '🌙' }[w.time];
     els.push(
+      sect(n++, 'The Realm'),
       h(
         'div',
-        { class: 'card doom' },
-        h('div', { class: 'row' }, h('b', null, `${w.antagonist.emoji} Doom Clock`), h('span', { class: 'grow' }), h('b', null, `${w.doom}/${w.doomMax}`)),
-        h('div', { class: 'clock' }, ...pips),
-        h('div', { class: 'small', style: 'margin-top:6px' }, `🔑 ${w.objective.keyName}: ${w.objective.keys}/${w.objective.keysNeeded}`),
-        h('div', { class: 'small muted' }, `${{ morning: '🌅', afternoon: '☀️', evening: '🌇', night: '🌙' }[w.time]} Day ${w.day} ${w.time} · ${w.weather} · 💰 ${v.party.gold}g · 🎒 ${v.party.stash.length}`),
+        { class: 'cluster' },
+        h('div', { class: 'card calendar' }, h('div', { class: 'cy' }, 'Day'), h('div', { class: 'cd' }, String(w.day)), h('div', { class: 'ct' }, w.time)),
+        h(
+          'div',
+          { class: 'card panel doom' },
+          h('div', { class: 'dh' }, h('span', null, w.antagonist.emoji), h('span', { class: 'grow' }, 'Doom Clock'), h('span', null, `${w.doom} / ${w.doomMax}`)),
+          h('div', { class: 'clock' }, ...pips),
+          h('div', { class: 'meta' }, `🔑 ${w.objective.keyName}: ${w.objective.keys} / ${w.objective.keysNeeded}`),
+        ),
       ),
+      h('div', { class: 'chips cluster-chips' }, h('span', { class: 'chip-dark' }, `${timeIcon} ${w.weather}`), h('span', { class: 'chip-dark' }, `💰 ${v.party.gold}g`), h('span', { class: 'chip-dark' }, `🎒 ${v.party.stash.length}`)),
     );
   }
   const party = h('div', { class: 'party' });
@@ -307,21 +324,31 @@ function renderSide() {
     party.appendChild(
       h(
         'div',
-        { class: `card member${c.dead ? ' dead' : c.down ? ' down' : ''}${current === c.id ? ' active' : ''}`, style: `--c:${p.color}`, 'data-uid': c.id },
+        { class: `card panel member${c.dead ? ' dead' : c.down ? ' down' : ''}${current === c.id ? ' active' : ''}`, style: `--c:${p.color}`, 'data-uid': c.id },
         h('div', { class: 'av' }, avatar(c)),
-        h(
-          'div',
-          null,
-          h('div', { class: 'row' }, h('span', { class: 'nm' }, c.name), h('span', { class: 'small muted' }, `L${c.level} ${C.classes[c.cls].name}`), p.connected ? null : h('span', { title: 'reconnecting' }, '📴'), c.inspiration ? h('span', { class: 'tag', title: 'Inspiration' }, `✨${c.inspiration}`) : null),
-          h('div', { class: 'bars' }, bar('hp', c.hp, c.maxHp), c.maxSp ? bar('sp', c.sp, c.maxSp) : null),
-          h('div', { class: 'small' }, `${c.dead ? '💀 fallen' : c.down ? `☠️ dying (${c.death.successes}✔ ${c.death.failures}✖)` : `${c.hp}/${c.maxHp} HP${c.maxSp ? ` · ${c.sp} SP` : ''}`} `, conds(c.conditions)),
-        ),
+        h('div', { class: 'row', style: 'gap:6px' }, h('span', { class: 'nm' }, c.name), p.connected ? null : h('span', { title: 'reconnecting' }, '📴'), c.inspiration ? h('span', { class: 'tag', title: 'Inspiration' }, `✨${c.inspiration}`) : null),
+        h('div', { class: 'lv' }, h('small', null, 'LV.'), h('b', null, String(c.level).padStart(2, '0'))),
+        h('div', { class: 'sub' }, `${C.species[c.species]?.name ?? ''} • ${C.classes[c.cls].name}`),
+        h('div', { class: 'bars' }, statLine('♥', 'hp', c.hp, c.maxHp), c.maxSp ? statLine('✦', 'sp', c.sp, c.maxSp) : null),
+        c.dead || c.down || c.conditions.length ? h('div', { class: 'foot' }, c.dead ? '💀 fallen' : c.down ? `☠️ dying (${c.death.successes}✔ ${c.death.failures}✖)` : null, conds(c.conditions)) : null,
       ),
     );
   }
-  els.push(party);
-  if (w && w.quests.filter((q) => q.status === 'active').length)
-    els.push(h('div', { class: 'card small' }, h('b', null, '📜 Quests'), ...w.quests.filter((q) => q.status === 'active').map((q) => h('div', null, `• ${q.title}`))));
+  els.push(sect(n++, 'The Company'), party);
+  const active = w?.quests.filter((q) => q.status === 'active') ?? [];
+  if (active.length)
+    els.push(
+      sect(n++, 'Tracked Objectives'),
+      h(
+        'div',
+        { class: 'card goals' },
+        h('div', { class: 'ribbon' }, '❦'),
+        h('div', { class: 'cardhead' }, h('span', { class: 'glyph' }, '✥'), 'Tracked Goals'),
+        ...active.map((q, i) =>
+          h('div', { class: `goal${q.main ? ' is-main' : ''}` }, h('span', { class: 'gt' }, q.title), q.goal ? h('span', { class: 'gp' }, `${q.progress ?? 0} / ${q.goal}`) : h('span', { class: 'gp muted' }, ROMAN[i] ?? ''), h('span', { class: 'gd' }, q.desc)),
+        ),
+      ),
+    );
   if (w?.banner) els.push(h('div', { class: 'card center' }, h('img', { src: w.banner, style: 'max-width:100%;max-height:120px' }), h('div', { class: 'small muted' }, `Banner of ${w.kingdomName}`)));
   return els;
 }
@@ -332,6 +359,7 @@ function renderEvent(ev: Extract<SceneView, { kind: 'event' }>['event']) {
   return h(
     'div',
     { class: 'card eventcard' },
+    h('div', { class: 'ribbon' }, '✦'),
     h('div', { class: 'em' }, ev.emoji),
     h('h1', null, ev.title),
     h('div', { class: 'txt' }, ev.text),
@@ -342,7 +370,7 @@ function renderEvent(ev: Extract<SceneView, { kind: 'event' }>['event']) {
           ...ev.options.map((o, i) =>
             h(
               'div',
-              { class: `card opt${ev.chosen === i ? ' chosen' : ''}` },
+              { class: `opt${ev.chosen === i ? ' chosen' : ''}` },
               ev.votes?.[i] ? h('span', { class: 'votes' }, '🗳️'.repeat(ev.votes[i]!)) : null,
               h('b', null, `${o.emoji} ${o.label}`),
               h('div', { class: 'small muted' }, [o.skill ? `${o.skill} DC ${o.dc}` : '', o.group ? 'everyone rolls' : '', o.best ? `best: ${o.best}` : '', o.cost ?? ''].filter(Boolean).join(' · ')),
@@ -366,7 +394,7 @@ function renderCombat(cb: { title: string; round: number; order: string[]; curre
   };
   const initbar = h(
     'div',
-    { class: 'initbar' },
+    { class: 'initbar panel' },
     h('b', null, cb.round ? `Round ${cb.round}` : 'Initiative!'),
     ...cb.order.map((id) => {
       const m = cb.monsters.find((x) => x.id === id);
@@ -376,7 +404,7 @@ function renderCombat(cb: { title: string; round: number; order: string[]; curre
   const unit = (m: Monster) =>
     h(
       'div',
-      { class: `card unit${m.boss ? ' boss' : ''}${m.dead || m.fled ? ' dead' : ''}${m.id === cb.current ? ' cur' : ''}`, 'data-uid': m.id },
+      { class: `card panel unit${m.side === 'enemy' ? ' foe' : ''}${m.boss ? ' boss' : ''}${m.dead || m.fled ? ' dead' : ''}${m.id === cb.current ? ' cur' : ''}`, 'data-uid': m.id },
       m.telegraph ? h('div', { class: 'tele' }, `⚠️ ${m.attacks[m.telegraph.attackIndex]?.name} → ${m.telegraph.targetId === 'all' ? 'EVERYONE' : unitName(m.telegraph.targetId)}`) : null,
       h('div', { class: 'big' }, m.emoji),
       h('div', { class: 'uname' }, m.name, m.elite ? ' ⭐' : ''),
@@ -392,8 +420,8 @@ function renderCombat(cb: { title: string; round: number; order: string[]; curre
     .map((c) =>
       h(
         'div',
-        { class: `card unit${c.dead ? ' dead' : ''}${c.id === cb.current ? ' cur' : ''}`, 'data-uid': c.id, style: `border-color:${playerColor(c.id)}` },
-        h('div', { class: 'big', style: 'font-size:2.6em' }, c.portrait ? h('img', { src: c.portrait, style: 'width:64px;height:64px;border-radius:50%;object-fit:cover' }) : C.classes[c.cls].emoji),
+        { class: `card panel unit${c.dead ? ' dead' : ''}${c.id === cb.current ? ' cur' : ''}`, 'data-uid': c.id, style: `border-color:${playerColor(c.id)}` },
+        h('div', { class: 'big', style: 'font-size:2.6em' }, c.portrait ? h('img', { src: c.portrait, style: 'width:64px;height:64px;object-fit:cover;outline:1px solid var(--edge-soft);outline-offset:2px' }) : C.classes[c.cls].emoji),
         h('div', { class: 'uname' }, c.name),
         bar('hp', c.hp, c.maxHp),
         h('div', { class: 'small' }, c.down && !c.dead ? `☠️ ${c.death.successes}✔ ${c.death.failures}✖` : `${c.hp}/${c.maxHp}`, ' ', conds(c.conditions)),
@@ -547,7 +575,7 @@ function renderModal() {
         h(
           'div',
           { class: 'card journal' },
-          h('div', { class: 'row' }, h('h2', null, `📖 The Chronicle of ${w?.kingdomName ?? 'the Realm'}`), h('span', { class: 'grow' }), h('button', { onclick: close }, '✖')),
+          h('div', { class: 'row' }, h('h2', null, `The Chronicle of ${w?.kingdomName ?? 'the Realm'}`), h('span', { class: 'grow' }), h('button', { onclick: close }, '✖')),
           w ? h('div', { class: 'small' }, `${w.antagonist.emoji} ${w.antagonist.name} ${w.antagonist.title} — ${w.antagonist.desc}`) : null,
           w?.mascot ? h('div', { class: 'small' }, `Mascot: ${w.mascot}`) : null,
           view!.party.motto ? h('div', { class: 'small' }, `Motto: “${view!.party.motto}”`) : null,

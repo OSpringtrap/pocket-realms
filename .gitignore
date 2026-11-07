@@ -4,3 +4,4 @@ saves/*.json
 .certs/
 *.log
 .DS_Store
+references/

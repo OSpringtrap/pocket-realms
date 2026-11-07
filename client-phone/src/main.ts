@@ -36,6 +36,11 @@ const LS = {
   },
 };
 
+function hudLine(icon: string, cls: string, cur: number, max: number) {
+  const pct = Math.max(0, Math.min(100, (cur / Math.max(1, max)) * 100));
+  return h('div', { class: 'stat-line' }, h('span', { class: 'ic' }, icon), h('span', { class: 'v' }, `${Math.max(0, cur)} / ${max}`), h('div', { class: `bar ${cls}` }, h('i', { style: `width:${pct}%` })));
+}
+
 export interface App {
   view?: PhoneView;
   send(msg: C2S): void;
@@ -170,16 +175,16 @@ function render(force = false) {
   hudSlot.render(hash([c.name, c.hp, c.maxHp, c.sp, c.maxSp, c.level, c.portrait, v.party.gold, player?.color, c.down, c.dead, c.inspiration, c.conditions]), () =>
     h(
       'div',
-      { class: 'hud', style: `--c:${player?.color ?? '#5a4326'}` },
+      { class: 'hud panel', style: `--c:${player?.color ?? '#5a4326'}` },
       h('div', { class: 'av' }, c.portrait ? h('img', { src: c.portrait }) : C.classes[c.cls].emoji),
       h(
         'div',
         { class: 'bars' },
-        h('div', { class: 'row' }, h('span', { class: 'nm' }, c.name), h('span', { class: 'small muted' }, `L${c.level}`), c.inspiration ? h('span', { class: 'badge' }, `✨${c.inspiration}`) : null),
-        h('div', { class: 'bar hp' }, h('i', { style: `width:${(c.hp / c.maxHp) * 100}%` })),
-        c.maxSp ? h('div', { class: 'bar sp' }, h('i', { style: `width:${(c.sp / Math.max(1, c.maxSp)) * 100}%` })) : null,
+        h('div', { class: 'row', style: 'gap:6px' }, h('span', { class: 'nm' }, c.name), c.dead ? h('span', null, '💀') : c.down ? h('span', null, '☠️') : null, c.inspiration ? h('span', { class: 'badge' }, `✨${c.inspiration}`) : null),
+        hudLine('♥', 'hp', c.hp, c.maxHp),
+        c.maxSp ? hudLine('✦', 'sp', c.sp, c.maxSp) : null,
       ),
-      h('div', { class: 'gold' }, h('div', null, c.dead ? '💀' : c.down ? '☠️' : `❤️ ${c.hp}/${c.maxHp}`), c.maxSp ? h('div', null, `🔷 ${c.sp}/${c.maxSp}`) : null, h('div', null, `💰 ${v.party.gold}`)),
+      h('div', { class: 'lv' }, h('small', null, 'LV.'), h('b', null, String(c.level).padStart(2, '0')), h('span', { class: 'gold' }, `💰 ${v.party.gold}`)),
     ),
   );
   // Tabs
@@ -187,7 +192,7 @@ function render(force = false) {
   tabsSlot.render(hash([app.tab, pending > 0, v.me.secrets.length]), () =>
     h(
       'div',
-      { class: 'tabs' },
+      { class: 'tabs panel' },
       ...(
         [
           ['now', '⚔️', 'Now'],
