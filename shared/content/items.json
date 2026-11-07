@@ -1,0 +1,2251 @@
+[
+ {
+  "id": "dagger",
+  "name": "Dagger",
+  "slot": "weapon",
+  "emoji": "🗡️",
+  "value": 5,
+  "damage": "1d4",
+  "damageType": "piercing",
+  "desc": "A weapon dealing 1d4 piercing.",
+  "finesse": true,
+  "rarity": "common"
+ },
+ {
+  "id": "dagger_pair",
+  "name": "Twin Daggers",
+  "slot": "weapon",
+  "emoji": "🗡️",
+  "value": 15,
+  "damage": "1d6",
+  "damageType": "piercing",
+  "desc": "A weapon dealing 1d6 piercing.",
+  "finesse": true,
+  "rarity": "common"
+ },
+ {
+  "id": "shortsword",
+  "name": "Shortsword",
+  "slot": "weapon",
+  "emoji": "🗡️",
+  "value": 10,
+  "damage": "1d6",
+  "damageType": "piercing",
+  "desc": "A weapon dealing 1d6 piercing.",
+  "finesse": true,
+  "rarity": "common"
+ },
+ {
+  "id": "rapier",
+  "name": "Rapier",
+  "slot": "weapon",
+  "emoji": "🤺",
+  "value": 25,
+  "damage": "1d8",
+  "damageType": "piercing",
+  "desc": "A weapon dealing 1d8 piercing.",
+  "finesse": true,
+  "rarity": "common"
+ },
+ {
+  "id": "scimitar",
+  "name": "Scimitar",
+  "slot": "weapon",
+  "emoji": "⚔️",
+  "value": 25,
+  "damage": "1d6",
+  "damageType": "slashing",
+  "desc": "A weapon dealing 1d6 slashing.",
+  "finesse": true,
+  "rarity": "common"
+ },
+ {
+  "id": "whip",
+  "name": "Whip",
+  "slot": "weapon",
+  "emoji": "➰",
+  "value": 5,
+  "damage": "1d4",
+  "damageType": "slashing",
+  "desc": "A weapon dealing 1d4 slashing.",
+  "finesse": true,
+  "rarity": "common"
+ },
+ {
+  "id": "sickle",
+  "name": "Sickle",
+  "slot": "weapon",
+  "emoji": "🌙",
+  "value": 3,
+  "damage": "1d4",
+  "damageType": "slashing",
+  "desc": "A weapon dealing 1d4 slashing.",
+  "rarity": "common"
+ },
+ {
+  "id": "club",
+  "name": "Club",
+  "slot": "weapon",
+  "emoji": "🏏",
+  "value": 1,
+  "damage": "1d4",
+  "damageType": "bludgeoning",
+  "desc": "A weapon dealing 1d4 bludgeoning.",
+  "rarity": "common"
+ },
+ {
+  "id": "quarterstaff",
+  "name": "Quarterstaff",
+  "slot": "weapon",
+  "emoji": "🦯",
+  "value": 2,
+  "damage": "1d6",
+  "damageType": "bludgeoning",
+  "desc": "A weapon dealing 1d6 bludgeoning.",
+  "rarity": "common"
+ },
+ {
+  "id": "mace",
+  "name": "Mace",
+  "slot": "weapon",
+  "emoji": "🔨",
+  "value": 5,
+  "damage": "1d6",
+  "damageType": "bludgeoning",
+  "desc": "A weapon dealing 1d6 bludgeoning.",
+  "rarity": "common"
+ },
+ {
+  "id": "handaxe",
+  "name": "Handaxe",
+  "slot": "weapon",
+  "emoji": "🪓",
+  "value": 5,
+  "damage": "1d6",
+  "damageType": "slashing",
+  "desc": "A weapon dealing 1d6 slashing.",
+  "rarity": "common"
+ },
+ {
+  "id": "spear",
+  "name": "Spear",
+  "slot": "weapon",
+  "emoji": "🔱",
+  "value": 3,
+  "damage": "1d6",
+  "damageType": "piercing",
+  "desc": "A weapon dealing 1d6 piercing.",
+  "rarity": "common"
+ },
+ {
+  "id": "trident",
+  "name": "Trident",
+  "slot": "weapon",
+  "emoji": "🔱",
+  "value": 15,
+  "damage": "1d8",
+  "damageType": "piercing",
+  "desc": "A weapon dealing 1d8 piercing.",
+  "rarity": "common"
+ },
+ {
+  "id": "longsword",
+  "name": "Longsword",
+  "slot": "weapon",
+  "emoji": "⚔️",
+  "value": 15,
+  "damage": "1d8",
+  "damageType": "slashing",
+  "desc": "A weapon dealing 1d8 slashing.",
+  "rarity": "common"
+ },
+ {
+  "id": "battleaxe",
+  "name": "Battleaxe",
+  "slot": "weapon",
+  "emoji": "🪓",
+  "value": 10,
+  "damage": "1d8",
+  "damageType": "slashing",
+  "desc": "A weapon dealing 1d8 slashing.",
+  "rarity": "common"
+ },
+ {
+  "id": "warhammer",
+  "name": "Warhammer",
+  "slot": "weapon",
+  "emoji": "🔨",
+  "value": 15,
+  "damage": "1d8",
+  "damageType": "bludgeoning",
+  "desc": "A weapon dealing 1d8 bludgeoning.",
+  "rarity": "common"
+ },
+ {
+  "id": "morningstar",
+  "name": "Morningstar",
+  "slot": "weapon",
+  "emoji": "⭐",
+  "value": 15,
+  "damage": "1d8",
+  "damageType": "piercing",
+  "desc": "A weapon dealing 1d8 piercing.",
+  "rarity": "common"
+ },
+ {
+  "id": "flail",
+  "name": "Flail",
+  "slot": "weapon",
+  "emoji": "⛓️",
+  "value": 10,
+  "damage": "1d8",
+  "damageType": "bludgeoning",
+  "desc": "A weapon dealing 1d8 bludgeoning.",
+  "rarity": "common"
+ },
+ {
+  "id": "war_pick",
+  "name": "War Pick",
+  "slot": "weapon",
+  "emoji": "⛏️",
+  "value": 5,
+  "damage": "1d8",
+  "damageType": "piercing",
+  "desc": "A weapon dealing 1d8 piercing.",
+  "rarity": "common"
+ },
+ {
+  "id": "greatsword",
+  "name": "Greatsword",
+  "slot": "weapon",
+  "emoji": "🗡️",
+  "value": 50,
+  "damage": "2d6",
+  "damageType": "slashing",
+  "desc": "A two-handed weapon dealing 2d6 slashing.",
+  "twoHanded": true,
+  "rarity": "common"
+ },
+ {
+  "id": "greataxe",
+  "name": "Greataxe",
+  "slot": "weapon",
+  "emoji": "🪓",
+  "value": 30,
+  "damage": "1d12",
+  "damageType": "slashing",
+  "desc": "A two-handed weapon dealing 1d12 slashing.",
+  "twoHanded": true,
+  "rarity": "common"
+ },
+ {
+  "id": "maul",
+  "name": "Maul",
+  "slot": "weapon",
+  "emoji": "🔨",
+  "value": 10,
+  "damage": "2d6",
+  "damageType": "bludgeoning",
+  "desc": "A two-handed weapon dealing 2d6 bludgeoning.",
+  "twoHanded": true,
+  "rarity": "common"
+ },
+ {
+  "id": "halberd",
+  "name": "Halberd",
+  "slot": "weapon",
+  "emoji": "🪓",
+  "value": 20,
+  "damage": "1d10",
+  "damageType": "slashing",
+  "desc": "A two-handed weapon dealing 1d10 slashing.",
+  "twoHanded": true,
+  "rarity": "common"
+ },
+ {
+  "id": "glaive",
+  "name": "Glaive",
+  "slot": "weapon",
+  "emoji": "🔪",
+  "value": 20,
+  "damage": "1d10",
+  "damageType": "slashing",
+  "desc": "A two-handed weapon dealing 1d10 slashing.",
+  "twoHanded": true,
+  "rarity": "common"
+ },
+ {
+  "id": "scythe",
+  "name": "War Scythe",
+  "slot": "weapon",
+  "emoji": "🌾",
+  "value": 20,
+  "damage": "1d10",
+  "damageType": "slashing",
+  "desc": "A two-handed weapon dealing 1d10 slashing.",
+  "twoHanded": true,
+  "rarity": "common"
+ },
+ {
+  "id": "lance",
+  "name": "Lance",
+  "slot": "weapon",
+  "emoji": "🏇",
+  "value": 10,
+  "damage": "1d12",
+  "damageType": "piercing",
+  "desc": "A two-handed weapon dealing 1d12 piercing.",
+  "twoHanded": true,
+  "rarity": "common"
+ },
+ {
+  "id": "shortbow",
+  "name": "Shortbow",
+  "slot": "weapon",
+  "emoji": "🏹",
+  "value": 25,
+  "damage": "1d6",
+  "damageType": "piercing",
+  "desc": "A ranged weapon dealing 1d6 piercing.",
+  "ranged": true,
+  "rarity": "common"
+ },
+ {
+  "id": "longbow",
+  "name": "Longbow",
+  "slot": "weapon",
+  "emoji": "🏹",
+  "value": 50,
+  "damage": "1d8",
+  "damageType": "piercing",
+  "desc": "A two-handed ranged weapon dealing 1d8 piercing.",
+  "ranged": true,
+  "twoHanded": true,
+  "rarity": "common"
+ },
+ {
+  "id": "light_crossbow",
+  "name": "Light Crossbow",
+  "slot": "weapon",
+  "emoji": "🎯",
+  "value": 25,
+  "damage": "1d8",
+  "damageType": "piercing",
+  "desc": "A ranged weapon dealing 1d8 piercing.",
+  "ranged": true,
+  "rarity": "common"
+ },
+ {
+  "id": "heavy_crossbow",
+  "name": "Heavy Crossbow",
+  "slot": "weapon",
+  "emoji": "🎯",
+  "value": 50,
+  "damage": "1d10",
+  "damageType": "piercing",
+  "desc": "A two-handed ranged weapon dealing 1d10 piercing.",
+  "ranged": true,
+  "twoHanded": true,
+  "rarity": "common"
+ },
+ {
+  "id": "hand_crossbow",
+  "name": "Hand Crossbow",
+  "slot": "weapon",
+  "emoji": "🎯",
+  "value": 75,
+  "damage": "1d6",
+  "damageType": "piercing",
+  "desc": "A ranged weapon dealing 1d6 piercing.",
+  "finesse": true,
+  "ranged": true,
+  "rarity": "common"
+ },
+ {
+  "id": "sling",
+  "name": "Sling",
+  "slot": "weapon",
+  "emoji": "🪨",
+  "value": 1,
+  "damage": "1d4",
+  "damageType": "bludgeoning",
+  "desc": "A ranged weapon dealing 1d4 bludgeoning.",
+  "ranged": true,
+  "rarity": "common"
+ },
+ {
+  "id": "wand_oak",
+  "name": "Oak Wand",
+  "slot": "weapon",
+  "emoji": "🪄",
+  "value": 30,
+  "damage": "1d6",
+  "damageType": "force",
+  "desc": "A wand that fires bolts of force. Uses DEX or INT.",
+  "finesse": true,
+  "ranged": true,
+  "rarity": "common"
+ },
+ {
+  "id": "staff_crystal",
+  "name": "Crystal Staff",
+  "slot": "weapon",
+  "emoji": "🔮",
+  "value": 120,
+  "damage": "1d8",
+  "damageType": "force",
+  "desc": "A staff topped with a humming crystal. +1 Spell Point.",
+  "ranged": true,
+  "rarity": "uncommon",
+  "spBonus": 1
+ },
+ {
+  "slot": "weapon",
+  "id": "sunblade",
+  "name": "Sunblade",
+  "emoji": "☀️",
+  "rarity": "epic",
+  "value": 1500,
+  "damage": "1d10",
+  "damageType": "radiant",
+  "finesse": true,
+  "attackBonus": 2,
+  "damageBonus": 2,
+  "extraDamage": {
+   "dice": "1d8",
+   "dmg": "radiant"
+  },
+  "desc": "A hilt that sprouts a blade of pure sunlight. Undead hate it."
+ },
+ {
+  "slot": "weapon",
+  "id": "frostbrand",
+  "name": "Frostbrand",
+  "emoji": "❄️",
+  "rarity": "epic",
+  "value": 1400,
+  "damage": "1d8",
+  "damageType": "slashing",
+  "attackBonus": 1,
+  "damageBonus": 1,
+  "extraDamage": {
+   "dice": "1d6",
+   "dmg": "cold"
+  },
+  "resist": [
+   "fire"
+  ],
+  "desc": "Always cold to the touch. Grants fire resistance."
+ },
+ {
+  "slot": "weapon",
+  "id": "dragonbane",
+  "name": "Dragonbane Greatsword",
+  "emoji": "🐉",
+  "rarity": "rare",
+  "value": 700,
+  "damage": "2d6",
+  "damageType": "slashing",
+  "twoHanded": true,
+  "attackBonus": 1,
+  "extraDamage": {
+   "dice": "2d6",
+   "dmg": "slashing"
+  },
+  "desc": "Forged to fell wyrms."
+ },
+ {
+  "slot": "weapon",
+  "id": "whisperknife",
+  "name": "Whisperknife",
+  "emoji": "🔪",
+  "rarity": "rare",
+  "value": 500,
+  "damage": "1d4",
+  "damageType": "piercing",
+  "finesse": true,
+  "critRange": 18,
+  "skillBonus": {
+   "stealth": 2
+  },
+  "desc": "Crits on 18-20. Makes no sound at all."
+ },
+ {
+  "slot": "weapon",
+  "id": "thunderstring",
+  "name": "Thunderstring Longbow",
+  "emoji": "🏹",
+  "rarity": "rare",
+  "value": 600,
+  "damage": "1d8",
+  "damageType": "piercing",
+  "ranged": true,
+  "twoHanded": true,
+  "attackBonus": 1,
+  "extraDamage": {
+   "dice": "1d6",
+   "dmg": "thunder"
+  },
+  "desc": "Every shot cracks like a storm."
+ },
+ {
+  "slot": "weapon",
+  "id": "giants_maul",
+  "name": "Giant's Knuckle",
+  "emoji": "🔨",
+  "rarity": "rare",
+  "value": 650,
+  "damage": "2d8",
+  "damageType": "bludgeoning",
+  "twoHanded": true,
+  "abilityBonus": {
+   "STR": 1
+  },
+  "desc": "A maul too big for any reasonable person."
+ },
+ {
+  "slot": "weapon",
+  "id": "staff_of_embers",
+  "name": "Staff of Embers",
+  "emoji": "🔥",
+  "rarity": "rare",
+  "value": 550,
+  "damage": "1d6",
+  "damageType": "fire",
+  "ranged": true,
+  "spBonus": 2,
+  "desc": "A smoldering staff. +2 Spell Points."
+ },
+ {
+  "slot": "weapon",
+  "id": "holy_avenger",
+  "name": "Oathkeeper",
+  "emoji": "⚜️",
+  "rarity": "legendary",
+  "value": 4000,
+  "damage": "1d8",
+  "damageType": "slashing",
+  "attackBonus": 3,
+  "damageBonus": 3,
+  "extraDamage": {
+   "dice": "2d10",
+   "dmg": "radiant"
+  },
+  "desc": "The sword of a paladin who never broke a promise."
+ },
+ {
+  "slot": "weapon",
+  "id": "vorpal_edge",
+  "name": "The Last Word",
+  "emoji": "🗡️",
+  "rarity": "legendary",
+  "value": 4500,
+  "damage": "2d6",
+  "damageType": "slashing",
+  "twoHanded": true,
+  "attackBonus": 3,
+  "damageBonus": 3,
+  "critRange": 18,
+  "desc": "Ends arguments. Permanently."
+ },
+ {
+  "slot": "weapon",
+  "id": "moonbow",
+  "name": "Moonbow",
+  "emoji": "🌙",
+  "rarity": "epic",
+  "value": 1600,
+  "damage": "1d10",
+  "damageType": "piercing",
+  "ranged": true,
+  "attackBonus": 2,
+  "extraDamage": {
+   "dice": "1d8",
+   "dmg": "radiant"
+  },
+  "desc": "Its arrows glow silver in the dark."
+ },
+ {
+  "slot": "weapon",
+  "id": "venom_fang",
+  "name": "Venom Fang",
+  "emoji": "🐍",
+  "rarity": "uncommon",
+  "value": 180,
+  "damage": "1d6",
+  "damageType": "piercing",
+  "finesse": true,
+  "extraDamage": {
+   "dice": "1d4",
+   "dmg": "poison"
+  },
+  "desc": "A blade carved from a serpent's fang."
+ },
+ {
+  "slot": "weapon",
+  "id": "ember_axe",
+  "name": "Ember Axe",
+  "emoji": "🪓",
+  "rarity": "uncommon",
+  "value": 200,
+  "damage": "1d8",
+  "damageType": "slashing",
+  "extraDamage": {
+   "dice": "1d4",
+   "dmg": "fire"
+  },
+  "desc": "Its edge glows like coals."
+ },
+ {
+  "slot": "weapon",
+  "id": "lich_wand",
+  "name": "Wand of Withering",
+  "emoji": "🪄",
+  "rarity": "rare",
+  "value": 500,
+  "damage": "2d6",
+  "damageType": "necrotic",
+  "ranged": true,
+  "finesse": true,
+  "spBonus": 1,
+  "desc": "Taken from a dead necromancer. Still warm."
+ },
+ {
+  "id": "robes",
+  "name": "Traveler's Robes",
+  "slot": "armor",
+  "emoji": "🥻",
+  "value": 5,
+  "rarity": "common",
+  "acBase": 10,
+  "desc": "AC 10 + DEX.",
+  "spBonus": 1
+ },
+ {
+  "id": "padded_armor",
+  "name": "Padded Armor",
+  "slot": "armor",
+  "emoji": "🧥",
+  "value": 5,
+  "rarity": "common",
+  "acBase": 11,
+  "desc": "AC 11 + DEX."
+ },
+ {
+  "id": "leather_armor",
+  "name": "Leather Armor",
+  "slot": "armor",
+  "emoji": "🦺",
+  "value": 10,
+  "rarity": "common",
+  "acBase": 11,
+  "desc": "AC 11 + DEX."
+ },
+ {
+  "id": "studded_leather",
+  "name": "Studded Leather",
+  "slot": "armor",
+  "emoji": "🦺",
+  "value": 45,
+  "rarity": "common",
+  "acBase": 12,
+  "desc": "AC 12 + DEX."
+ },
+ {
+  "id": "hide_armor",
+  "name": "Hide Armor",
+  "slot": "armor",
+  "emoji": "🐻",
+  "value": 10,
+  "rarity": "common",
+  "acBase": 12,
+  "desc": "AC 12 + DEX (max 2).",
+  "dexCap": 2
+ },
+ {
+  "id": "chain_shirt",
+  "name": "Chain Shirt",
+  "slot": "armor",
+  "emoji": "⛓️",
+  "value": 50,
+  "rarity": "common",
+  "acBase": 13,
+  "desc": "AC 13 + DEX (max 2).",
+  "dexCap": 2
+ },
+ {
+  "id": "scale_mail",
+  "name": "Scale Mail",
+  "slot": "armor",
+  "emoji": "🐟",
+  "value": 50,
+  "rarity": "common",
+  "acBase": 14,
+  "desc": "AC 14 + DEX (max 2).",
+  "dexCap": 2
+ },
+ {
+  "id": "breastplate",
+  "name": "Breastplate",
+  "slot": "armor",
+  "emoji": "🛡️",
+  "value": 400,
+  "rarity": "uncommon",
+  "acBase": 14,
+  "desc": "AC 14 + DEX (max 2).",
+  "dexCap": 2
+ },
+ {
+  "id": "half_plate",
+  "name": "Half Plate",
+  "slot": "armor",
+  "emoji": "🛡️",
+  "value": 750,
+  "rarity": "uncommon",
+  "acBase": 15,
+  "desc": "AC 15 + DEX (max 2).",
+  "dexCap": 2
+ },
+ {
+  "id": "ring_mail",
+  "name": "Ring Mail",
+  "slot": "armor",
+  "emoji": "⭕",
+  "value": 30,
+  "rarity": "common",
+  "acBase": 14,
+  "desc": "AC 14.",
+  "dexCap": 0
+ },
+ {
+  "id": "chain_mail",
+  "name": "Chain Mail",
+  "slot": "armor",
+  "emoji": "⛓️",
+  "value": 75,
+  "rarity": "common",
+  "acBase": 16,
+  "desc": "AC 16.",
+  "dexCap": 0
+ },
+ {
+  "id": "splint_mail",
+  "name": "Splint Armor",
+  "slot": "armor",
+  "emoji": "🪵",
+  "value": 200,
+  "rarity": "uncommon",
+  "acBase": 17,
+  "desc": "AC 17.",
+  "dexCap": 0
+ },
+ {
+  "id": "plate_armor",
+  "name": "Plate Armor",
+  "slot": "armor",
+  "emoji": "🏰",
+  "value": 1500,
+  "rarity": "rare",
+  "acBase": 18,
+  "desc": "AC 18.",
+  "dexCap": 0
+ },
+ {
+  "id": "elven_chain",
+  "name": "Elven Chain",
+  "slot": "armor",
+  "emoji": "✨",
+  "value": 900,
+  "rarity": "rare",
+  "acBase": 14,
+  "desc": "AC 14 + DEX (max 4).",
+  "dexCap": 4,
+  "skillBonus": {
+   "stealth": 1
+  }
+ },
+ {
+  "id": "mithral_shirt",
+  "name": "Mithral Shirt",
+  "slot": "armor",
+  "emoji": "🪙",
+  "value": 1200,
+  "rarity": "rare",
+  "acBase": 15,
+  "desc": "AC 15 + DEX (max 3).",
+  "dexCap": 3
+ },
+ {
+  "id": "dragonscale",
+  "name": "Dragonscale Mail",
+  "slot": "armor",
+  "emoji": "🐲",
+  "value": 2500,
+  "rarity": "epic",
+  "acBase": 16,
+  "desc": "AC 16 + DEX (max 2).",
+  "dexCap": 2,
+  "resist": [
+   "fire"
+  ],
+  "acBonus": 1
+ },
+ {
+  "id": "archmage_robes",
+  "name": "Robes of the Archmage",
+  "slot": "armor",
+  "emoji": "🧙",
+  "value": 2400,
+  "rarity": "epic",
+  "acBase": 12,
+  "desc": "AC 12 + DEX.",
+  "spBonus": 4,
+  "abilityBonus": {
+   "INT": 1
+  }
+ },
+ {
+  "id": "shadow_leathers",
+  "name": "Shadowweave Leathers",
+  "slot": "armor",
+  "emoji": "🌑",
+  "value": 800,
+  "rarity": "rare",
+  "acBase": 12,
+  "desc": "AC 12 + DEX.",
+  "skillBonus": {
+   "stealth": 3
+  },
+  "initBonus": 2
+ },
+ {
+  "id": "troll_hide",
+  "name": "Troll-Hide Coat",
+  "slot": "armor",
+  "emoji": "🧌",
+  "value": 700,
+  "rarity": "rare",
+  "acBase": 13,
+  "desc": "AC 13 + DEX (max 3).",
+  "dexCap": 3,
+  "maxHpBonus": 8
+ },
+ {
+  "id": "celestial_plate",
+  "name": "Celestial Plate",
+  "slot": "armor",
+  "emoji": "🌟",
+  "value": 5000,
+  "rarity": "legendary",
+  "acBase": 19,
+  "desc": "AC 19.",
+  "dexCap": 0,
+  "resist": [
+   "necrotic",
+   "radiant"
+  ],
+  "maxHpBonus": 10
+ },
+ {
+  "id": "wooden_shield",
+  "name": "Wooden Shield",
+  "slot": "trinket",
+  "emoji": "🛡️",
+  "rarity": "common",
+  "value": 10,
+  "desc": "+2 AC.",
+  "acBonus": 2
+ },
+ {
+  "id": "steel_shield",
+  "name": "Steel Shield",
+  "slot": "trinket",
+  "emoji": "🛡️",
+  "rarity": "uncommon",
+  "value": 80,
+  "desc": "+2 AC, +2 max HP.",
+  "acBonus": 2,
+  "maxHpBonus": 2
+ },
+ {
+  "id": "tower_shield",
+  "name": "Tower Shield",
+  "slot": "trinket",
+  "emoji": "🧱",
+  "rarity": "rare",
+  "value": 300,
+  "desc": "+3 AC. Heavy, but who's counting.",
+  "acBonus": 3
+ },
+ {
+  "id": "spiked_shield",
+  "name": "Spiked Shield",
+  "slot": "trinket",
+  "emoji": "🦔",
+  "rarity": "uncommon",
+  "value": 120,
+  "desc": "+2 AC, +1 damage.",
+  "acBonus": 2,
+  "damageBonus": 1
+ },
+ {
+  "id": "lute_charm",
+  "name": "Lucky Lute Pick",
+  "slot": "trinket",
+  "emoji": "🎸",
+  "rarity": "common",
+  "value": 15,
+  "desc": "+1 Performance.",
+  "skillBonus": {
+   "performance": 1
+  }
+ },
+ {
+  "id": "holy_symbol",
+  "name": "Holy Symbol",
+  "slot": "trinket",
+  "emoji": "📿",
+  "rarity": "common",
+  "value": 25,
+  "desc": "+1 Spell Point.",
+  "spBonus": 1
+ },
+ {
+  "id": "arcane_orb",
+  "name": "Arcane Orb",
+  "slot": "trinket",
+  "emoji": "🔮",
+  "rarity": "uncommon",
+  "value": 150,
+  "desc": "+2 Spell Points.",
+  "spBonus": 2
+ },
+ {
+  "id": "ring_protection",
+  "name": "Ring of Protection",
+  "slot": "trinket",
+  "emoji": "💍",
+  "rarity": "rare",
+  "value": 450,
+  "desc": "+1 AC.",
+  "acBonus": 1
+ },
+ {
+  "id": "ring_vigor",
+  "name": "Ring of Vigor",
+  "slot": "trinket",
+  "emoji": "💍",
+  "rarity": "uncommon",
+  "value": 160,
+  "desc": "+5 max HP.",
+  "maxHpBonus": 5
+ },
+ {
+  "id": "ring_warmth",
+  "name": "Ring of Warmth",
+  "slot": "trinket",
+  "emoji": "🔥",
+  "rarity": "uncommon",
+  "value": 140,
+  "desc": "Resistance to cold.",
+  "resist": [
+   "cold"
+  ]
+ },
+ {
+  "id": "ring_fire_res",
+  "name": "Ring of Fire Resistance",
+  "slot": "trinket",
+  "emoji": "💍",
+  "rarity": "uncommon",
+  "value": 180,
+  "desc": "Resistance to fire.",
+  "resist": [
+   "fire"
+  ]
+ },
+ {
+  "id": "ring_mind",
+  "name": "Ring of Mind Shielding",
+  "slot": "trinket",
+  "emoji": "🧠",
+  "rarity": "uncommon",
+  "value": 160,
+  "desc": "Resistance to psychic.",
+  "resist": [
+   "psychic"
+  ]
+ },
+ {
+  "id": "amulet_health",
+  "name": "Amulet of Health",
+  "slot": "trinket",
+  "emoji": "📿",
+  "rarity": "rare",
+  "value": 600,
+  "desc": "+2 CON.",
+  "abilityBonus": {
+   "CON": 2
+  }
+ },
+ {
+  "id": "amulet_undeath",
+  "name": "Amulet of the Grave",
+  "slot": "trinket",
+  "emoji": "⚰️",
+  "rarity": "uncommon",
+  "value": 200,
+  "desc": "Resistance to necrotic.",
+  "resist": [
+   "necrotic"
+  ]
+ },
+ {
+  "id": "cloak_elvenkind",
+  "name": "Cloak of Elvenkind",
+  "slot": "trinket",
+  "emoji": "🧝",
+  "rarity": "uncommon",
+  "value": 250,
+  "desc": "+3 Stealth.",
+  "skillBonus": {
+   "stealth": 3
+  }
+ },
+ {
+  "id": "cloak_protection",
+  "name": "Cloak of Protection",
+  "slot": "trinket",
+  "emoji": "🧣",
+  "rarity": "uncommon",
+  "value": 300,
+  "desc": "+1 AC.",
+  "acBonus": 1
+ },
+ {
+  "id": "cloak_displacement",
+  "name": "Shimmering Cloak",
+  "slot": "trinket",
+  "emoji": "🌫️",
+  "rarity": "rare",
+  "value": 700,
+  "desc": "+2 AC. You're never quite where you seem.",
+  "acBonus": 2
+ },
+ {
+  "id": "boots_speed",
+  "name": "Boots of Speed",
+  "slot": "trinket",
+  "emoji": "👢",
+  "rarity": "rare",
+  "value": 500,
+  "desc": "+5 initiative.",
+  "initBonus": 5
+ },
+ {
+  "id": "boots_elvenkind",
+  "name": "Silent Boots",
+  "slot": "trinket",
+  "emoji": "🥾",
+  "rarity": "uncommon",
+  "value": 150,
+  "desc": "+2 Stealth, +1 initiative.",
+  "skillBonus": {
+   "stealth": 2
+  },
+  "initBonus": 1
+ },
+ {
+  "id": "gauntlets_ogre",
+  "name": "Gauntlets of Ogre Power",
+  "slot": "trinket",
+  "emoji": "🧤",
+  "rarity": "rare",
+  "value": 600,
+  "desc": "+2 STR.",
+  "abilityBonus": {
+   "STR": 2
+  }
+ },
+ {
+  "id": "headband_intellect",
+  "name": "Headband of Intellect",
+  "slot": "trinket",
+  "emoji": "🎗️",
+  "rarity": "rare",
+  "value": 600,
+  "desc": "+2 INT.",
+  "abilityBonus": {
+   "INT": 2
+  }
+ },
+ {
+  "id": "circlet_wisdom",
+  "name": "Circlet of Insight",
+  "slot": "trinket",
+  "emoji": "👑",
+  "rarity": "rare",
+  "value": 600,
+  "desc": "+2 WIS.",
+  "abilityBonus": {
+   "WIS": 2
+  }
+ },
+ {
+  "id": "gloves_thief",
+  "name": "Thieves' Gloves",
+  "slot": "trinket",
+  "emoji": "🧤",
+  "rarity": "uncommon",
+  "value": 160,
+  "desc": "+1 DEX, +1 Stealth.",
+  "abilityBonus": {
+   "DEX": 1
+  },
+  "skillBonus": {
+   "stealth": 1
+  }
+ },
+ {
+  "id": "pendant_charisma",
+  "name": "Silver Tongue Pendant",
+  "slot": "trinket",
+  "emoji": "🗝️",
+  "rarity": "uncommon",
+  "value": 200,
+  "desc": "+2 Persuasion & Deception.",
+  "skillBonus": {
+   "persuasion": 2,
+   "deception": 2
+  }
+ },
+ {
+  "id": "bracers_archery",
+  "name": "Bracers of Archery",
+  "slot": "trinket",
+  "emoji": "🏹",
+  "rarity": "uncommon",
+  "value": 250,
+  "desc": "+1 to attack rolls.",
+  "attackBonus": 1
+ },
+ {
+  "id": "bracers_defense",
+  "name": "Bracers of Defense",
+  "slot": "trinket",
+  "emoji": "🛡️",
+  "rarity": "rare",
+  "value": 500,
+  "desc": "+2 AC.",
+  "acBonus": 2
+ },
+ {
+  "id": "lucky_rabbit",
+  "name": "Lucky Rabbit's Foot",
+  "slot": "trinket",
+  "emoji": "🐇",
+  "rarity": "uncommon",
+  "value": 180,
+  "desc": "Crit on 19-20.",
+  "critRange": 19
+ },
+ {
+  "id": "four_leaf",
+  "name": "Four-Leaf Clover",
+  "slot": "trinket",
+  "emoji": "🍀",
+  "rarity": "rare",
+  "value": 500,
+  "desc": "Crit on 19-20, +1 initiative.",
+  "critRange": 19,
+  "initBonus": 1
+ },
+ {
+  "id": "eye_of_hawk",
+  "name": "Hawk's Eye Monocle",
+  "slot": "trinket",
+  "emoji": "🧐",
+  "rarity": "uncommon",
+  "value": 150,
+  "desc": "+3 Perception.",
+  "skillBonus": {
+   "perception": 3
+  }
+ },
+ {
+  "id": "tome_lore",
+  "name": "Pocket Tome of Lore",
+  "slot": "trinket",
+  "emoji": "📘",
+  "rarity": "uncommon",
+  "value": 150,
+  "desc": "+2 Arcana, Religion, Nature.",
+  "skillBonus": {
+   "arcana": 2,
+   "religion": 2,
+   "nature": 2
+  }
+ },
+ {
+  "id": "war_horn",
+  "name": "War Horn",
+  "slot": "trinket",
+  "emoji": "📯",
+  "rarity": "uncommon",
+  "value": 120,
+  "desc": "+3 Intimidation.",
+  "skillBonus": {
+   "intimidation": 3
+  }
+ },
+ {
+  "id": "pearl_power",
+  "name": "Pearl of Power",
+  "slot": "trinket",
+  "emoji": "🦪",
+  "rarity": "rare",
+  "value": 700,
+  "desc": "+4 Spell Points.",
+  "spBonus": 4
+ },
+ {
+  "id": "periapt_wound",
+  "name": "Periapt of Wound Closure",
+  "slot": "trinket",
+  "emoji": "❤️‍🩹",
+  "rarity": "rare",
+  "value": 650,
+  "desc": "+12 max HP.",
+  "maxHpBonus": 12
+ },
+ {
+  "id": "dragon_tooth",
+  "name": "Dragon Tooth Necklace",
+  "slot": "trinket",
+  "emoji": "🦷",
+  "rarity": "rare",
+  "value": 550,
+  "desc": "+2 damage, fire resistance.",
+  "damageBonus": 2,
+  "resist": [
+   "fire"
+  ]
+ },
+ {
+  "id": "storm_ring",
+  "name": "Ring of Storms",
+  "slot": "trinket",
+  "emoji": "⛈️",
+  "rarity": "epic",
+  "value": 1500,
+  "desc": "Lightning and thunder resistance, +2 SP, +1 damage.",
+  "resist": [
+   "lightning",
+   "thunder"
+  ],
+  "spBonus": 2,
+  "damageBonus": 1
+ },
+ {
+  "id": "crown_kings",
+  "name": "Crown of Old Kings",
+  "slot": "trinket",
+  "emoji": "👑",
+  "rarity": "epic",
+  "value": 2000,
+  "desc": "+2 CHA, +3 Persuasion, +1 AC.",
+  "abilityBonus": {
+   "CHA": 2
+  },
+  "skillBonus": {
+   "persuasion": 3
+  },
+  "acBonus": 1
+ },
+ {
+  "id": "heart_mountain",
+  "name": "Heart of the Mountain",
+  "slot": "trinket",
+  "emoji": "💎",
+  "rarity": "legendary",
+  "value": 5000,
+  "desc": "+2 STR & CON, +20 max HP.",
+  "abilityBonus": {
+   "CON": 2,
+   "STR": 2
+  },
+  "maxHpBonus": 20
+ },
+ {
+  "id": "star_compass",
+  "name": "Star Compass",
+  "slot": "trinket",
+  "emoji": "🧭",
+  "rarity": "uncommon",
+  "value": 120,
+  "desc": "+2 Nature, +1 Perception. Always points to adventure.",
+  "skillBonus": {
+   "nature": 2,
+   "perception": 1
+  }
+ },
+ {
+  "id": "fang_charm",
+  "name": "Wolf Fang Charm",
+  "slot": "trinket",
+  "emoji": "🐺",
+  "rarity": "common",
+  "value": 30,
+  "desc": "+1 initiative.",
+  "initBonus": 1
+ },
+ {
+  "id": "bone_dice",
+  "name": "Bone Dice",
+  "slot": "trinket",
+  "emoji": "🎲",
+  "rarity": "common",
+  "value": 20,
+  "desc": "+1 Deception. Lucky? Loaded?",
+  "skillBonus": {
+   "deception": 1
+  }
+ },
+ {
+  "id": "prayer_beads",
+  "name": "Prayer Beads",
+  "slot": "trinket",
+  "emoji": "📿",
+  "rarity": "uncommon",
+  "value": 140,
+  "desc": "+2 Religion, +1 SP.",
+  "skillBonus": {
+   "religion": 2
+  },
+  "spBonus": 1
+ },
+ {
+  "id": "ward_stone",
+  "name": "Ward Stone",
+  "slot": "trinket",
+  "emoji": "🪨",
+  "rarity": "common",
+  "value": 40,
+  "desc": "Resistance to force damage.",
+  "resist": [
+   "force"
+  ]
+ },
+ {
+  "id": "ironwood_charm",
+  "name": "Ironwood Charm",
+  "slot": "trinket",
+  "emoji": "🌳",
+  "rarity": "common",
+  "value": 35,
+  "desc": "+2 max HP.",
+  "maxHpBonus": 2
+ },
+ {
+  "id": "potion_healing",
+  "name": "Potion of Healing",
+  "slot": "consumable",
+  "emoji": "🧪",
+  "rarity": "common",
+  "value": 25,
+  "use": {
+   "heal": "2d4+2",
+   "target": "ally"
+  },
+  "desc": "Heals 2d4+2."
+ },
+ {
+  "id": "potion_greater",
+  "name": "Greater Healing Potion",
+  "slot": "consumable",
+  "emoji": "🧪",
+  "rarity": "uncommon",
+  "value": 75,
+  "use": {
+   "heal": "4d4+4",
+   "target": "ally"
+  },
+  "desc": "Heals 4d4+4."
+ },
+ {
+  "id": "potion_superior",
+  "name": "Superior Healing Potion",
+  "slot": "consumable",
+  "emoji": "🧪",
+  "rarity": "rare",
+  "value": 250,
+  "use": {
+   "heal": "8d4+8",
+   "target": "ally"
+  },
+  "desc": "Heals 8d4+8."
+ },
+ {
+  "id": "potion_supreme",
+  "name": "Supreme Healing Potion",
+  "slot": "consumable",
+  "emoji": "🧪",
+  "rarity": "epic",
+  "value": 800,
+  "use": {
+   "heal": "10d4+20",
+   "target": "ally"
+  },
+  "desc": "Heals 10d4+20."
+ },
+ {
+  "id": "ether_vial",
+  "name": "Vial of Ether",
+  "slot": "consumable",
+  "emoji": "🫙",
+  "rarity": "common",
+  "value": 30,
+  "use": {
+   "sp": 2,
+   "target": "self"
+  },
+  "desc": "Restores 2 Spell Points."
+ },
+ {
+  "id": "ether_greater",
+  "name": "Greater Ether",
+  "slot": "consumable",
+  "emoji": "🫙",
+  "rarity": "uncommon",
+  "value": 90,
+  "use": {
+   "sp": 4,
+   "target": "self"
+  },
+  "desc": "Restores 4 Spell Points."
+ },
+ {
+  "id": "elixir_mind",
+  "name": "Elixir of the Mind",
+  "slot": "consumable",
+  "emoji": "🍶",
+  "rarity": "rare",
+  "value": 250,
+  "use": {
+   "sp": 8,
+   "target": "self"
+  },
+  "desc": "Restores 8 Spell Points."
+ },
+ {
+  "id": "antidote",
+  "name": "Antidote",
+  "slot": "consumable",
+  "emoji": "💊",
+  "rarity": "common",
+  "value": 15,
+  "use": {
+   "cleanse": true,
+   "target": "ally"
+  },
+  "desc": "Removes all conditions."
+ },
+ {
+  "id": "smoke_pellet",
+  "name": "Smoke Pellet",
+  "slot": "consumable",
+  "emoji": "💨",
+  "rarity": "common",
+  "value": 20,
+  "use": {
+   "condition": "blinded",
+   "target": "allEnemies"
+  },
+  "desc": "Blinds all foes for a turn."
+ },
+ {
+  "id": "alchemist_fire",
+  "name": "Alchemist's Fire",
+  "slot": "consumable",
+  "emoji": "🔥",
+  "rarity": "common",
+  "value": 50,
+  "use": {
+   "damage": "2d6",
+   "damageType": "fire",
+   "condition": "burning",
+   "target": "enemy"
+  },
+  "desc": "2d6 fire and sets the target burning."
+ },
+ {
+  "id": "acid_flask",
+  "name": "Acid Flask",
+  "slot": "consumable",
+  "emoji": "🧪",
+  "rarity": "common",
+  "value": 25,
+  "use": {
+   "damage": "2d6",
+   "damageType": "acid",
+   "target": "enemy"
+  },
+  "desc": "2d6 acid."
+ },
+ {
+  "id": "holy_water",
+  "name": "Holy Water",
+  "slot": "consumable",
+  "emoji": "💧",
+  "rarity": "common",
+  "value": 25,
+  "use": {
+   "damage": "2d8",
+   "damageType": "radiant",
+   "target": "enemy"
+  },
+  "desc": "2d8 radiant. Undead hate it."
+ },
+ {
+  "id": "thunderstone",
+  "name": "Thunderstone",
+  "slot": "consumable",
+  "emoji": "🪨",
+  "rarity": "uncommon",
+  "value": 60,
+  "use": {
+   "damage": "2d6",
+   "damageType": "thunder",
+   "condition": "prone",
+   "target": "allEnemies"
+  },
+  "desc": "2d6 thunder to all foes and knocks them prone."
+ },
+ {
+  "id": "frost_bomb",
+  "name": "Frost Bomb",
+  "slot": "consumable",
+  "emoji": "🧊",
+  "rarity": "uncommon",
+  "value": 60,
+  "use": {
+   "damage": "3d6",
+   "damageType": "cold",
+   "condition": "slowed",
+   "target": "enemy"
+  },
+  "desc": "3d6 cold and slows."
+ },
+ {
+  "id": "poison_vial",
+  "name": "Basic Poison",
+  "slot": "consumable",
+  "emoji": "☠️",
+  "rarity": "common",
+  "value": 30,
+  "use": {
+   "damage": "1d6",
+   "damageType": "poison",
+   "condition": "poisoned",
+   "target": "enemy"
+  },
+  "desc": "Poisons a foe."
+ },
+ {
+  "id": "sleep_dust",
+  "name": "Sleeping Dust",
+  "slot": "consumable",
+  "emoji": "😴",
+  "rarity": "uncommon",
+  "value": 80,
+  "use": {
+   "condition": "stunned",
+   "target": "enemy"
+  },
+  "desc": "The target falls asleep for a turn."
+ },
+ {
+  "id": "oil_sharpness",
+  "name": "Oil of Sharpness",
+  "slot": "consumable",
+  "emoji": "🫗",
+  "rarity": "uncommon",
+  "value": 100,
+  "use": {
+   "buff": {
+    "id": "damage",
+    "turns": 5,
+    "amount": 3,
+    "name": "Sharpened"
+   },
+   "target": "self"
+  },
+  "desc": "+3 weapon damage for 5 turns."
+ },
+ {
+  "id": "potion_giant",
+  "name": "Potion of Giant Strength",
+  "slot": "consumable",
+  "emoji": "💪",
+  "rarity": "rare",
+  "value": 300,
+  "use": {
+   "buff": {
+    "id": "damage",
+    "turns": 5,
+    "amount": 5,
+    "name": "Giant Strength"
+   },
+   "target": "self"
+  },
+  "desc": "+5 damage for 5 turns."
+ },
+ {
+  "id": "potion_heroism",
+  "name": "Potion of Heroism",
+  "slot": "consumable",
+  "emoji": "🦸",
+  "rarity": "uncommon",
+  "value": 120,
+  "use": {
+   "buff": {
+    "id": "attack",
+    "turns": 5,
+    "amount": 2,
+    "name": "Heroism"
+   },
+   "heal": "2d6",
+   "target": "self"
+  },
+  "desc": "+2 to hit for 5 turns, heals 2d6."
+ },
+ {
+  "id": "potion_invis",
+  "name": "Potion of Invisibility",
+  "slot": "consumable",
+  "emoji": "👻",
+  "rarity": "rare",
+  "value": 250,
+  "use": {
+   "buff": {
+    "id": "invisible",
+    "turns": 3,
+    "name": "Invisible"
+   },
+   "target": "self"
+  },
+  "desc": "Become invisible."
+ },
+ {
+  "id": "potion_speed",
+  "name": "Potion of Speed",
+  "slot": "consumable",
+  "emoji": "⚡",
+  "rarity": "rare",
+  "value": 350,
+  "use": {
+   "buff": {
+    "id": "haste",
+    "turns": 3,
+    "name": "Hasted"
+   },
+   "target": "self"
+  },
+  "desc": "An extra attack each turn for 3 turns."
+ },
+ {
+  "id": "potion_resist",
+  "name": "Potion of Resistance",
+  "slot": "consumable",
+  "emoji": "🧴",
+  "rarity": "uncommon",
+  "value": 150,
+  "use": {
+   "buff": {
+    "id": "resistAll",
+    "turns": 3,
+    "name": "Resistant"
+   },
+   "target": "self"
+  },
+  "desc": "Halve all damage for 3 turns."
+ },
+ {
+  "id": "potion_stone",
+  "name": "Potion of Stoneskin",
+  "slot": "consumable",
+  "emoji": "🪨",
+  "rarity": "uncommon",
+  "value": 130,
+  "use": {
+   "buff": {
+    "id": "resist",
+    "turns": 4,
+    "name": "Stoneskin"
+   },
+   "target": "ally"
+  },
+  "desc": "Halve physical damage for 4 turns."
+ },
+ {
+  "id": "potion_barkskin",
+  "name": "Barkskin Draught",
+  "slot": "consumable",
+  "emoji": "🌳",
+  "rarity": "common",
+  "value": 50,
+  "use": {
+   "buff": {
+    "id": "ac",
+    "turns": 5,
+    "amount": 2,
+    "name": "Barkskin"
+   },
+   "target": "ally"
+  },
+  "desc": "+2 AC for 5 turns."
+ },
+ {
+  "id": "phoenix_feather",
+  "name": "Phoenix Feather",
+  "slot": "consumable",
+  "emoji": "🪶",
+  "rarity": "rare",
+  "value": 500,
+  "use": {
+   "revive": true,
+   "heal": "2d8",
+   "target": "ally"
+  },
+  "desc": "Revives a downed or fallen ally."
+ },
+ {
+  "id": "scroll_fireball",
+  "name": "Scroll of Fireball",
+  "slot": "consumable",
+  "emoji": "📜",
+  "rarity": "rare",
+  "value": 300,
+  "use": {
+   "damage": "6d6",
+   "damageType": "fire",
+   "target": "allEnemies"
+  },
+  "desc": "Unleashes a fireball (6d6 fire to all foes)."
+ },
+ {
+  "id": "scroll_lightning",
+  "name": "Scroll of Lightning",
+  "slot": "consumable",
+  "emoji": "📜",
+  "rarity": "uncommon",
+  "value": 150,
+  "use": {
+   "damage": "4d6",
+   "damageType": "lightning",
+   "target": "enemy"
+  },
+  "desc": "A bolt of lightning (4d6)."
+ },
+ {
+  "id": "scroll_missile",
+  "name": "Scroll of Magic Missile",
+  "slot": "consumable",
+  "emoji": "📜",
+  "rarity": "common",
+  "value": 50,
+  "use": {
+   "damage": "3d4+3",
+   "damageType": "force",
+   "target": "enemy"
+  },
+  "desc": "Three darts that never miss."
+ },
+ {
+  "id": "scroll_heal",
+  "name": "Scroll of Mass Healing",
+  "slot": "consumable",
+  "emoji": "📜",
+  "rarity": "rare",
+  "value": 350,
+  "use": {
+   "heal": "3d8",
+   "target": "ally"
+  },
+  "desc": "Heals 3d8."
+ },
+ {
+  "id": "scroll_bless",
+  "name": "Scroll of Blessing",
+  "slot": "consumable",
+  "emoji": "📜",
+  "rarity": "common",
+  "value": 60,
+  "use": {
+   "buff": {
+    "id": "attack",
+    "turns": 3,
+    "amount": 2,
+    "name": "Blessed Scroll"
+   },
+   "target": "ally"
+  },
+  "desc": "+2 to hit for 3 turns."
+ },
+ {
+  "id": "scroll_ward",
+  "name": "Scroll of Warding",
+  "slot": "consumable",
+  "emoji": "📜",
+  "rarity": "uncommon",
+  "value": 120,
+  "use": {
+   "buff": {
+    "id": "shield",
+    "turns": 2,
+    "amount": 5,
+    "name": "Ward"
+   },
+   "target": "ally"
+  },
+  "desc": "+5 AC for 2 turns."
+ },
+ {
+  "id": "javelin_bundle",
+  "name": "Bundle of Javelins",
+  "slot": "consumable",
+  "emoji": "🎯",
+  "rarity": "common",
+  "value": 10,
+  "use": {
+   "damage": "2d6+2",
+   "damageType": "piercing",
+   "target": "enemy"
+  },
+  "desc": "Hurl a javelin (2d6+2)."
+ },
+ {
+  "id": "throwing_knives",
+  "name": "Throwing Knives",
+  "slot": "consumable",
+  "emoji": "🔪",
+  "rarity": "common",
+  "value": 15,
+  "use": {
+   "damage": "2d4+2",
+   "damageType": "piercing",
+   "target": "enemy"
+  },
+  "desc": "Flick a knife at a foe (2d4+2)."
+ },
+ {
+  "id": "bandages",
+  "name": "Bandages",
+  "slot": "consumable",
+  "emoji": "🩹",
+  "rarity": "common",
+  "value": 5,
+  "use": {
+   "heal": "1d6+1",
+   "target": "ally"
+  },
+  "desc": "Patch up 1d6+1 HP."
+ },
+ {
+  "id": "honey_cake",
+  "name": "Honey Cake",
+  "slot": "consumable",
+  "emoji": "🍯",
+  "rarity": "common",
+  "value": 8,
+  "use": {
+   "heal": "1d8",
+   "target": "self"
+  },
+  "desc": "Delicious. Heals 1d8."
+ },
+ {
+  "id": "trail_rations",
+  "name": "Trail Rations",
+  "slot": "consumable",
+  "emoji": "🥖",
+  "rarity": "common",
+  "value": 5,
+  "use": {
+   "heal": "1d4+1",
+   "target": "self"
+  },
+  "desc": "Tastes like cardboard and courage."
+ },
+ {
+  "id": "dwarven_ale",
+  "name": "Dwarven Stout",
+  "slot": "consumable",
+  "emoji": "🍺",
+  "rarity": "common",
+  "value": 10,
+  "use": {
+   "heal": "1d6",
+   "buff": {
+    "id": "resist",
+    "turns": 2,
+    "name": "Liquid Courage"
+   },
+   "target": "self"
+  },
+  "desc": "Heals 1d6, brief toughness."
+ },
+ {
+  "id": "elven_wine",
+  "name": "Elven Moonwine",
+  "slot": "consumable",
+  "emoji": "🍷",
+  "rarity": "uncommon",
+  "value": 90,
+  "use": {
+   "sp": 3,
+   "heal": "1d6",
+   "target": "self"
+  },
+  "desc": "Restores 3 SP and 1d6 HP."
+ },
+ {
+  "id": "troll_fat",
+  "name": "Troll Fat Salve",
+  "slot": "consumable",
+  "emoji": "🫕",
+  "rarity": "uncommon",
+  "value": 120,
+  "use": {
+   "buff": {
+    "id": "regen",
+    "turns": 4,
+    "amount": 5,
+    "name": "Regenerating"
+   },
+   "target": "ally"
+  },
+  "desc": "Regenerate 5 HP per turn for 4 turns."
+ },
+ {
+  "id": "mandrake_root",
+  "name": "Screaming Mandrake",
+  "slot": "consumable",
+  "emoji": "🌱",
+  "rarity": "uncommon",
+  "value": 90,
+  "use": {
+   "condition": "frightened",
+   "target": "allEnemies"
+  },
+  "desc": "Pull it out: everyone (else) is frightened."
+ },
+ {
+  "id": "glitter_bomb",
+  "name": "Glitter Bomb",
+  "slot": "consumable",
+  "emoji": "✨",
+  "rarity": "common",
+  "value": 20,
+  "use": {
+   "condition": "blinded",
+   "target": "enemy"
+  },
+  "desc": "Blinds a foe. Gets everywhere."
+ },
+ {
+  "id": "caltrop_bag",
+  "name": "Bag of Caltrops",
+  "slot": "consumable",
+  "emoji": "📌",
+  "rarity": "common",
+  "value": 10,
+  "use": {
+   "condition": "slowed",
+   "damage": "1d4",
+   "damageType": "piercing",
+   "target": "allEnemies"
+  },
+  "desc": "Slows all foes."
+ },
+ {
+  "id": "tanglefoot",
+  "name": "Tanglefoot Bag",
+  "slot": "consumable",
+  "emoji": "🕸️",
+  "rarity": "common",
+  "value": 40,
+  "use": {
+   "condition": "slowed",
+   "target": "enemy"
+  },
+  "desc": "Glues a foe in place."
+ },
+ {
+  "id": "dragon_pepper",
+  "name": "Dragon Pepper",
+  "slot": "consumable",
+  "emoji": "🌶️",
+  "rarity": "uncommon",
+  "value": 70,
+  "use": {
+   "damage": "3d6",
+   "damageType": "fire",
+   "target": "enemy"
+  },
+  "desc": "Eat it and breathe fire (3d6) on a foe."
+ },
+ {
+  "id": "star_shard",
+  "name": "Star Shard",
+  "slot": "consumable",
+  "emoji": "🌠",
+  "rarity": "rare",
+  "value": 400,
+  "use": {
+   "damage": "5d8",
+   "damageType": "radiant",
+   "target": "enemy"
+  },
+  "desc": "A fallen star fragment. 5d8 radiant."
+ },
+ {
+  "id": "tea_calming",
+  "name": "Calming Tea",
+  "slot": "consumable",
+  "emoji": "🍵",
+  "rarity": "common",
+  "value": 10,
+  "use": {
+   "cleanse": true,
+   "heal": "1d4",
+   "target": "self"
+  },
+  "desc": "Removes conditions. Very soothing."
+ },
+ {
+  "id": "liquid_luck",
+  "name": "Liquid Luck",
+  "slot": "consumable",
+  "emoji": "🍀",
+  "rarity": "epic",
+  "value": 900,
+  "use": {
+   "buff": {
+    "id": "attack",
+    "turns": 5,
+    "amount": 5,
+    "name": "Lucky"
+   },
+   "target": "self"
+  },
+  "desc": "+5 to hit for 5 turns."
+ },
+ {
+  "id": "divine_draught",
+  "name": "Divine Draught",
+  "slot": "consumable",
+  "emoji": "🏺",
+  "rarity": "epic",
+  "value": 1000,
+  "use": {
+   "heal": "6d8+10",
+   "cleanse": true,
+   "target": "ally"
+  },
+  "desc": "A huge heal that also cleanses."
+ },
+ {
+  "id": "bottled_storm",
+  "name": "Bottled Storm",
+  "slot": "consumable",
+  "emoji": "🌪️",
+  "rarity": "epic",
+  "value": 900,
+  "use": {
+   "damage": "8d6",
+   "damageType": "lightning",
+   "target": "allEnemies"
+  },
+  "desc": "Uncork. Duck."
+ },
+ {
+  "id": "wolfpack_cloak",
+  "name": "Wolfpack Cloak",
+  "slot": "trinket",
+  "emoji": "🐺",
+  "rarity": "uncommon",
+  "value": 200,
+  "setId": "wolfpack",
+  "initBonus": 2,
+  "desc": "Part of the Wolfpack set. +2 initiative."
+ },
+ {
+  "id": "wolfpack_fang",
+  "name": "Wolfpack Fang",
+  "slot": "weapon",
+  "emoji": "🐺",
+  "rarity": "uncommon",
+  "value": 220,
+  "setId": "wolfpack",
+  "damage": "1d8",
+  "damageType": "piercing",
+  "finesse": true,
+  "desc": "Part of the Wolfpack set."
+ },
+ {
+  "id": "wolfpack_hide",
+  "name": "Wolfpack Hide",
+  "slot": "armor",
+  "emoji": "🐺",
+  "rarity": "uncommon",
+  "value": 220,
+  "setId": "wolfpack",
+  "acBase": 12,
+  "dexCap": 3,
+  "desc": "Part of the Wolfpack set. AC 12 + DEX (max 3)."
+ },
+ {
+  "id": "paladin_aegis",
+  "name": "Aegis of Dawn",
+  "slot": "trinket",
+  "emoji": "🌅",
+  "rarity": "rare",
+  "value": 500,
+  "setId": "dawn",
+  "acBonus": 2,
+  "desc": "Part of the Dawnguard set. +2 AC."
+ },
+ {
+  "id": "paladin_plate",
+  "name": "Dawnguard Plate",
+  "slot": "armor",
+  "emoji": "🌅",
+  "rarity": "rare",
+  "value": 900,
+  "setId": "dawn",
+  "acBase": 17,
+  "dexCap": 0,
+  "desc": "Part of the Dawnguard set."
+ },
+ {
+  "id": "paladin_blade",
+  "name": "Dawnguard Blade",
+  "slot": "weapon",
+  "emoji": "🌅",
+  "rarity": "rare",
+  "value": 700,
+  "setId": "dawn",
+  "damage": "1d8",
+  "damageType": "radiant",
+  "desc": "Part of the Dawnguard set. Deals radiant damage."
+ },
+ {
+  "id": "arcanist_hat",
+  "name": "Arcanist's Pointy Hat",
+  "slot": "trinket",
+  "emoji": "🎩",
+  "rarity": "uncommon",
+  "value": 200,
+  "setId": "arcanist",
+  "spBonus": 2,
+  "desc": "Part of the Arcanist set. +2 SP."
+ },
+ {
+  "id": "arcanist_robe",
+  "name": "Arcanist's Starry Robe",
+  "slot": "armor",
+  "emoji": "🌌",
+  "rarity": "uncommon",
+  "value": 200,
+  "setId": "arcanist",
+  "acBase": 11,
+  "spBonus": 2,
+  "desc": "Part of the Arcanist set. +2 SP."
+ },
+ {
+  "id": "shadow_mask",
+  "name": "Nightblade Mask",
+  "slot": "trinket",
+  "emoji": "🎭",
+  "rarity": "rare",
+  "value": 450,
+  "setId": "nightblade",
+  "skillBonus": {
+   "stealth": 2,
+   "deception": 2
+  },
+  "desc": "Part of the Nightblade set."
+ },
+ {
+  "id": "shadow_dagger",
+  "name": "Nightblade Dagger",
+  "slot": "weapon",
+  "emoji": "🌑",
+  "rarity": "rare",
+  "value": 500,
+  "setId": "nightblade",
+  "damage": "1d6",
+  "damageType": "piercing",
+  "finesse": true,
+  "critRange": 19,
+  "desc": "Part of the Nightblade set. Crits on 19-20."
+ },
+ {
+  "id": "berserker_axe",
+  "name": "Bloodroar Axe",
+  "slot": "weapon",
+  "emoji": "🩸",
+  "rarity": "rare",
+  "value": 550,
+  "setId": "bloodroar",
+  "damage": "1d12",
+  "damageType": "slashing",
+  "twoHanded": true,
+  "damageBonus": 1,
+  "desc": "Part of the Bloodroar set."
+ },
+ {
+  "id": "berserker_torc",
+  "name": "Bloodroar Torc",
+  "slot": "trinket",
+  "emoji": "⭕",
+  "rarity": "rare",
+  "value": 450,
+  "setId": "bloodroar",
+  "maxHpBonus": 8,
+  "desc": "Part of the Bloodroar set. +8 max HP."
+ },
+ {
+  "id": "sigil_key",
+  "name": "Seal Sigil",
+  "slot": "quest",
+  "emoji": "🔑",
+  "value": 0,
+  "desc": "A glowing sigil. The antagonist's seal weakens with each one."
+ },
+ {
+  "id": "map_fragment",
+  "name": "Map Fragment",
+  "slot": "quest",
+  "emoji": "🗺️",
+  "value": 0,
+  "desc": "Part of a map to somewhere important."
+ },
+ {
+  "id": "mysterious_egg",
+  "name": "Mysterious Egg",
+  "slot": "quest",
+  "emoji": "🥚",
+  "value": 0,
+  "desc": "It's warm. And it moved."
+ },
+ {
+  "id": "royal_letter",
+  "name": "Sealed Royal Letter",
+  "slot": "quest",
+  "emoji": "✉️",
+  "value": 0,
+  "desc": "Do not open. (You could open it.)"
+ }
+]

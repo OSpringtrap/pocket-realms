@@ -1,0 +1,22 @@
+[
+ { "id": "kingdom_name", "text": "Name the kingdom you all hail from!", "use": "kingdom", "examples": ["Puddlemere", "The Realm of Mild Inconvenience", "Greater Turnipshire"] },
+ { "id": "mascot", "text": "Name the village's beloved mascot (an animal, object, or creature).", "use": "mascot", "examples": ["Sir Honksalot the goose", "A very old cheese", "Kevin the haunted scarecrow"] },
+ { "id": "tavern_rumor", "text": "Write a rumor overheard at the tavern.", "use": "rumor", "examples": ["The mayor is three goblins in a coat", "The well grants wishes, but only bad ones"] },
+ { "id": "tavern_name", "text": "Name the tavern you just walked into.", "use": "tavern", "examples": ["The Prancing Mimic", "The Last Good Decision", "Ye Olde Sticky Table"] },
+ { "id": "last_night", "text": "Write what your character did last night. (Be honest.)", "use": "deed", "examples": ["Arm-wrestled a priest and lost", "Sold the party's map for a sandwich"] },
+ { "id": "villain_secret", "text": "Write an embarrassing secret about the villain.", "use": "lore", "examples": ["Still sleeps with a nightlight", "Failed wizard school twice"] },
+ { "id": "local_legend", "text": "Name a local legend everyone here is afraid of.", "use": "npc", "examples": ["Old Man Thistlewhip", "The Moth Duke", "Grandma Teeth"] },
+ { "id": "place_name", "text": "Name the dreary hill you're camping on tonight.", "use": "place", "examples": ["Mount Regret", "Soggy Bottom Knoll", "The Hill of Bad Vibes"] },
+ { "id": "party_motto", "text": "Write your adventuring party's motto.", "use": "motto", "examples": ["We came, we saw, we panicked", "Loot first, questions never"] },
+ { "id": "party_title", "text": "Give your party a heroic name.", "use": "title", "examples": ["The Unbreakable Spoons", "Mostly Heroes", "The Fellowship of the Snack"] },
+ { "id": "festival", "text": "Invent the realm's strangest annual festival.", "use": "lore", "examples": ["The Running of the Snails", "National Yell-At-A-Rock Day"] },
+ { "id": "forbidden_food", "text": "Name a local dish that outsiders are warned never to eat.", "use": "lore", "examples": ["Surprise Pie", "Bog Pudding", "Grandmother's Revenge"] },
+ { "id": "monster_name", "text": "Name the monster that lives under the town bridge.", "use": "npc", "examples": ["Gerald", "The Damp Gentleman", "Toll-Troll Tim"] },
+ { "id": "king_decree", "text": "Write the king's newest, silliest royal decree.", "use": "lore", "examples": ["All hats must contain at least one bird", "Wednesdays are cancelled"] },
+ { "id": "shop_name", "text": "Name the general store run by a suspiciously cheerful gnome.", "use": "place", "examples": ["Knick-Knacks & Knives", "Totally Not Cursed Goods"] },
+ { "id": "ghost_story", "text": "Write the first line of the scariest campfire story you know.", "use": "lore", "examples": ["It was a dark and stormy afternoon...", "The goose knew your name."] },
+ { "id": "epitaph", "text": "Write an epitaph for the last adventurer who tried this.", "use": "deed", "examples": ["He pulled the lever.", "She said 'how hard can it be?'"] },
+ { "id": "ship_name", "text": "Name the leaky boat that will carry you across the lake.", "use": "place", "examples": ["The Unsinkable II", "Probably Fine", "The Soggy Biscuit"] },
+ { "id": "battle_cry", "text": "Write the party's official battle cry.", "use": "motto", "examples": ["FOR SNACKS!", "Not the face!", "Leeeroy—"] },
+ { "id": "fortune", "text": "Write the fortune a mysterious seer just gave you.", "use": "lore", "examples": ["Beware the third sandwich", "You will meet a tall, dark goblin"] }
+]

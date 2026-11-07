@@ -1,0 +1,18 @@
+[
+ { "id": "c_scar", "text": "{a}, tell {b} the story behind your favorite scar." },
+ { "id": "c_fear", "text": "{a}, confess to {b} the one thing you're secretly afraid of on this journey." },
+ { "id": "c_home", "text": "{a}, describe home to {b}. What do you miss most?" },
+ { "id": "c_argue", "text": "{a} and {b} have a heated argument about the right way to cook a sausage. Go!" },
+ { "id": "c_teach", "text": "{a}, teach {b} a skill from your past. {b}, be a terrible student." },
+ { "id": "c_dream", "text": "{a}, you had a strange dream last night about {b}. Tell them about it." },
+ { "id": "c_secret", "text": "{a}, {b} catches you doing something suspicious by the fire. Explain yourself." },
+ { "id": "c_toast", "text": "{a}, raise a toast to {b}. What did they do today that impressed you?" },
+ { "id": "c_song", "text": "{a}, sing (or hum) {b} a few lines of a song from your homeland." },
+ { "id": "c_bet", "text": "{a} and {b} make a bet about tomorrow. What's the bet and what are the stakes?" },
+ { "id": "c_rival", "text": "{a}, explain to {b} why you two are rivals now. {b}, disagree." },
+ { "id": "c_food", "text": "{a}, you're cooking tonight. Describe the meal to {b}, who is very suspicious." },
+ { "id": "c_quirk", "text": "{a}, {b} has noticed your quirk ({quirk}). Explain it, in character." },
+ { "id": "c_regret", "text": "{a}, tell {b} about the biggest mistake you've ever made." },
+ { "id": "c_name", "text": "{a}, give {b} an affectionate nickname and explain where it came from." },
+ { "id": "c_watch", "text": "{a} and {b} are on night watch. Something rustles in the dark. Act it out!" }
+]

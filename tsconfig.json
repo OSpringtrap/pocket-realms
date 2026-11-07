@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "allowImportingTsExtensions": false,
+    "types": ["node", "vite/client"],
+    "baseUrl": ".",
+    "paths": { "@pr/shared": ["shared/src/index.ts"], "@pr/shared/*": ["shared/src/*"] }
+  },
+  "include": ["shared/src", "shared/test", "server/src", "client-host/src", "client-phone/src", "scripts", "vitest.config.ts", "client-host/vite.config.ts", "client-phone/vite.config.ts"]
+}

@@ -1,0 +1,1 @@
+{ "name": "@pr/client-phone", "version": "0.1.0", "private": true, "type": "module", "dependencies": { "@pr/shared": "*" } }

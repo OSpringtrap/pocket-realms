@@ -1,0 +1,32 @@
+{
+ "townPre": ["Oak", "Mill", "Thorn", "Brook", "Ash", "Raven", "Stone", "Fern", "Hollow", "Bright", "Wolf", "Salt", "Amber", "Copper", "Moss", "Elder", "Frost", "Honey", "Barrow", "Kettle"],
+ "townSuf": ["ford", "haven", "wick", "stead", "bury", "dale", "mere", "gate", "watch", "hollow", "cross", "field", "bridge", "well", "moor"],
+ "wild": {
+  "plains": ["the Golden Reach", "Windblown Downs", "the Long Meadows", "Sheepsbane Fields"],
+  "forest": ["the Whisperwood", "Gloomhollow", "the Tanglebriar", "Oldroot Forest", "Mossmantle Wood"],
+  "swamp": ["the Murkmire", "Bogsbottom", "the Weeping Fen", "Croakwater Marsh"],
+  "mountains": ["the Grimteeth", "Skyshear Peaks", "the Anvil Range", "Frostfang Heights"],
+  "desert": ["the Sunscald Wastes", "the Glass Dunes", "Dry Bones Basin"],
+  "ruins": ["the Shattered Court", "Fallen Spire", "the Old Empire's Bones", "Ghostgate"],
+  "coast": ["the Saltcliffs", "Gullwhistle Shore", "the Wreckers' Coast", "Pearlstrand"],
+  "water": ["the Mirror Lake", "the Deepwater", "the Grey Sound"]
+ },
+ "dungeon": ["Crypt", "Barrow", "Den", "Warren", "Sunken Temple", "Vault", "Catacombs", "Mine", "Tower", "Grotto", "Lair", "Keep"],
+ "dungeonSuf": ["of Sorrows", "of the Forgotten King", "of Whispers", "of Bones", "of the Deep", "of Echoes", "of the Moon", "of Rust", "of Mischief", "of the Last Light"],
+ "heroic": ["Dawnbringer", "the Bold", "Ironheart", "Stormcaller", "the Lucky", "Goblinbane", "Shadowstep", "the Unkillable", "Silvertongue", "Wyrmslayer"],
+ "personalities": [
+  "Cheerful to the point of being annoying.",
+  "Grumpy, but secretly cares a lot.",
+  "Wants to be famous, will settle for infamous.",
+  "Extremely polite, even to monsters.",
+  "Trusts nobody. Especially not you.",
+  "Looking for a long-lost sibling.",
+  "Collects stories, souvenirs and grudges.",
+  "Runs toward danger, mostly by accident.",
+  "Speaks in proverbs nobody has heard of.",
+  "Owes money to at least three guilds.",
+  "Fiercely protective of the party's snacks.",
+  "Convinced they are the hero of a prophecy."
+ ],
+ "epithets": ["the Bold", "the Unlucky", "the Magnificent", "the Snackbringer", "Goblin-Punter", "the Unflinching", "Doom-Dodger", "the Loud", "Dragon-Tickler", "the Twice-Dead", "of the Silver Tongue", "Who Pulled the Lever"]
+}

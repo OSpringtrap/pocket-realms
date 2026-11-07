@@ -1,0 +1,8 @@
+[
+ { "id": "wardens", "name": "The Crown Wardens", "emoji": "🛡️", "desc": "The realm's overworked, underpaid royal guard." },
+ { "id": "velvet", "name": "The Velvet Hand", "emoji": "🧤", "desc": "A thieves' guild with excellent manners." },
+ { "id": "thorns", "name": "Circle of Thorns", "emoji": "🌿", "desc": "Druids who speak for the wild places." },
+ { "id": "flame", "name": "Order of the Silver Flame", "emoji": "🕯️", "desc": "Zealous priests who hunt the undead." },
+ { "id": "gilded", "name": "The Gilded Scale", "emoji": "⚖️", "desc": "A merchant league that will sell you anything." },
+ { "id": "lanterns", "name": "The Lantern Society", "emoji": "🏮", "desc": "Scholars and explorers mapping forgotten ruins." }
+]

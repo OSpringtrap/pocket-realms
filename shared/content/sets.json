@@ -1,0 +1,7 @@
+[
+ { "id": "wolfpack", "name": "Wolfpack", "pieces": ["wolfpack_cloak", "wolfpack_fang", "wolfpack_hide"], "bonus": { "attackBonus": 1, "initBonus": 2 }, "desc": "2+ pieces: +1 to hit, +2 initiative." },
+ { "id": "dawn", "name": "Dawnguard", "pieces": ["paladin_aegis", "paladin_plate", "paladin_blade"], "bonus": { "extraDamage": { "dice": "1d6", "dmg": "radiant" }, "resist": ["necrotic"] }, "desc": "2+ pieces: +1d6 radiant damage, necrotic resistance." },
+ { "id": "arcanist", "name": "Arcanist", "pieces": ["arcanist_hat", "arcanist_robe"], "bonus": { "spBonus": 3, "abilityBonus": { "INT": 1 } }, "desc": "2 pieces: +3 Spell Points, +1 INT." },
+ { "id": "nightblade", "name": "Nightblade", "pieces": ["shadow_mask", "shadow_dagger"], "bonus": { "damageBonus": 2, "initBonus": 3 }, "desc": "2 pieces: +2 damage, +3 initiative." },
+ { "id": "bloodroar", "name": "Bloodroar", "pieces": ["berserker_axe", "berserker_torc"], "bonus": { "damageBonus": 2, "maxHpBonus": 6 }, "desc": "2 pieces: +2 damage, +6 max HP." }
+]

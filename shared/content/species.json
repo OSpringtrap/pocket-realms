@@ -1,0 +1,44 @@
+[
+  { "id": "elf", "name": "Elf", "emoji": "🧝", "desc": "Graceful, long-lived and keen-eyed folk of the old forests.",
+    "abilityBonus": { "DEX": 2, "WIS": 1 }, "skills": ["perception"],
+    "traits": [
+      { "id": "keen_senses", "name": "Keen Senses", "desc": "Proficient in Perception; +2 when scanning for hidden things." },
+      { "id": "trance", "name": "Trance", "desc": "Short rests restore 2 extra Spell Points and 25% more HP." },
+      { "id": "fey_ancestry", "name": "Fey Ancestry", "desc": "Immune to being charmed." }
+    ] },
+  { "id": "dwarf", "name": "Dwarf", "emoji": "🧔", "desc": "Stout, stubborn, and carved from the same stone as their halls.",
+    "abilityBonus": { "CON": 2, "STR": 1 }, "skills": [], "resist": ["poison"],
+    "traits": [
+      { "id": "poison_resistance", "name": "Dwarven Resilience", "desc": "Resistant to poison damage; poison wears off twice as fast." },
+      { "id": "stonecunning", "name": "Stonecunning", "desc": "+3 to checks in ruins, mountains and dungeons; spots traps more easily." },
+      { "id": "dwarven_toughness", "name": "Dwarven Toughness", "desc": "+1 max HP per level." }
+    ] },
+  { "id": "human", "name": "Human", "emoji": "🧑", "desc": "Ambitious, adaptable, and found absolutely everywhere.",
+    "abilityBonus": { "STR": 1, "DEX": 1, "CON": 1, "INT": 1, "WIS": 1, "CHA": 1 }, "skills": [],
+    "traits": [
+      { "id": "versatile", "name": "Versatile", "desc": "+1 to every ability score." },
+      { "id": "extra_skill", "name": "Skilled", "desc": "Gain proficiency in one extra skill of your choice." },
+      { "id": "determined", "name": "Determined", "desc": "Start each long rest with 1 Inspiration if you have none." }
+    ] },
+  { "id": "orc", "name": "Orc", "emoji": "👹", "desc": "Fierce, proud and unbreakable warriors of the hard places.",
+    "abilityBonus": { "STR": 2, "CON": 1 }, "skills": ["intimidation"], "abilities": ["aggressive_charge"],
+    "traits": [
+      { "id": "relentless_endurance", "name": "Relentless Endurance", "desc": "Once per long rest, when dropped to 0 HP you stay up with 1 HP." },
+      { "id": "aggressive_charge", "name": "Aggressive Charge", "desc": "Bonus action: your next attack gains +1d6 damage." },
+      { "id": "menacing", "name": "Menacing", "desc": "Proficient in Intimidation." }
+    ] },
+  { "id": "dragonborn", "name": "Dragonborn", "emoji": "🐲", "desc": "Proud scaled folk who carry the blood — and breath — of dragons.",
+    "abilityBonus": { "STR": 2, "CHA": 1 }, "skills": [], "abilities": ["breath_weapon"],
+    "traits": [
+      { "id": "breath_weapon", "name": "Breath Weapon", "desc": "Blow into the mic to exhale your ancestry's element on up to 3 foes." },
+      { "id": "draconic_resistance", "name": "Draconic Resistance", "desc": "Resistant to your ancestry's damage type." }
+    ],
+    "ancestries": [
+      { "id": "red", "name": "Red", "dmg": "fire", "emoji": "🔥" },
+      { "id": "blue", "name": "Blue", "dmg": "lightning", "emoji": "⚡" },
+      { "id": "white", "name": "White", "dmg": "cold", "emoji": "❄️" },
+      { "id": "green", "name": "Green", "dmg": "poison", "emoji": "☠️" },
+      { "id": "black", "name": "Black", "dmg": "acid", "emoji": "🧪" },
+      { "id": "gold", "name": "Gold", "dmg": "radiant", "emoji": "✨" }
+    ] }
+]

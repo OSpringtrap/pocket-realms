@@ -1,0 +1,41 @@
+{
+  "name": "pocket-realms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pocket Realms — a Jackbox-style local multiplayer fantasy RPG (5e-lite) played on phones with a shared main screen.",
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "server",
+    "client-host",
+    "client-phone"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm run build:host && npm run build:phone && npm run build:server",
+    "build:host": "vite build --config client-host/vite.config.ts",
+    "build:phone": "vite build --config client-phone/vite.config.ts",
+    "build:server": "node scripts/build-server.mjs",
+    "start": "npm run build && node dist/server/index.js",
+    "serve": "node dist/server/index.js",
+    "dev": "tsx watch server/src/index.ts --dev",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "sim": "tsx scripts/sim.ts",
+    "sim:ci": "tsx scripts/sim.ts --ci",
+    "ci": "npm run typecheck && npm test && npm run sim:ci"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.25",
+    "@types/node": "^22.20.5",
+    "@types/qrcode": "^1.5.6",
+    "@types/ws": "^8.18.2",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.5",
+    "vitest": "^3.2.7"
+  }
+}

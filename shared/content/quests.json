@@ -1,0 +1,9 @@
+[
+ { "type": "rescue", "titles": ["The Missing {npc}", "Lost in the {biome}", "Save {npc}!"], "desc": ["{giver} begs you to rescue {npc}, last seen near {place}.", "{npc} was dragged off toward {place}. {giver} is desperate."] },
+ { "type": "fetch", "titles": ["The {item} of {place}", "A Rare Ingredient", "Recover the Heirloom"], "desc": ["{giver} needs the {item} hidden at {place}.", "Bring back the {item} from {place} for {giver}."] },
+ { "type": "escort", "titles": ["Safe Passage", "The Long Road to {place}"], "desc": ["Escort {npc} safely to {place}.", "{giver} will pay well if {npc} reaches {place} alive."] },
+ { "type": "investigate", "titles": ["Strange Lights at {place}", "The {place} Mystery", "Whispers in the Dark"], "desc": ["Something strange is happening at {place}. {giver} wants answers.", "Investigate the rumors about {place} for {giver}."] },
+ { "type": "hunt", "titles": ["Hunt the {monster}", "Bounty: {monster}", "The Beast of {place}"], "desc": ["A {monster} terrorizes the land near {place}. {giver} offers a bounty.", "Slay the {monster} lairing at {place}."], "goal": 1 },
+ { "type": "negotiate", "titles": ["A Delicate Matter", "Peace at {place}"], "desc": ["Broker peace between {giver}'s people and the folk of {place}.", "{giver} needs a silver tongue to settle a dispute at {place}."] },
+ { "type": "heist", "titles": ["The {place} Job", "Lighter Pockets"], "desc": ["{giver} has a plan to lift the {item} from {place}. Quietly.", "Steal the {item} from {place}. Don't get caught."] }
+]

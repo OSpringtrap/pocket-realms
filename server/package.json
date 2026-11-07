@@ -1,0 +1,1 @@
+{ "name": "@pr/server", "version": "0.1.0", "private": true, "type": "module", "dependencies": { "@pr/shared": "*", "express": "^4.21.0", "ws": "^8.18.0", "selfsigned": "^2.4.1", "qrcode": "^1.5.4" } }

@@ -1,0 +1,3550 @@
+[
+ {
+  "id": "goblin",
+  "name": "Goblin",
+  "emoji": "👺",
+  "family": "goblin",
+  "tier": 1,
+  "xp": 50,
+  "hp": 9,
+  "ac": 13,
+  "stats": {
+   "STR": 8,
+   "DEX": 14,
+   "CON": 10,
+   "INT": 10,
+   "WIS": 8,
+   "CHA": 8
+  },
+  "attacks": [
+   {
+    "name": "Scimitar",
+    "toHit": 4,
+    "damage": "1d6+2",
+    "dmg": "slashing"
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "radiant",
+  "tags": [
+   "goblinoid",
+   "humanoid"
+  ],
+  "biomes": [
+   "forest",
+   "plains",
+   "mountains",
+   "ruins"
+  ],
+  "gold": 4,
+  "desc": "Small, mean, and mostly teeth."
+ },
+ {
+  "id": "goblin_archer",
+  "name": "Goblin Archer",
+  "emoji": "🏹",
+  "family": "goblin",
+  "tier": 1,
+  "xp": 50,
+  "hp": 8,
+  "ac": 12,
+  "stats": {
+   "STR": 8,
+   "DEX": 15,
+   "CON": 10,
+   "INT": 10,
+   "WIS": 10,
+   "CHA": 8
+  },
+  "attacks": [
+   {
+    "name": "Shortbow",
+    "toHit": 4,
+    "damage": "1d6+2",
+    "dmg": "piercing"
+   }
+  ],
+  "behavior": "skirmisher",
+  "tags": [
+   "goblinoid",
+   "humanoid"
+  ],
+  "biomes": [
+   "forest",
+   "plains",
+   "mountains"
+  ],
+  "gold": 4,
+  "desc": "Shoots from the back and giggles."
+ },
+ {
+  "id": "goblin_shaman",
+  "name": "Goblin Shaman",
+  "emoji": "🧌",
+  "family": "goblin",
+  "tier": 1,
+  "xp": 100,
+  "hp": 14,
+  "ac": 12,
+  "stats": {
+   "STR": 8,
+   "DEX": 12,
+   "CON": 12,
+   "INT": 12,
+   "WIS": 14,
+   "CHA": 10
+  },
+  "attacks": [
+   {
+    "name": "Hex Bolt",
+    "toHit": 4,
+    "damage": "2d6",
+    "dmg": "necrotic",
+    "weight": 2
+   },
+   {
+    "name": "Mend Kin",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "force",
+    "heal": "2d4+2",
+    "weight": 1,
+    "text": "mutters and a goblin's wounds knit"
+   }
+  ],
+  "behavior": "support",
+  "tags": [
+   "goblinoid",
+   "humanoid"
+  ],
+  "biomes": [
+   "forest",
+   "swamp",
+   "ruins"
+  ],
+  "gold": 8,
+  "desc": "Wears a lot of feathers and bones."
+ },
+ {
+  "id": "goblin_warlord",
+  "name": "Goblin Warlord",
+  "emoji": "👹",
+  "family": "goblin",
+  "tier": 2,
+  "xp": 450,
+  "hp": 38,
+  "ac": 15,
+  "stats": {
+   "STR": 14,
+   "DEX": 14,
+   "CON": 14,
+   "INT": 10,
+   "WIS": 10,
+   "CHA": 12
+  },
+  "attacks": [
+   {
+    "name": "Jagged Blade",
+    "toHit": 5,
+    "damage": "2d6+2",
+    "dmg": "slashing",
+    "weight": 3
+   },
+   {
+    "name": "Brutal Overhead",
+    "toHit": 6,
+    "damage": "3d8+3",
+    "dmg": "slashing",
+    "telegraph": true,
+    "weight": 1,
+    "text": "raises the jagged blade high overhead"
+   }
+  ],
+  "multiattack": 1,
+  "behavior": "brute",
+  "tags": [
+   "goblinoid",
+   "humanoid"
+  ],
+  "biomes": [
+   "forest",
+   "mountains",
+   "ruins"
+  ],
+  "gold": 30,
+  "desc": "Biggest goblin. Wants you to know it."
+ },
+ {
+  "id": "goblin_king",
+  "name": "Grizzlefang, the Goblin King",
+  "emoji": "🤴",
+  "family": "goblin",
+  "tier": 2,
+  "xp": 1100,
+  "hp": 85,
+  "ac": 15,
+  "stats": {
+   "STR": 16,
+   "DEX": 14,
+   "CON": 16,
+   "INT": 12,
+   "WIS": 10,
+   "CHA": 16
+  },
+  "attacks": [
+   {
+    "name": "Crown-Spiked Mace",
+    "toHit": 6,
+    "damage": "2d8+3",
+    "dmg": "bludgeoning",
+    "weight": 3
+   },
+   {
+    "name": "Royal Tantrum",
+    "toHit": 0,
+    "damage": "3d8",
+    "dmg": "bludgeoning",
+    "save": {
+     "ability": "DEX",
+     "dc": 13,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "weight": 1,
+    "text": "starts stomping and screaming, the throne room shakes"
+   },
+   {
+    "name": "Call the Guard",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "force",
+    "summon": "goblin",
+    "weight": 1,
+    "text": "blows a horn: more goblins pour in!"
+   }
+  ],
+  "multiattack": 1,
+  "behavior": "boss",
+  "boss": true,
+  "legendary": 1,
+  "weakness": "radiant",
+  "tags": [
+   "goblinoid",
+   "humanoid"
+  ],
+  "biomes": [],
+  "gold": 150,
+  "desc": "A goblin with a crown and absolutely no chill."
+ },
+ {
+  "id": "wolf",
+  "name": "Wolf",
+  "emoji": "🐺",
+  "family": "wolf",
+  "tier": 1,
+  "xp": 50,
+  "hp": 11,
+  "ac": 13,
+  "stats": {
+   "STR": 12,
+   "DEX": 15,
+   "CON": 12,
+   "INT": 3,
+   "WIS": 12,
+   "CHA": 6
+  },
+  "attacks": [
+   {
+    "name": "Bite",
+    "toHit": 4,
+    "damage": "2d4+2",
+    "dmg": "piercing",
+    "condition": {
+     "id": "prone",
+     "turns": 1,
+     "chance": 0.25
+    }
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "fire",
+  "tags": [
+   "beast"
+  ],
+  "biomes": [
+   "forest",
+   "plains",
+   "mountains"
+  ],
+  "night": true,
+  "desc": "They hunt in packs, and they're patient."
+ },
+ {
+  "id": "dire_wolf",
+  "name": "Dire Wolf",
+  "emoji": "🐺",
+  "family": "wolf",
+  "tier": 2,
+  "xp": 200,
+  "hp": 37,
+  "ac": 14,
+  "stats": {
+   "STR": 17,
+   "DEX": 15,
+   "CON": 15,
+   "INT": 3,
+   "WIS": 12,
+   "CHA": 7
+  },
+  "attacks": [
+   {
+    "name": "Savage Bite",
+    "toHit": 5,
+    "damage": "2d6+3",
+    "dmg": "piercing",
+    "condition": {
+     "id": "prone",
+     "turns": 1,
+     "chance": 0.35
+    }
+   }
+  ],
+  "behavior": "brute",
+  "weakness": "fire",
+  "tags": [
+   "beast"
+  ],
+  "biomes": [
+   "forest",
+   "mountains"
+  ],
+  "night": true,
+  "desc": "A wolf the size of a pony."
+ },
+ {
+  "id": "winter_wolf",
+  "name": "Winter Wolf",
+  "emoji": "🐺",
+  "family": "wolf",
+  "tier": 3,
+  "xp": 700,
+  "hp": 75,
+  "ac": 13,
+  "stats": {
+   "STR": 18,
+   "DEX": 13,
+   "CON": 14,
+   "INT": 7,
+   "WIS": 12,
+   "CHA": 8
+  },
+  "attacks": [
+   {
+    "name": "Bite",
+    "toHit": 6,
+    "damage": "2d6+4",
+    "dmg": "piercing",
+    "weight": 2
+   },
+   {
+    "name": "Freezing Breath",
+    "toHit": 0,
+    "damage": "4d8",
+    "dmg": "cold",
+    "save": {
+     "ability": "DEX",
+     "dc": 13,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "condition": {
+     "id": "slowed",
+     "turns": 1
+    },
+    "text": "draws in a breath that frosts the air"
+   }
+  ],
+  "behavior": "brute",
+  "weakness": "fire",
+  "resist": [
+   "cold"
+  ],
+  "tags": [
+   "beast"
+  ],
+  "biomes": [
+   "mountains"
+  ],
+  "desc": "Its howl freezes puddles."
+ },
+ {
+  "id": "skeleton",
+  "name": "Skeleton",
+  "emoji": "💀",
+  "family": "skeleton",
+  "tier": 1,
+  "xp": 50,
+  "hp": 13,
+  "ac": 13,
+  "stats": {
+   "STR": 10,
+   "DEX": 14,
+   "CON": 15,
+   "INT": 6,
+   "WIS": 8,
+   "CHA": 5
+  },
+  "attacks": [
+   {
+    "name": "Rusty Sword",
+    "toHit": 4,
+    "damage": "1d6+2",
+    "dmg": "slashing"
+   }
+  ],
+  "behavior": "brute",
+  "weakness": "bludgeoning",
+  "resist": [
+   "poison"
+  ],
+  "immune": [
+   "poisoned",
+   "frightened",
+   "charmed"
+  ],
+  "tags": [
+   "undead"
+  ],
+  "biomes": [
+   "ruins",
+   "desert",
+   "swamp"
+  ],
+  "night": true,
+  "desc": "Rattles when it walks. Rattles more when it's angry."
+ },
+ {
+  "id": "skeleton_archer",
+  "name": "Skeleton Archer",
+  "emoji": "🏹",
+  "family": "skeleton",
+  "tier": 1,
+  "xp": 100,
+  "hp": 13,
+  "ac": 13,
+  "stats": {
+   "STR": 10,
+   "DEX": 16,
+   "CON": 15,
+   "INT": 6,
+   "WIS": 8,
+   "CHA": 5
+  },
+  "attacks": [
+   {
+    "name": "Bone Bow",
+    "toHit": 5,
+    "damage": "1d8+3",
+    "dmg": "piercing"
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "bludgeoning",
+  "immune": [
+   "poisoned",
+   "frightened",
+   "charmed"
+  ],
+  "tags": [
+   "undead"
+  ],
+  "biomes": [
+   "ruins",
+   "desert"
+  ],
+  "night": true,
+  "desc": "Never blinks. Can't."
+ },
+ {
+  "id": "skeleton_knight",
+  "name": "Skeleton Knight",
+  "emoji": "☠️",
+  "family": "skeleton",
+  "tier": 2,
+  "xp": 450,
+  "hp": 45,
+  "ac": 17,
+  "stats": {
+   "STR": 16,
+   "DEX": 10,
+   "CON": 16,
+   "INT": 8,
+   "WIS": 10,
+   "CHA": 8
+  },
+  "attacks": [
+   {
+    "name": "Grave Blade",
+    "toHit": 5,
+    "damage": "2d8+3",
+    "dmg": "slashing",
+    "weight": 3
+   },
+   {
+    "name": "Executioner's Arc",
+    "toHit": 6,
+    "damage": "4d8+3",
+    "dmg": "necrotic",
+    "telegraph": true,
+    "text": "lifts its black blade in a slow salute"
+   }
+  ],
+  "behavior": "brute",
+  "weakness": "bludgeoning",
+  "immune": [
+   "poisoned",
+   "frightened",
+   "charmed"
+  ],
+  "tags": [
+   "undead"
+  ],
+  "biomes": [
+   "ruins"
+  ],
+  "night": true,
+  "desc": "Its armor outlived its owner by centuries."
+ },
+ {
+  "id": "zombie",
+  "name": "Zombie",
+  "emoji": "🧟",
+  "family": "zombie",
+  "tier": 1,
+  "xp": 50,
+  "hp": 22,
+  "ac": 8,
+  "stats": {
+   "STR": 13,
+   "DEX": 6,
+   "CON": 16,
+   "INT": 3,
+   "WIS": 6,
+   "CHA": 5
+  },
+  "attacks": [
+   {
+    "name": "Slam",
+    "toHit": 3,
+    "damage": "1d6+1",
+    "dmg": "bludgeoning"
+   }
+  ],
+  "behavior": "brute",
+  "weakness": "radiant",
+  "immune": [
+   "poisoned",
+   "charmed",
+   "frightened"
+  ],
+  "tags": [
+   "undead"
+  ],
+  "biomes": [
+   "swamp",
+   "ruins",
+   "plains"
+  ],
+  "night": true,
+  "desc": "Slow, hungry and very persistent."
+ },
+ {
+  "id": "ghoul",
+  "name": "Ghoul",
+  "emoji": "🧟",
+  "family": "zombie",
+  "tier": 2,
+  "xp": 200,
+  "hp": 22,
+  "ac": 12,
+  "stats": {
+   "STR": 13,
+   "DEX": 15,
+   "CON": 10,
+   "INT": 7,
+   "WIS": 10,
+   "CHA": 6
+  },
+  "attacks": [
+   {
+    "name": "Paralyzing Claws",
+    "toHit": 4,
+    "damage": "2d4+2",
+    "dmg": "slashing",
+    "condition": {
+     "id": "stunned",
+     "turns": 1,
+     "chance": 0.25
+    }
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "radiant",
+  "immune": [
+   "poisoned",
+   "charmed"
+  ],
+  "tags": [
+   "undead"
+  ],
+  "biomes": [
+   "swamp",
+   "ruins"
+  ],
+  "night": true,
+  "desc": "Its touch locks your muscles."
+ },
+ {
+  "id": "wight",
+  "name": "Wight",
+  "emoji": "🧛",
+  "family": "zombie",
+  "tier": 3,
+  "xp": 700,
+  "hp": 45,
+  "ac": 14,
+  "stats": {
+   "STR": 15,
+   "DEX": 14,
+   "CON": 16,
+   "INT": 10,
+   "WIS": 13,
+   "CHA": 15
+  },
+  "attacks": [
+   {
+    "name": "Longsword",
+    "toHit": 5,
+    "damage": "1d8+2",
+    "dmg": "slashing",
+    "weight": 2
+   },
+   {
+    "name": "Life Drain",
+    "toHit": 5,
+    "damage": "2d6+2",
+    "dmg": "necrotic",
+    "weight": 1
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "radiant",
+  "resist": [
+   "necrotic",
+   "cold"
+  ],
+  "immune": [
+   "poisoned"
+  ],
+  "tags": [
+   "undead"
+  ],
+  "biomes": [
+   "ruins",
+   "mountains"
+  ],
+  "night": true,
+  "desc": "A cold intelligence behind dead eyes."
+ },
+ {
+  "id": "bandit",
+  "name": "Bandit",
+  "emoji": "🥷",
+  "family": "bandit",
+  "tier": 1,
+  "xp": 25,
+  "hp": 11,
+  "ac": 12,
+  "stats": {
+   "STR": 11,
+   "DEX": 12,
+   "CON": 12,
+   "INT": 10,
+   "WIS": 10,
+   "CHA": 10
+  },
+  "attacks": [
+   {
+    "name": "Scimitar",
+    "toHit": 3,
+    "damage": "1d6+1",
+    "dmg": "slashing"
+   }
+  ],
+  "behavior": "coward",
+  "tags": [
+   "humanoid"
+  ],
+  "biomes": [
+   "plains",
+   "forest",
+   "coast",
+   "desert"
+  ],
+  "gold": 10,
+  "desc": "Your money or your life. Preferably both."
+ },
+ {
+  "id": "bandit_archer",
+  "name": "Bandit Archer",
+  "emoji": "🏹",
+  "family": "bandit",
+  "tier": 1,
+  "xp": 50,
+  "hp": 11,
+  "ac": 12,
+  "stats": {
+   "STR": 10,
+   "DEX": 14,
+   "CON": 12,
+   "INT": 10,
+   "WIS": 12,
+   "CHA": 10
+  },
+  "attacks": [
+   {
+    "name": "Light Crossbow",
+    "toHit": 4,
+    "damage": "1d8+2",
+    "dmg": "piercing"
+   }
+  ],
+  "behavior": "skirmisher",
+  "tags": [
+   "humanoid"
+  ],
+  "biomes": [
+   "plains",
+   "forest",
+   "coast"
+  ],
+  "gold": 10,
+  "desc": "Hides behind a rock and takes potshots."
+ },
+ {
+  "id": "cutthroat",
+  "name": "Cutthroat",
+  "emoji": "🔪",
+  "family": "bandit",
+  "tier": 2,
+  "xp": 200,
+  "hp": 27,
+  "ac": 14,
+  "stats": {
+   "STR": 10,
+   "DEX": 16,
+   "CON": 12,
+   "INT": 12,
+   "WIS": 10,
+   "CHA": 12
+  },
+  "attacks": [
+   {
+    "name": "Poisoned Dagger",
+    "toHit": 5,
+    "damage": "1d4+3",
+    "dmg": "piercing",
+    "condition": {
+     "id": "poisoned",
+     "turns": 2,
+     "chance": 0.4
+    }
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "skirmisher",
+  "tags": [
+   "humanoid"
+  ],
+  "biomes": [
+   "plains",
+   "coast",
+   "desert"
+  ],
+  "gold": 20,
+  "desc": "Smiles a lot. Never at you."
+ },
+ {
+  "id": "bandit_captain",
+  "name": "Bandit Captain",
+  "emoji": "🏴‍☠️",
+  "family": "bandit",
+  "tier": 2,
+  "xp": 450,
+  "hp": 50,
+  "ac": 15,
+  "stats": {
+   "STR": 15,
+   "DEX": 16,
+   "CON": 14,
+   "INT": 14,
+   "WIS": 11,
+   "CHA": 14
+  },
+  "attacks": [
+   {
+    "name": "Scimitar Flurry",
+    "toHit": 5,
+    "damage": "1d6+3",
+    "dmg": "slashing",
+    "weight": 3
+   },
+   {
+    "name": "Rally the Crew",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "force",
+    "summon": "bandit",
+    "weight": 1,
+    "text": "whistles sharply — another bandit joins the fight"
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "tags": [
+   "humanoid"
+  ],
+  "biomes": [
+   "plains",
+   "coast",
+   "forest"
+  ],
+  "gold": 60,
+  "desc": "Gold earring, silver tongue, steel blade."
+ },
+ {
+  "id": "cave_spider",
+  "name": "Cave Spider",
+  "emoji": "🕷️",
+  "family": "spider",
+  "tier": 1,
+  "xp": 50,
+  "hp": 10,
+  "ac": 13,
+  "stats": {
+   "STR": 8,
+   "DEX": 16,
+   "CON": 10,
+   "INT": 2,
+   "WIS": 10,
+   "CHA": 2
+  },
+  "attacks": [
+   {
+    "name": "Venomous Bite",
+    "toHit": 5,
+    "damage": "1d6+3",
+    "dmg": "piercing",
+    "condition": {
+     "id": "poisoned",
+     "turns": 1,
+     "chance": 0.4
+    }
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "fire",
+  "tags": [
+   "beast",
+   "spider"
+  ],
+  "biomes": [
+   "forest",
+   "ruins",
+   "mountains"
+  ],
+  "night": true,
+  "desc": "Fist-sized. Then dog-sized. Then you stop looking."
+ },
+ {
+  "id": "giant_spider",
+  "name": "Giant Spider",
+  "emoji": "🕷️",
+  "family": "spider",
+  "tier": 2,
+  "xp": 200,
+  "hp": 26,
+  "ac": 14,
+  "stats": {
+   "STR": 14,
+   "DEX": 16,
+   "CON": 12,
+   "INT": 2,
+   "WIS": 11,
+   "CHA": 4
+  },
+  "attacks": [
+   {
+    "name": "Bite",
+    "toHit": 5,
+    "damage": "1d8+3",
+    "dmg": "piercing",
+    "condition": {
+     "id": "poisoned",
+     "turns": 2,
+     "chance": 0.5
+    },
+    "weight": 2
+   },
+   {
+    "name": "Web Spray",
+    "toHit": 5,
+    "damage": "0",
+    "dmg": "bludgeoning",
+    "condition": {
+     "id": "slowed",
+     "turns": 2
+    },
+    "weight": 1,
+    "text": "sprays sticky webbing"
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "fire",
+  "tags": [
+   "beast",
+   "spider"
+  ],
+  "biomes": [
+   "forest",
+   "ruins",
+   "swamp"
+  ],
+  "desc": "Eight legs, eight eyes, zero mercy."
+ },
+ {
+  "id": "phase_spider",
+  "name": "Phase Spider",
+  "emoji": "🕸️",
+  "family": "spider",
+  "tier": 3,
+  "xp": 700,
+  "hp": 32,
+  "ac": 15,
+  "stats": {
+   "STR": 15,
+   "DEX": 17,
+   "CON": 12,
+   "INT": 6,
+   "WIS": 10,
+   "CHA": 6
+  },
+  "attacks": [
+   {
+    "name": "Phasing Bite",
+    "toHit": 6,
+    "damage": "2d8+3",
+    "dmg": "poison",
+    "condition": {
+     "id": "poisoned",
+     "turns": 2,
+     "chance": 0.5
+    }
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "force",
+  "tags": [
+   "beast",
+   "spider"
+  ],
+  "biomes": [
+   "ruins",
+   "forest"
+  ],
+  "desc": "Blinks in and out of reality to bite you."
+ },
+ {
+  "id": "mother_of_webs",
+  "name": "Mother of Webs",
+  "emoji": "🕷️",
+  "family": "spider",
+  "tier": 3,
+  "xp": 2300,
+  "hp": 120,
+  "ac": 15,
+  "stats": {
+   "STR": 18,
+   "DEX": 16,
+   "CON": 16,
+   "INT": 10,
+   "WIS": 14,
+   "CHA": 10
+  },
+  "attacks": [
+   {
+    "name": "Venom Fangs",
+    "toHit": 7,
+    "damage": "2d10+4",
+    "dmg": "piercing",
+    "condition": {
+     "id": "poisoned",
+     "turns": 2,
+     "chance": 0.5
+    },
+    "weight": 3
+   },
+   {
+    "name": "Cocoon Storm",
+    "toHit": 0,
+    "damage": "2d8",
+    "dmg": "poison",
+    "save": {
+     "ability": "DEX",
+     "dc": 14,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "condition": {
+     "id": "slowed",
+     "turns": 2
+    },
+    "text": "rears up and her spinnerets begin to quiver"
+   },
+   {
+    "name": "Brood",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "force",
+    "summon": "cave_spider",
+    "text": "taps the web: her children come",
+    "weight": 1
+   }
+  ],
+  "behavior": "boss",
+  "boss": true,
+  "legendary": 1,
+  "weakness": "fire",
+  "tags": [
+   "beast",
+   "spider"
+  ],
+  "gold": 200,
+  "desc": "She's been waiting a long, long time."
+ },
+ {
+  "id": "giant_rat",
+  "name": "Giant Rat",
+  "emoji": "🐀",
+  "family": "vermin",
+  "tier": 1,
+  "xp": 25,
+  "hp": 7,
+  "ac": 12,
+  "stats": {
+   "STR": 7,
+   "DEX": 15,
+   "CON": 11,
+   "INT": 2,
+   "WIS": 10,
+   "CHA": 4
+  },
+  "attacks": [
+   {
+    "name": "Bite",
+    "toHit": 4,
+    "damage": "1d4+2",
+    "dmg": "piercing",
+    "condition": {
+     "id": "poisoned",
+     "turns": 1,
+     "chance": 0.15
+    }
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "fire",
+  "tags": [
+   "beast"
+  ],
+  "biomes": [
+   "swamp",
+   "ruins",
+   "coast"
+  ],
+  "desc": "Too big. Way too big."
+ },
+ {
+  "id": "crow_swarm",
+  "name": "Swarm of Crows",
+  "emoji": "🐦‍⬛",
+  "family": "vermin",
+  "tier": 1,
+  "xp": 50,
+  "hp": 16,
+  "ac": 12,
+  "stats": {
+   "STR": 6,
+   "DEX": 14,
+   "CON": 8,
+   "INT": 3,
+   "WIS": 12,
+   "CHA": 6
+  },
+  "attacks": [
+   {
+    "name": "Pecking Frenzy",
+    "toHit": 4,
+    "damage": "2d4",
+    "dmg": "piercing",
+    "condition": {
+     "id": "blinded",
+     "turns": 1,
+     "chance": 0.2
+    }
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "thunder",
+  "resist": [
+   "slashing",
+   "piercing"
+  ],
+  "tags": [
+   "beast",
+   "flying"
+  ],
+  "biomes": [
+   "plains",
+   "ruins",
+   "coast",
+   "mountains"
+  ],
+  "desc": "A thousand beaks and a single grudge."
+ },
+ {
+  "id": "stirge",
+  "name": "Stirge",
+  "emoji": "🦟",
+  "family": "vermin",
+  "tier": 1,
+  "xp": 25,
+  "hp": 5,
+  "ac": 14,
+  "stats": {
+   "STR": 4,
+   "DEX": 16,
+   "CON": 11,
+   "INT": 2,
+   "WIS": 8,
+   "CHA": 6
+  },
+  "attacks": [
+   {
+    "name": "Blood Drain",
+    "toHit": 5,
+    "damage": "1d4+3",
+    "dmg": "piercing"
+   }
+  ],
+  "behavior": "skirmisher",
+  "tags": [
+   "beast",
+   "flying"
+  ],
+  "biomes": [
+   "swamp",
+   "forest"
+  ],
+  "night": true,
+  "desc": "A mosquito with ambitions."
+ },
+ {
+  "id": "boar",
+  "name": "Wild Boar",
+  "emoji": "🐗",
+  "family": "beast",
+  "tier": 1,
+  "xp": 50,
+  "hp": 13,
+  "ac": 11,
+  "stats": {
+   "STR": 13,
+   "DEX": 11,
+   "CON": 12,
+   "INT": 2,
+   "WIS": 9,
+   "CHA": 5
+  },
+  "attacks": [
+   {
+    "name": "Tusk Charge",
+    "toHit": 3,
+    "damage": "1d6+3",
+    "dmg": "slashing",
+    "condition": {
+     "id": "prone",
+     "turns": 1,
+     "chance": 0.3
+    }
+   }
+  ],
+  "behavior": "brute",
+  "tags": [
+   "beast"
+  ],
+  "biomes": [
+   "forest",
+   "plains"
+  ],
+  "desc": "Angry bacon."
+ },
+ {
+  "id": "brown_bear",
+  "name": "Brown Bear",
+  "emoji": "🐻",
+  "family": "beast",
+  "tier": 2,
+  "xp": 200,
+  "hp": 34,
+  "ac": 11,
+  "stats": {
+   "STR": 19,
+   "DEX": 10,
+   "CON": 16,
+   "INT": 2,
+   "WIS": 13,
+   "CHA": 7
+  },
+  "attacks": [
+   {
+    "name": "Claw & Bite",
+    "toHit": 6,
+    "damage": "2d6+4",
+    "dmg": "slashing"
+   }
+  ],
+  "behavior": "brute",
+  "tags": [
+   "beast"
+  ],
+  "biomes": [
+   "forest",
+   "mountains"
+  ],
+  "desc": "You were warned about the honey."
+ },
+ {
+  "id": "owlbear",
+  "name": "Owlbear",
+  "emoji": "🦉",
+  "family": "beast",
+  "tier": 3,
+  "xp": 700,
+  "hp": 59,
+  "ac": 13,
+  "stats": {
+   "STR": 20,
+   "DEX": 12,
+   "CON": 17,
+   "INT": 3,
+   "WIS": 12,
+   "CHA": 7
+  },
+  "attacks": [
+   {
+    "name": "Beak & Claws",
+    "toHit": 7,
+    "damage": "2d8+5",
+    "dmg": "slashing",
+    "weight": 3
+   },
+   {
+    "name": "Crushing Hug",
+    "toHit": 7,
+    "damage": "4d8+5",
+    "dmg": "bludgeoning",
+    "telegraph": true,
+    "condition": {
+     "id": "stunned",
+     "turns": 1,
+     "chance": 0.5
+    },
+    "text": "spreads its arms wide with a terrible hoot"
+   }
+  ],
+  "behavior": "brute",
+  "tags": [
+   "beast",
+   "monstrosity"
+  ],
+  "biomes": [
+   "forest"
+  ],
+  "desc": "Half owl, half bear, all bad news."
+ },
+ {
+  "id": "kobold",
+  "name": "Kobold",
+  "emoji": "🦎",
+  "family": "kobold",
+  "tier": 1,
+  "xp": 25,
+  "hp": 6,
+  "ac": 12,
+  "stats": {
+   "STR": 7,
+   "DEX": 15,
+   "CON": 9,
+   "INT": 8,
+   "WIS": 7,
+   "CHA": 8
+  },
+  "attacks": [
+   {
+    "name": "Spear",
+    "toHit": 4,
+    "damage": "1d6+2",
+    "dmg": "piercing"
+   }
+  ],
+  "behavior": "coward",
+  "tags": [
+   "humanoid",
+   "dragonkin"
+  ],
+  "biomes": [
+   "mountains",
+   "ruins",
+   "desert"
+  ],
+  "gold": 3,
+  "desc": "Loyal servant of dragons. Terrible at it."
+ },
+ {
+  "id": "kobold_slinger",
+  "name": "Kobold Slinger",
+  "emoji": "🦎",
+  "family": "kobold",
+  "tier": 1,
+  "xp": 25,
+  "hp": 6,
+  "ac": 12,
+  "stats": {
+   "STR": 7,
+   "DEX": 15,
+   "CON": 9,
+   "INT": 8,
+   "WIS": 7,
+   "CHA": 8
+  },
+  "attacks": [
+   {
+    "name": "Sling",
+    "toHit": 4,
+    "damage": "1d4+2",
+    "dmg": "bludgeoning"
+   }
+  ],
+  "behavior": "skirmisher",
+  "tags": [
+   "humanoid",
+   "dragonkin"
+  ],
+  "biomes": [
+   "mountains",
+   "desert"
+  ],
+  "gold": 3,
+  "desc": "Pebbles. So many pebbles."
+ },
+ {
+  "id": "kobold_dragonshield",
+  "name": "Kobold Dragonshield",
+  "emoji": "🛡️",
+  "family": "kobold",
+  "tier": 2,
+  "xp": 200,
+  "hp": 30,
+  "ac": 15,
+  "stats": {
+   "STR": 12,
+   "DEX": 15,
+   "CON": 14,
+   "INT": 8,
+   "WIS": 9,
+   "CHA": 10
+  },
+  "attacks": [
+   {
+    "name": "Spear",
+    "toHit": 4,
+    "damage": "1d6+2",
+    "dmg": "piercing",
+    "weight": 2
+   },
+   {
+    "name": "Heart of the Hoard",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "force",
+    "heal": "2d6",
+    "text": "raises its shield and its kin rally"
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "support",
+  "resist": [
+   "fire"
+  ],
+  "tags": [
+   "humanoid",
+   "dragonkin"
+  ],
+  "biomes": [
+   "mountains"
+  ],
+  "gold": 15,
+  "desc": "Carries a scale from its dragon like a holy relic."
+ },
+ {
+  "id": "cultist",
+  "name": "Cultist",
+  "emoji": "🧎",
+  "family": "cult",
+  "tier": 1,
+  "xp": 25,
+  "hp": 9,
+  "ac": 12,
+  "stats": {
+   "STR": 11,
+   "DEX": 12,
+   "CON": 10,
+   "INT": 10,
+   "WIS": 11,
+   "CHA": 10
+  },
+  "attacks": [
+   {
+    "name": "Ritual Dagger",
+    "toHit": 3,
+    "damage": "1d4+1",
+    "dmg": "piercing"
+   }
+  ],
+  "behavior": "brute",
+  "tags": [
+   "humanoid"
+  ],
+  "biomes": [
+   "ruins",
+   "swamp",
+   "plains"
+  ],
+  "gold": 5,
+  "desc": "Chanting, hooded, and committed."
+ },
+ {
+  "id": "cult_fanatic",
+  "name": "Cult Fanatic",
+  "emoji": "🧙‍♂️",
+  "family": "cult",
+  "tier": 2,
+  "xp": 450,
+  "hp": 33,
+  "ac": 13,
+  "stats": {
+   "STR": 11,
+   "DEX": 14,
+   "CON": 12,
+   "INT": 10,
+   "WIS": 13,
+   "CHA": 14
+  },
+  "attacks": [
+   {
+    "name": "Inflict Wounds",
+    "toHit": 5,
+    "damage": "3d10",
+    "dmg": "necrotic",
+    "weight": 2
+   },
+   {
+    "name": "Command: Grovel",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "psychic",
+    "save": {
+     "ability": "WIS",
+     "dc": 12
+    },
+    "condition": {
+     "id": "prone",
+     "turns": 1
+    },
+    "weight": 1,
+    "text": "barks a word of command"
+   }
+  ],
+  "behavior": "caster",
+  "tags": [
+   "humanoid"
+  ],
+  "biomes": [
+   "ruins",
+   "swamp"
+  ],
+  "gold": 25,
+  "desc": "Their eyes glow when they pray."
+ },
+ {
+  "id": "cult_priest",
+  "name": "Doom Priest",
+  "emoji": "🕯️",
+  "family": "cult",
+  "tier": 3,
+  "xp": 1100,
+  "hp": 60,
+  "ac": 14,
+  "stats": {
+   "STR": 12,
+   "DEX": 12,
+   "CON": 14,
+   "INT": 14,
+   "WIS": 16,
+   "CHA": 16
+  },
+  "attacks": [
+   {
+    "name": "Dark Lance",
+    "toHit": 6,
+    "damage": "3d8+3",
+    "dmg": "necrotic",
+    "weight": 2
+   },
+   {
+    "name": "Doom Chant",
+    "toHit": 0,
+    "damage": "4d6",
+    "dmg": "psychic",
+    "save": {
+     "ability": "WIS",
+     "dc": 14,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "condition": {
+     "id": "frightened",
+     "turns": 1
+    },
+    "text": "begins a droning chant, the shadows lengthen"
+   },
+   {
+    "name": "Dark Blessing",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "force",
+    "heal": "3d6",
+    "weight": 1,
+    "text": "anoints an ally in black oil"
+   }
+  ],
+  "behavior": "caster",
+  "tags": [
+   "humanoid"
+  ],
+  "biomes": [
+   "ruins"
+  ],
+  "gold": 60,
+  "desc": "Speaks for the Doom. Loudly."
+ },
+ {
+  "id": "lizardfolk",
+  "name": "Lizardfolk",
+  "emoji": "🐊",
+  "family": "lizardfolk",
+  "tier": 1,
+  "xp": 100,
+  "hp": 22,
+  "ac": 15,
+  "stats": {
+   "STR": 15,
+   "DEX": 10,
+   "CON": 13,
+   "INT": 7,
+   "WIS": 12,
+   "CHA": 7
+  },
+  "attacks": [
+   {
+    "name": "Heavy Club & Bite",
+    "toHit": 4,
+    "damage": "1d8+2",
+    "dmg": "bludgeoning"
+   }
+  ],
+  "behavior": "brute",
+  "weakness": "cold",
+  "tags": [
+   "humanoid"
+  ],
+  "biomes": [
+   "swamp",
+   "coast"
+  ],
+  "desc": "Pragmatic, hungry, and considering you as lunch."
+ },
+ {
+  "id": "lizard_shaman",
+  "name": "Lizardfolk Shaman",
+  "emoji": "🦎",
+  "family": "lizardfolk",
+  "tier": 2,
+  "xp": 200,
+  "hp": 27,
+  "ac": 13,
+  "stats": {
+   "STR": 15,
+   "DEX": 10,
+   "CON": 13,
+   "INT": 10,
+   "WIS": 15,
+   "CHA": 8
+  },
+  "attacks": [
+   {
+    "name": "Thorn Whip",
+    "toHit": 4,
+    "damage": "2d6",
+    "dmg": "piercing",
+    "weight": 2
+   },
+   {
+    "name": "Swamp Mend",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "force",
+    "heal": "2d6+2",
+    "text": "smears healing mud on an ally"
+   }
+  ],
+  "behavior": "support",
+  "weakness": "cold",
+  "tags": [
+   "humanoid"
+  ],
+  "biomes": [
+   "swamp"
+  ],
+  "desc": "Croaks prayers to the drowned god."
+ },
+ {
+  "id": "green_slime",
+  "name": "Green Slime",
+  "emoji": "🟢",
+  "family": "ooze",
+  "tier": 1,
+  "xp": 100,
+  "hp": 25,
+  "ac": 8,
+  "stats": {
+   "STR": 12,
+   "DEX": 6,
+   "CON": 16,
+   "INT": 1,
+   "WIS": 6,
+   "CHA": 1
+  },
+  "attacks": [
+   {
+    "name": "Acid Touch",
+    "toHit": 3,
+    "damage": "2d6",
+    "dmg": "acid"
+   }
+  ],
+  "behavior": "brute",
+  "weakness": "cold",
+  "resist": [
+   "acid",
+   "slashing"
+  ],
+  "immune": [
+   "blinded",
+   "charmed",
+   "frightened",
+   "prone"
+  ],
+  "tags": [
+   "ooze"
+  ],
+  "biomes": [
+   "swamp",
+   "ruins"
+  ],
+  "desc": "Wobbly. Corrosive. Somehow smug."
+ },
+ {
+  "id": "gelatinous_cube",
+  "name": "Gelatinous Cube",
+  "emoji": "🧊",
+  "family": "ooze",
+  "tier": 2,
+  "xp": 450,
+  "hp": 70,
+  "ac": 6,
+  "stats": {
+   "STR": 14,
+   "DEX": 3,
+   "CON": 20,
+   "INT": 1,
+   "WIS": 6,
+   "CHA": 1
+  },
+  "attacks": [
+   {
+    "name": "Pseudopod",
+    "toHit": 4,
+    "damage": "3d6",
+    "dmg": "acid",
+    "weight": 2
+   },
+   {
+    "name": "Engulf",
+    "toHit": 0,
+    "damage": "3d6+3",
+    "dmg": "acid",
+    "save": {
+     "ability": "DEX",
+     "dc": 12,
+     "half": true
+    },
+    "telegraph": true,
+    "condition": {
+     "id": "stunned",
+     "turns": 1
+    },
+    "text": "quivers and slides toward its target"
+   }
+  ],
+  "behavior": "brute",
+  "immune": [
+   "blinded",
+   "charmed",
+   "frightened",
+   "prone"
+  ],
+  "tags": [
+   "ooze"
+  ],
+  "biomes": [
+   "ruins"
+  ],
+  "desc": "You can see last week's adventurer inside."
+ },
+ {
+  "id": "harpy",
+  "name": "Harpy",
+  "emoji": "🦅",
+  "family": "harpy",
+  "tier": 2,
+  "xp": 200,
+  "hp": 38,
+  "ac": 11,
+  "stats": {
+   "STR": 12,
+   "DEX": 13,
+   "CON": 12,
+   "INT": 7,
+   "WIS": 10,
+   "CHA": 13
+  },
+  "attacks": [
+   {
+    "name": "Talons",
+    "toHit": 3,
+    "damage": "2d4+1",
+    "dmg": "slashing",
+    "weight": 2
+   },
+   {
+    "name": "Luring Song",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "psychic",
+    "save": {
+     "ability": "WIS",
+     "dc": 11
+    },
+    "condition": {
+     "id": "charmed",
+     "turns": 1
+    },
+    "weight": 1,
+    "text": "sings a beautiful, terrible song"
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "thunder",
+  "tags": [
+   "monstrosity",
+   "flying"
+  ],
+  "biomes": [
+   "coast",
+   "mountains"
+  ],
+  "desc": "Beautiful voice. Horrible everything else."
+ },
+ {
+  "id": "gargoyle",
+  "name": "Gargoyle",
+  "emoji": "🗿",
+  "family": "construct",
+  "tier": 3,
+  "xp": 450,
+  "hp": 52,
+  "ac": 15,
+  "stats": {
+   "STR": 15,
+   "DEX": 11,
+   "CON": 16,
+   "INT": 6,
+   "WIS": 11,
+   "CHA": 7
+  },
+  "attacks": [
+   {
+    "name": "Claws & Horns",
+    "toHit": 4,
+    "damage": "1d6+2",
+    "dmg": "slashing"
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "bludgeoning",
+  "resist": [
+   "slashing",
+   "piercing"
+  ],
+  "immune": [
+   "poisoned"
+  ],
+  "tags": [
+   "elemental",
+   "flying"
+  ],
+  "biomes": [
+   "ruins",
+   "mountains"
+  ],
+  "night": true,
+  "desc": "It was a statue a moment ago. Wasn't it?"
+ },
+ {
+  "id": "mimic",
+  "name": "Mimic",
+  "emoji": "🧰",
+  "family": "mimic",
+  "tier": 2,
+  "xp": 450,
+  "hp": 58,
+  "ac": 12,
+  "stats": {
+   "STR": 17,
+   "DEX": 12,
+   "CON": 15,
+   "INT": 5,
+   "WIS": 13,
+   "CHA": 8
+  },
+  "attacks": [
+   {
+    "name": "Sticky Bite",
+    "toHit": 5,
+    "damage": "1d8+3",
+    "dmg": "piercing",
+    "condition": {
+     "id": "slowed",
+     "turns": 1,
+     "chance": 0.5
+    }
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "fire",
+  "resist": [
+   "acid"
+  ],
+  "immune": [
+   "prone"
+  ],
+  "tags": [
+   "monstrosity"
+  ],
+  "biomes": [
+   "ruins"
+  ],
+  "desc": "That treasure chest has teeth."
+ },
+ {
+  "id": "will_o_wisp",
+  "name": "Will-o'-Wisp",
+  "emoji": "💡",
+  "family": "fey",
+  "tier": 2,
+  "xp": 450,
+  "hp": 22,
+  "ac": 19,
+  "stats": {
+   "STR": 1,
+   "DEX": 28,
+   "CON": 10,
+   "INT": 13,
+   "WIS": 14,
+   "CHA": 11
+  },
+  "attacks": [
+   {
+    "name": "Shock",
+    "toHit": 4,
+    "damage": "2d8",
+    "dmg": "lightning"
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "force",
+  "resist": [
+   "slashing",
+   "piercing",
+   "bludgeoning",
+   "fire"
+  ],
+  "immune": [
+   "poisoned",
+   "prone"
+  ],
+  "tags": [
+   "undead",
+   "flying"
+  ],
+  "biomes": [
+   "swamp"
+  ],
+  "night": true,
+  "desc": "Follow the pretty light. Don't."
+ },
+ {
+  "id": "bugbear",
+  "name": "Bugbear",
+  "emoji": "🐻",
+  "family": "goblin",
+  "tier": 2,
+  "xp": 200,
+  "hp": 27,
+  "ac": 16,
+  "stats": {
+   "STR": 15,
+   "DEX": 14,
+   "CON": 13,
+   "INT": 8,
+   "WIS": 11,
+   "CHA": 9
+  },
+  "attacks": [
+   {
+    "name": "Morningstar Ambush",
+    "toHit": 4,
+    "damage": "2d8+2",
+    "dmg": "piercing"
+   }
+  ],
+  "behavior": "brute",
+  "tags": [
+   "goblinoid",
+   "humanoid"
+  ],
+  "biomes": [
+   "forest",
+   "mountains"
+  ],
+  "gold": 12,
+  "desc": "Hairy, sneaky and terrifyingly quiet for its size."
+ },
+ {
+  "id": "hobgoblin",
+  "name": "Hobgoblin Soldier",
+  "emoji": "💂",
+  "family": "goblin",
+  "tier": 1,
+  "xp": 100,
+  "hp": 18,
+  "ac": 17,
+  "stats": {
+   "STR": 13,
+   "DEX": 12,
+   "CON": 12,
+   "INT": 10,
+   "WIS": 10,
+   "CHA": 9
+  },
+  "attacks": [
+   {
+    "name": "Longsword",
+    "toHit": 3,
+    "damage": "1d10+1",
+    "dmg": "slashing"
+   }
+  ],
+  "behavior": "brute",
+  "tags": [
+   "goblinoid",
+   "humanoid"
+  ],
+  "biomes": [
+   "plains",
+   "mountains"
+  ],
+  "gold": 8,
+  "desc": "Disciplined, drilled and very orderly about violence."
+ },
+ {
+  "id": "ogre",
+  "name": "Ogre",
+  "emoji": "🧌",
+  "family": "giant",
+  "tier": 3,
+  "xp": 450,
+  "hp": 59,
+  "ac": 11,
+  "stats": {
+   "STR": 19,
+   "DEX": 8,
+   "CON": 16,
+   "INT": 5,
+   "WIS": 7,
+   "CHA": 7
+  },
+  "attacks": [
+   {
+    "name": "Greatclub",
+    "toHit": 6,
+    "damage": "2d8+4",
+    "dmg": "bludgeoning",
+    "weight": 3
+   },
+   {
+    "name": "Crushing Blow",
+    "toHit": 7,
+    "damage": "4d8+4",
+    "dmg": "bludgeoning",
+    "telegraph": true,
+    "condition": {
+     "id": "prone",
+     "turns": 1
+    },
+    "text": "raises its club high over its head"
+   }
+  ],
+  "behavior": "brute",
+  "weakness": "psychic",
+  "tags": [
+   "giant"
+  ],
+  "biomes": [
+   "plains",
+   "forest",
+   "mountains",
+   "swamp"
+  ],
+  "gold": 40,
+  "desc": "Big, dim, and permanently hungry."
+ },
+ {
+  "id": "hill_giant",
+  "name": "Hill Giant",
+  "emoji": "🗻",
+  "family": "giant",
+  "tier": 4,
+  "xp": 1800,
+  "hp": 105,
+  "ac": 13,
+  "stats": {
+   "STR": 21,
+   "DEX": 8,
+   "CON": 19,
+   "INT": 5,
+   "WIS": 9,
+   "CHA": 6
+  },
+  "attacks": [
+   {
+    "name": "Greatclub",
+    "toHit": 8,
+    "damage": "3d8+5",
+    "dmg": "bludgeoning",
+    "weight": 3
+   },
+   {
+    "name": "Boulder Toss",
+    "toHit": 0,
+    "damage": "4d10",
+    "dmg": "bludgeoning",
+    "save": {
+     "ability": "DEX",
+     "dc": 15,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "text": "hefts a boulder the size of a cottage"
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "psychic",
+  "tags": [
+   "giant"
+  ],
+  "biomes": [
+   "plains",
+   "mountains"
+  ],
+  "gold": 80,
+  "desc": "Not clever. Doesn't need to be."
+ },
+ {
+  "id": "frost_giant",
+  "name": "Frost Giant",
+  "emoji": "🥶",
+  "family": "giant",
+  "tier": 5,
+  "xp": 3900,
+  "hp": 138,
+  "ac": 15,
+  "stats": {
+   "STR": 23,
+   "DEX": 9,
+   "CON": 21,
+   "INT": 9,
+   "WIS": 10,
+   "CHA": 12
+  },
+  "attacks": [
+   {
+    "name": "Rime Greataxe",
+    "toHit": 9,
+    "damage": "3d12+6",
+    "dmg": "slashing",
+    "weight": 3
+   },
+   {
+    "name": "Glacier Stomp",
+    "toHit": 0,
+    "damage": "6d8",
+    "dmg": "cold",
+    "save": {
+     "ability": "CON",
+     "dc": 16,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "condition": {
+     "id": "slowed",
+     "turns": 2
+    },
+    "text": "lifts one enormous foot as frost races across the ground"
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "fire",
+  "resist": [
+   "cold"
+  ],
+  "tags": [
+   "giant"
+  ],
+  "biomes": [
+   "mountains"
+  ],
+  "gold": 150,
+  "desc": "Their breath fogs even in summer."
+ },
+ {
+  "id": "troll",
+  "name": "Troll",
+  "emoji": "👹",
+  "family": "troll",
+  "tier": 3,
+  "xp": 1800,
+  "hp": 84,
+  "ac": 15,
+  "stats": {
+   "STR": 18,
+   "DEX": 13,
+   "CON": 20,
+   "INT": 7,
+   "WIS": 9,
+   "CHA": 7
+  },
+  "attacks": [
+   {
+    "name": "Claws & Bite",
+    "toHit": 7,
+    "damage": "2d6+4",
+    "dmg": "slashing"
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "fire",
+  "tags": [
+   "giant",
+   "regen"
+  ],
+  "biomes": [
+   "swamp",
+   "forest",
+   "mountains"
+  ],
+  "night": true,
+  "gold": 30,
+  "desc": "Regenerates. Unless you use fire. USE FIRE."
+ },
+ {
+  "id": "minotaur",
+  "name": "Minotaur",
+  "emoji": "🐂",
+  "family": "monstrosity",
+  "tier": 3,
+  "xp": 700,
+  "hp": 76,
+  "ac": 14,
+  "stats": {
+   "STR": 18,
+   "DEX": 11,
+   "CON": 16,
+   "INT": 6,
+   "WIS": 16,
+   "CHA": 9
+  },
+  "attacks": [
+   {
+    "name": "Greataxe",
+    "toHit": 6,
+    "damage": "2d12+4",
+    "dmg": "slashing",
+    "weight": 3
+   },
+   {
+    "name": "Gore Charge",
+    "toHit": 7,
+    "damage": "4d8+4",
+    "dmg": "piercing",
+    "telegraph": true,
+    "condition": {
+     "id": "prone",
+     "turns": 1
+    },
+    "text": "paws the ground and lowers its horns"
+   }
+  ],
+  "behavior": "brute",
+  "tags": [
+   "monstrosity"
+  ],
+  "biomes": [
+   "ruins"
+  ],
+  "gold": 40,
+  "desc": "It knows every turn of this maze."
+ },
+ {
+  "id": "basilisk",
+  "name": "Basilisk",
+  "emoji": "🦎",
+  "family": "monstrosity",
+  "tier": 3,
+  "xp": 700,
+  "hp": 52,
+  "ac": 15,
+  "stats": {
+   "STR": 16,
+   "DEX": 8,
+   "CON": 15,
+   "INT": 2,
+   "WIS": 8,
+   "CHA": 7
+  },
+  "attacks": [
+   {
+    "name": "Bite",
+    "toHit": 5,
+    "damage": "2d6+3",
+    "dmg": "piercing",
+    "weight": 2
+   },
+   {
+    "name": "Petrifying Gaze",
+    "toHit": 0,
+    "damage": "2d6",
+    "dmg": "force",
+    "save": {
+     "ability": "CON",
+     "dc": 12
+    },
+    "condition": {
+     "id": "stunned",
+     "turns": 1
+    },
+    "weight": 1,
+    "text": "fixes its terrible gaze"
+   }
+  ],
+  "behavior": "brute",
+  "tags": [
+   "monstrosity"
+  ],
+  "biomes": [
+   "desert",
+   "mountains",
+   "ruins"
+  ],
+  "desc": "Don't look it in the eye. Seriously."
+ },
+ {
+  "id": "ettercap",
+  "name": "Ettercap",
+  "emoji": "🕷️",
+  "family": "spider",
+  "tier": 2,
+  "xp": 450,
+  "hp": 44,
+  "ac": 13,
+  "stats": {
+   "STR": 14,
+   "DEX": 15,
+   "CON": 13,
+   "INT": 7,
+   "WIS": 12,
+   "CHA": 8
+  },
+  "attacks": [
+   {
+    "name": "Claws",
+    "toHit": 4,
+    "damage": "2d4+2",
+    "dmg": "slashing",
+    "weight": 2
+   },
+   {
+    "name": "Web Line",
+    "toHit": 4,
+    "damage": "0",
+    "dmg": "bludgeoning",
+    "condition": {
+     "id": "slowed",
+     "turns": 2
+    },
+    "text": "flings a sticky web line"
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "skirmisher",
+  "weakness": "fire",
+  "tags": [
+   "monstrosity",
+   "spider"
+  ],
+  "biomes": [
+   "forest"
+  ],
+  "desc": "Herds spiders like sheep."
+ },
+ {
+  "id": "green_hag",
+  "name": "Green Hag",
+  "emoji": "🧙‍♀️",
+  "family": "hag",
+  "tier": 3,
+  "xp": 700,
+  "hp": 82,
+  "ac": 17,
+  "stats": {
+   "STR": 18,
+   "DEX": 12,
+   "CON": 16,
+   "INT": 13,
+   "WIS": 14,
+   "CHA": 14
+  },
+  "attacks": [
+   {
+    "name": "Claws",
+    "toHit": 6,
+    "damage": "2d8+4",
+    "dmg": "slashing",
+    "weight": 2
+   },
+   {
+    "name": "Mimicry Curse",
+    "toHit": 0,
+    "damage": "2d8",
+    "dmg": "psychic",
+    "save": {
+     "ability": "WIS",
+     "dc": 13
+    },
+    "condition": {
+     "id": "frightened",
+     "turns": 2
+    },
+    "text": "speaks in the voice of someone you've lost"
+   }
+  ],
+  "behavior": "caster",
+  "tags": [
+   "fey"
+  ],
+  "biomes": [
+   "swamp",
+   "forest"
+  ],
+  "gold": 50,
+  "desc": "Grandmotherly smile. Rotten teeth."
+ },
+ {
+  "id": "bog_witch",
+  "name": "Mother Murk, the Bog Witch",
+  "emoji": "🧙‍♀️",
+  "family": "hag",
+  "tier": 3,
+  "xp": 2300,
+  "hp": 130,
+  "ac": 16,
+  "stats": {
+   "STR": 18,
+   "DEX": 12,
+   "CON": 16,
+   "INT": 16,
+   "WIS": 16,
+   "CHA": 16
+  },
+  "attacks": [
+   {
+    "name": "Rotting Claws",
+    "toHit": 7,
+    "damage": "2d8+4",
+    "dmg": "necrotic",
+    "weight": 3
+   },
+   {
+    "name": "Cauldron Eruption",
+    "toHit": 0,
+    "damage": "5d6",
+    "dmg": "acid",
+    "save": {
+     "ability": "DEX",
+     "dc": 14,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "condition": {
+     "id": "poisoned",
+     "turns": 2
+    },
+    "text": "stirs her cauldron — it begins to bubble violently"
+   },
+   {
+    "name": "Toad Hex",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "psychic",
+    "save": {
+     "ability": "WIS",
+     "dc": 14
+    },
+    "condition": {
+     "id": "stunned",
+     "turns": 1
+    },
+    "text": "points a crooked finger: 'Ribbit.'",
+    "weight": 1
+   }
+  ],
+  "behavior": "boss",
+  "boss": true,
+  "legendary": 1,
+  "weakness": "radiant",
+  "tags": [
+   "fey"
+  ],
+  "gold": 220,
+  "desc": "The swamp is her cauldron, and you are the soup."
+ },
+ {
+  "id": "specter",
+  "name": "Specter",
+  "emoji": "👻",
+  "family": "wraith",
+  "tier": 2,
+  "xp": 200,
+  "hp": 22,
+  "ac": 12,
+  "stats": {
+   "STR": 1,
+   "DEX": 14,
+   "CON": 11,
+   "INT": 10,
+   "WIS": 10,
+   "CHA": 11
+  },
+  "attacks": [
+   {
+    "name": "Life Drain",
+    "toHit": 4,
+    "damage": "3d6",
+    "dmg": "necrotic"
+   }
+  ],
+  "behavior": "skirmisher",
+  "weakness": "radiant",
+  "resist": [
+   "slashing",
+   "piercing",
+   "bludgeoning",
+   "cold",
+   "fire"
+  ],
+  "immune": [
+   "poisoned",
+   "charmed",
+   "prone"
+  ],
+  "tags": [
+   "undead",
+   "flying"
+  ],
+  "biomes": [
+   "ruins",
+   "swamp"
+  ],
+  "night": true,
+  "desc": "A cold spot with a grudge."
+ },
+ {
+  "id": "wraith",
+  "name": "Wraith",
+  "emoji": "👤",
+  "family": "wraith",
+  "tier": 3,
+  "xp": 1800,
+  "hp": 67,
+  "ac": 13,
+  "stats": {
+   "STR": 6,
+   "DEX": 16,
+   "CON": 16,
+   "INT": 12,
+   "WIS": 14,
+   "CHA": 15
+  },
+  "attacks": [
+   {
+    "name": "Soul Rend",
+    "toHit": 6,
+    "damage": "4d8+3",
+    "dmg": "necrotic",
+    "weight": 3
+   },
+   {
+    "name": "Dread Wail",
+    "toHit": 0,
+    "damage": "3d6",
+    "dmg": "psychic",
+    "save": {
+     "ability": "WIS",
+     "dc": 14,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "condition": {
+     "id": "frightened",
+     "turns": 1
+    },
+    "text": "draws in the light around it, preparing to wail"
+   }
+  ],
+  "behavior": "brute",
+  "weakness": "radiant",
+  "resist": [
+   "slashing",
+   "piercing",
+   "bludgeoning",
+   "fire",
+   "cold"
+  ],
+  "immune": [
+   "poisoned",
+   "charmed",
+   "prone"
+  ],
+  "tags": [
+   "undead"
+  ],
+  "biomes": [
+   "ruins"
+  ],
+  "night": true,
+  "desc": "Pure malice wrapped in shadow."
+ },
+ {
+  "id": "hollow_king",
+  "name": "The Hollow King",
+  "emoji": "👑",
+  "family": "wraith",
+  "tier": 4,
+  "xp": 5000,
+  "hp": 160,
+  "ac": 17,
+  "stats": {
+   "STR": 18,
+   "DEX": 14,
+   "CON": 18,
+   "INT": 16,
+   "WIS": 16,
+   "CHA": 20
+  },
+  "attacks": [
+   {
+    "name": "Crown-Blade",
+    "toHit": 8,
+    "damage": "3d8+5",
+    "dmg": "necrotic",
+    "weight": 3
+   },
+   {
+    "name": "Decree of Ending",
+    "toHit": 0,
+    "damage": "6d8",
+    "dmg": "necrotic",
+    "save": {
+     "ability": "CON",
+     "dc": 15,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "text": "rises from the throne and begins to speak your names"
+   },
+   {
+    "name": "Rise, My Knights",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "force",
+    "summon": "skeleton_knight",
+    "weight": 1,
+    "text": "lifts a hand and the dead stand up"
+   }
+  ],
+  "multiattack": 1,
+  "behavior": "boss",
+  "boss": true,
+  "legendary": 2,
+  "weakness": "radiant",
+  "resist": [
+   "necrotic",
+   "cold",
+   "poison"
+  ],
+  "immune": [
+   "poisoned",
+   "charmed",
+   "frightened"
+  ],
+  "tags": [
+   "undead"
+  ],
+  "gold": 400,
+  "desc": "A crown with no head. A throne with no kingdom. Yet."
+ },
+ {
+  "id": "vampire_spawn",
+  "name": "Vampire Spawn",
+  "emoji": "🧛",
+  "family": "vampire",
+  "tier": 4,
+  "xp": 1800,
+  "hp": 82,
+  "ac": 15,
+  "stats": {
+   "STR": 16,
+   "DEX": 16,
+   "CON": 16,
+   "INT": 11,
+   "WIS": 10,
+   "CHA": 12
+  },
+  "attacks": [
+   {
+    "name": "Claws",
+    "toHit": 6,
+    "damage": "2d4+3",
+    "dmg": "slashing",
+    "weight": 2
+   },
+   {
+    "name": "Drinking Bite",
+    "toHit": 6,
+    "damage": "3d6+3",
+    "dmg": "necrotic",
+    "weight": 1
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "skirmisher",
+  "weakness": "radiant",
+  "resist": [
+   "necrotic"
+  ],
+  "tags": [
+   "undead"
+  ],
+  "biomes": [
+   "ruins"
+  ],
+  "night": true,
+  "desc": "Hungry, elegant and in no hurry."
+ },
+ {
+  "id": "bone_tyrant",
+  "name": "Vex-Morrow the Bone Tyrant",
+  "emoji": "💀",
+  "family": "lich",
+  "tier": 5,
+  "xp": 7200,
+  "hp": 190,
+  "ac": 17,
+  "stats": {
+   "STR": 11,
+   "DEX": 16,
+   "CON": 16,
+   "INT": 21,
+   "WIS": 14,
+   "CHA": 16
+  },
+  "attacks": [
+   {
+    "name": "Necrotic Ray",
+    "toHit": 9,
+    "damage": "4d10",
+    "dmg": "necrotic",
+    "weight": 3
+   },
+   {
+    "name": "Soul Harvest",
+    "toHit": 0,
+    "damage": "8d8",
+    "dmg": "necrotic",
+    "save": {
+     "ability": "CON",
+     "dc": 17,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "text": "opens its phylactery: green fire swirls into its hands"
+   },
+   {
+    "name": "Grasp of Bone",
+    "toHit": 0,
+    "damage": "2d6",
+    "dmg": "cold",
+    "save": {
+     "ability": "STR",
+     "dc": 16
+    },
+    "condition": {
+     "id": "stunned",
+     "turns": 1
+    },
+    "text": "skeletal hands burst from the floor"
+   },
+   {
+    "name": "Raise Dead",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "force",
+    "summon": "skeleton_knight",
+    "weight": 1,
+    "text": "speaks a word and the dead obey"
+   }
+  ],
+  "behavior": "boss",
+  "boss": true,
+  "legendary": 2,
+  "weakness": "radiant",
+  "resist": [
+   "cold",
+   "necrotic",
+   "poison"
+  ],
+  "immune": [
+   "poisoned",
+   "charmed",
+   "frightened",
+   "stunned"
+  ],
+  "tags": [
+   "undead"
+  ],
+  "gold": 600,
+  "desc": "It was a king once. It still keeps the crown, just in case."
+ },
+ {
+  "id": "wyrmling",
+  "name": "Dragon Wyrmling",
+  "emoji": "🐉",
+  "family": "dragon",
+  "tier": 2,
+  "xp": 450,
+  "hp": 38,
+  "ac": 17,
+  "stats": {
+   "STR": 15,
+   "DEX": 12,
+   "CON": 14,
+   "INT": 10,
+   "WIS": 11,
+   "CHA": 13
+  },
+  "attacks": [
+   {
+    "name": "Bite",
+    "toHit": 4,
+    "damage": "1d10+2",
+    "dmg": "piercing",
+    "weight": 3
+   },
+   {
+    "name": "Fire Breath",
+    "toHit": 0,
+    "damage": "5d6",
+    "dmg": "fire",
+    "save": {
+     "ability": "DEX",
+     "dc": 12,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "text": "smoke curls from its nostrils"
+   }
+  ],
+  "behavior": "brute",
+  "weakness": "cold",
+  "resist": [
+   "fire"
+  ],
+  "tags": [
+   "dragon",
+   "flying"
+  ],
+  "biomes": [
+   "mountains",
+   "desert"
+  ],
+  "gold": 60,
+  "desc": "Small, fierce and already hoarding."
+ },
+ {
+  "id": "young_red_dragon",
+  "name": "Young Red Dragon",
+  "emoji": "🐲",
+  "family": "dragon",
+  "tier": 4,
+  "xp": 3900,
+  "hp": 140,
+  "ac": 18,
+  "stats": {
+   "STR": 23,
+   "DEX": 10,
+   "CON": 21,
+   "INT": 14,
+   "WIS": 11,
+   "CHA": 19
+  },
+  "attacks": [
+   {
+    "name": "Bite & Claws",
+    "toHit": 9,
+    "damage": "2d10+6",
+    "dmg": "piercing",
+    "weight": 3
+   },
+   {
+    "name": "Fire Breath",
+    "toHit": 0,
+    "damage": "10d6",
+    "dmg": "fire",
+    "save": {
+     "ability": "DEX",
+     "dc": 17,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "text": "rears back, its chest glowing like a forge"
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "cold",
+  "resist": [
+   "fire"
+  ],
+  "immune": [
+   "frightened"
+  ],
+  "tags": [
+   "dragon",
+   "flying"
+  ],
+  "biomes": [
+   "mountains",
+   "desert"
+  ],
+  "gold": 300,
+  "desc": "Arrogant, greedy and on fire."
+ },
+ {
+  "id": "wyvern",
+  "name": "Wyvern",
+  "emoji": "🦖",
+  "family": "dragon",
+  "tier": 3,
+  "xp": 1800,
+  "hp": 90,
+  "ac": 13,
+  "stats": {
+   "STR": 19,
+   "DEX": 10,
+   "CON": 16,
+   "INT": 5,
+   "WIS": 12,
+   "CHA": 6
+  },
+  "attacks": [
+   {
+    "name": "Bite",
+    "toHit": 7,
+    "damage": "2d6+4",
+    "dmg": "piercing",
+    "weight": 2
+   },
+   {
+    "name": "Venom Stinger",
+    "toHit": 7,
+    "damage": "2d6+4",
+    "dmg": "poison",
+    "condition": {
+     "id": "poisoned",
+     "turns": 2
+    },
+    "weight": 1
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "cold",
+  "tags": [
+   "dragon",
+   "flying"
+  ],
+  "biomes": [
+   "mountains",
+   "coast"
+  ],
+  "desc": "A dragon's dumb, angry cousin."
+ },
+ {
+  "id": "ashmaw",
+  "name": "Ashmaw the Red Wyrm",
+  "emoji": "🐲",
+  "family": "dragon",
+  "tier": 5,
+  "xp": 10000,
+  "hp": 210,
+  "ac": 19,
+  "stats": {
+   "STR": 25,
+   "DEX": 10,
+   "CON": 23,
+   "INT": 16,
+   "WIS": 13,
+   "CHA": 21
+  },
+  "attacks": [
+   {
+    "name": "Rending Bite",
+    "toHit": 10,
+    "damage": "2d10+7",
+    "dmg": "piercing",
+    "weight": 3
+   },
+   {
+    "name": "Inferno Breath",
+    "toHit": 0,
+    "damage": "12d6",
+    "dmg": "fire",
+    "save": {
+     "ability": "DEX",
+     "dc": 18,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "condition": {
+     "id": "burning",
+     "turns": 2
+    },
+    "text": "inhales — the air itself is pulled toward its jaws"
+   },
+   {
+    "name": "Wing Buffet",
+    "toHit": 0,
+    "damage": "2d6+7",
+    "dmg": "bludgeoning",
+    "save": {
+     "ability": "DEX",
+     "dc": 18
+    },
+    "aoe": true,
+    "condition": {
+     "id": "prone",
+     "turns": 1
+    },
+    "text": "beats its vast wings",
+    "weight": 1
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "boss",
+  "boss": true,
+  "legendary": 2,
+  "weakness": "cold",
+  "resist": [
+   "fire"
+  ],
+  "immune": [
+   "frightened",
+   "charmed"
+  ],
+  "tags": [
+   "dragon",
+   "flying"
+  ],
+  "gold": 1000,
+  "desc": "Mountains have burned for less."
+ },
+ {
+  "id": "fire_elemental",
+  "name": "Fire Elemental",
+  "emoji": "🔥",
+  "family": "elemental",
+  "tier": 4,
+  "xp": 1800,
+  "hp": 102,
+  "ac": 13,
+  "stats": {
+   "STR": 10,
+   "DEX": 17,
+   "CON": 16,
+   "INT": 6,
+   "WIS": 10,
+   "CHA": 7
+  },
+  "attacks": [
+   {
+    "name": "Burning Touch",
+    "toHit": 6,
+    "damage": "2d6+3",
+    "dmg": "fire",
+    "condition": {
+     "id": "burning",
+     "turns": 2,
+     "chance": 0.5
+    }
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "cold",
+  "resist": [
+   "slashing",
+   "piercing",
+   "bludgeoning"
+  ],
+  "immune": [
+   "poisoned",
+   "prone"
+  ],
+  "tags": [
+   "elemental"
+  ],
+  "biomes": [
+   "desert",
+   "mountains"
+  ],
+  "desc": "A bonfire with opinions."
+ },
+ {
+  "id": "stone_golem",
+  "name": "Stone Golem",
+  "emoji": "🗿",
+  "family": "construct",
+  "tier": 4,
+  "xp": 3900,
+  "hp": 140,
+  "ac": 17,
+  "stats": {
+   "STR": 22,
+   "DEX": 9,
+   "CON": 20,
+   "INT": 3,
+   "WIS": 11,
+   "CHA": 1
+  },
+  "attacks": [
+   {
+    "name": "Slam",
+    "toHit": 9,
+    "damage": "3d8+6",
+    "dmg": "bludgeoning",
+    "weight": 3
+   },
+   {
+    "name": "Slow Pulse",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "force",
+    "save": {
+     "ability": "WIS",
+     "dc": 17
+    },
+    "aoe": true,
+    "condition": {
+     "id": "slowed",
+     "turns": 2
+    },
+    "text": "its eyes pulse with a slow, heavy light",
+    "weight": 1
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "thunder",
+  "resist": [
+   "slashing",
+   "piercing",
+   "poison"
+  ],
+  "immune": [
+   "poisoned",
+   "charmed",
+   "frightened"
+  ],
+  "tags": [
+   "construct"
+  ],
+  "biomes": [
+   "ruins"
+  ],
+  "desc": "Built to guard. Built well."
+ },
+ {
+  "id": "iron_colossus",
+  "name": "The Iron Colossus",
+  "emoji": "🤖",
+  "family": "construct",
+  "tier": 4,
+  "xp": 5900,
+  "hp": 175,
+  "ac": 19,
+  "stats": {
+   "STR": 24,
+   "DEX": 9,
+   "CON": 20,
+   "INT": 3,
+   "WIS": 11,
+   "CHA": 1
+  },
+  "attacks": [
+   {
+    "name": "Iron Fist",
+    "toHit": 9,
+    "damage": "3d10+6",
+    "dmg": "bludgeoning",
+    "weight": 3
+   },
+   {
+    "name": "Furnace Vent",
+    "toHit": 0,
+    "damage": "8d8",
+    "dmg": "fire",
+    "save": {
+     "ability": "CON",
+     "dc": 17,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "text": "its chest plates grind open, revealing a roaring furnace"
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "boss",
+  "boss": true,
+  "legendary": 2,
+  "weakness": "lightning",
+  "resist": [
+   "slashing",
+   "piercing",
+   "poison",
+   "fire"
+  ],
+  "immune": [
+   "poisoned",
+   "charmed",
+   "frightened",
+   "stunned"
+  ],
+  "tags": [
+   "construct"
+  ],
+  "gold": 500,
+  "desc": "The old empire's last soldier. Still following orders."
+ },
+ {
+  "id": "chimera",
+  "name": "Chimera",
+  "emoji": "🦁",
+  "family": "monstrosity",
+  "tier": 4,
+  "xp": 2300,
+  "hp": 114,
+  "ac": 14,
+  "stats": {
+   "STR": 19,
+   "DEX": 11,
+   "CON": 19,
+   "INT": 3,
+   "WIS": 14,
+   "CHA": 10
+  },
+  "attacks": [
+   {
+    "name": "Three Heads",
+    "toHit": 7,
+    "damage": "2d6+4",
+    "dmg": "piercing",
+    "weight": 3
+   },
+   {
+    "name": "Dragon Head Flame",
+    "toHit": 0,
+    "damage": "7d8",
+    "dmg": "fire",
+    "save": {
+     "ability": "DEX",
+     "dc": 15,
+     "half": true
+    },
+    "aoe": true,
+    "telegraph": true,
+    "text": "its dragon head swells with flame"
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "tags": [
+   "monstrosity",
+   "flying"
+  ],
+  "biomes": [
+   "mountains",
+   "desert"
+  ],
+  "desc": "Lion, goat and dragon — and none of them like you."
+ },
+ {
+  "id": "sand_wurm",
+  "name": "Sand Wurm",
+  "emoji": "🪱",
+  "family": "monstrosity",
+  "tier": 3,
+  "xp": 1100,
+  "hp": 80,
+  "ac": 14,
+  "stats": {
+   "STR": 20,
+   "DEX": 8,
+   "CON": 18,
+   "INT": 1,
+   "WIS": 8,
+   "CHA": 4
+  },
+  "attacks": [
+   {
+    "name": "Bite",
+    "toHit": 7,
+    "damage": "3d8+4",
+    "dmg": "piercing",
+    "weight": 3
+   },
+   {
+    "name": "Swallow Whole",
+    "toHit": 7,
+    "damage": "5d8",
+    "dmg": "acid",
+    "telegraph": true,
+    "condition": {
+     "id": "stunned",
+     "turns": 1
+    },
+    "text": "sinks beneath the sand... the ground bulges under someone"
+   }
+  ],
+  "behavior": "brute",
+  "weakness": "cold",
+  "tags": [
+   "monstrosity"
+  ],
+  "biomes": [
+   "desert"
+  ],
+  "desc": "The dunes move. That's not the wind."
+ },
+ {
+  "id": "sahuagin",
+  "name": "Sahuagin Raider",
+  "emoji": "🐟",
+  "family": "sahuagin",
+  "tier": 1,
+  "xp": 100,
+  "hp": 22,
+  "ac": 12,
+  "stats": {
+   "STR": 13,
+   "DEX": 11,
+   "CON": 12,
+   "INT": 12,
+   "WIS": 13,
+   "CHA": 9
+  },
+  "attacks": [
+   {
+    "name": "Trident",
+    "toHit": 3,
+    "damage": "1d8+1",
+    "dmg": "piercing"
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "lightning",
+  "tags": [
+   "humanoid"
+  ],
+  "biomes": [
+   "coast"
+  ],
+  "night": true,
+  "desc": "Sea-devils with sharp teeth and sharper tridents."
+ },
+ {
+  "id": "sea_hag",
+  "name": "Sea Hag",
+  "emoji": "🧜‍♀️",
+  "family": "hag",
+  "tier": 2,
+  "xp": 450,
+  "hp": 52,
+  "ac": 14,
+  "stats": {
+   "STR": 16,
+   "DEX": 13,
+   "CON": 16,
+   "INT": 12,
+   "WIS": 12,
+   "CHA": 13
+  },
+  "attacks": [
+   {
+    "name": "Claws",
+    "toHit": 5,
+    "damage": "2d6+3",
+    "dmg": "slashing",
+    "weight": 2
+   },
+   {
+    "name": "Horrific Visage",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "psychic",
+    "save": {
+     "ability": "WIS",
+     "dc": 11
+    },
+    "aoe": true,
+    "condition": {
+     "id": "frightened",
+     "turns": 1
+    },
+    "text": "drops her glamour"
+   }
+  ],
+  "behavior": "caster",
+  "tags": [
+   "fey"
+  ],
+  "biomes": [
+   "coast"
+  ],
+  "desc": "Smells of low tide and bad bargains."
+ },
+ {
+  "id": "scorpion_giant",
+  "name": "Giant Scorpion",
+  "emoji": "🦂",
+  "family": "beast",
+  "tier": 2,
+  "xp": 450,
+  "hp": 52,
+  "ac": 15,
+  "stats": {
+   "STR": 15,
+   "DEX": 13,
+   "CON": 15,
+   "INT": 1,
+   "WIS": 9,
+   "CHA": 3
+  },
+  "attacks": [
+   {
+    "name": "Claws",
+    "toHit": 4,
+    "damage": "1d8+2",
+    "dmg": "bludgeoning",
+    "weight": 2
+   },
+   {
+    "name": "Sting",
+    "toHit": 4,
+    "damage": "1d10+2",
+    "dmg": "poison",
+    "condition": {
+     "id": "poisoned",
+     "turns": 2,
+     "chance": 0.6
+    }
+   }
+  ],
+  "multiattack": 2,
+  "behavior": "brute",
+  "weakness": "cold",
+  "tags": [
+   "beast"
+  ],
+  "biomes": [
+   "desert"
+  ],
+  "desc": "The desert's least friendly hug."
+ },
+ {
+  "id": "companion_squire",
+  "name": "Pip the Squire",
+  "emoji": "🧒",
+  "family": "companion",
+  "tier": 1,
+  "xp": 0,
+  "hp": 18,
+  "ac": 15,
+  "stats": {
+   "STR": 13,
+   "DEX": 12,
+   "CON": 13,
+   "INT": 10,
+   "WIS": 11,
+   "CHA": 12
+  },
+  "attacks": [
+   {
+    "name": "Earnest Swing",
+    "toHit": 4,
+    "damage": "1d8+1",
+    "dmg": "slashing",
+    "weight": 3
+   },
+   {
+    "name": "Bandage!",
+    "toHit": 0,
+    "damage": "0",
+    "dmg": "force",
+    "heal": "1d6+2",
+    "weight": 1,
+    "text": "rushes over with a slightly-used bandage"
+   }
+  ],
+  "behavior": "companion",
+  "tags": [
+   "humanoid"
+  ],
+  "biomes": [],
+  "desc": "An eager squire who follows lone heroes. Nobody asked."
+ },
+ {
+  "id": "summoned_wolf",
+  "name": "Spirit Wolf",
+  "emoji": "🐺",
+  "family": "companion",
+  "tier": 1,
+  "xp": 0,
+  "hp": 12,
+  "ac": 13,
+  "stats": {
+   "STR": 12,
+   "DEX": 15,
+   "CON": 12,
+   "INT": 3,
+   "WIS": 12,
+   "CHA": 6
+  },
+  "attacks": [
+   {
+    "name": "Bite",
+    "toHit": 4,
+    "damage": "2d4+2",
+    "dmg": "piercing"
+   }
+  ],
+  "behavior": "companion",
+  "tags": [
+   "beast"
+  ],
+  "biomes": [],
+  "desc": "A friendly spirit-wolf."
+ }
+]

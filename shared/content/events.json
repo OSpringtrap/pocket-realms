@@ -1,0 +1,318 @@
+[
+ { "id": "troll_bridge", "title": "The Toll Bridge", "emoji": "🌉", "biomes": ["forest", "swamp", "plains"], "weight": 2, "tags": ["social"],
+   "text": ["A rickety bridge spans a gorge. Underneath, something large clears its throat. 'Toll is ten gold. Or one riddle. Or one of you.'", "A troll in a tiny hat blocks the bridge. 'Toll!' it bellows, holding out a hand the size of a cart."],
+   "options": [
+    { "label": "Pay the toll", "emoji": "💰", "cost": { "gold": 10 }, "outcomes": { "success": { "text": ["The troll bites each coin, satisfied, and waves you across with surprising courtesy."], "effects": [ { "type": "xp", "amount": 5 } ] } } },
+    { "label": "Answer its riddle", "emoji": "🧩", "skill": "arcana", "dc": 12, "best": { "classes": ["wizard", "bard"] },
+      "outcomes": { "crit": { "text": ["{actor} answers before the troll finishes asking. It weeps with joy and gives you its 'shiny rock collection'."], "effects": [ { "type": "item", "rarity": "rare", "slot": "trinket" }, { "type": "xp", "amount": 25 } ] },
+        "success": { "text": ["'...a shadow?' The troll gasps. 'Nobody ever gets that one!' You cross in triumph."], "effects": [ { "type": "xp", "amount": 20 }, { "type": "gold", "amount": 5 } ] },
+        "partial": { "text": ["{actor}'s answer is technically wrong but so confidently delivered that the troll lets you pass, muttering."], "effects": [ { "type": "xp", "amount": 10 } ] },
+        "fail": { "text": ["Wrong! The troll shakes the bridge until {actor} falls in the river, then lets you pass, laughing."], "effects": [ { "type": "damage", "dice": "1d6", "who": "actor" } ] },
+        "fumble": { "text": ["{actor}'s answer offends the troll's mother. It attacks!"], "effects": [ { "type": "combat", "monsters": ["ogre"], "difficulty": "medium" } ] } } },
+    { "label": "Intimidate it", "emoji": "😠", "skill": "intimidation", "dc": 14, "best": { "classes": ["barbarian", "warrior"], "species": ["orc"] },
+      "outcomes": { "success": { "text": ["{actor} roars. The troll squeaks, hides under the bridge, and you stroll across. It leaves its toll jar behind."], "effects": [ { "type": "gold", "amount": 25 }, { "type": "xp", "amount": 15 } ] },
+        "fail": { "text": ["The troll is not impressed. 'Rude!' It charges."], "effects": [ { "type": "combat", "monsters": ["ogre"], "difficulty": "easy" } ] } } }
+   ] },
+ { "id": "wounded_traveler", "title": "A Wounded Traveler", "emoji": "🤕", "biomes": ["any"], "weight": 2, "tags": ["social", "safe"],
+   "text": ["A traveler lies by the road, clutching a wounded leg. 'Bandits... took everything... please...'", "Groaning from the ditch: a merchant, bruised and battered, waves weakly at you."],
+   "options": [
+    { "label": "Tend their wounds", "emoji": "🩹", "skill": "religion", "dc": 10, "best": { "classes": ["cleric", "paladin"] },
+      "outcomes": { "crit": { "text": ["{actor}'s care is miraculous. The grateful traveler presses a family heirloom into their hands."], "effects": [ { "type": "item", "rarity": "rare" }, { "type": "rep", "faction": "wardens", "amount": 1 }, { "type": "xp", "amount": 20 } ] },
+        "success": { "text": ["The traveler limps away blessing your names, after pointing out a hidden cache the bandits missed."], "effects": [ { "type": "gold", "amount": 20 }, { "type": "reveal", "radius": 2 }, { "type": "xp", "amount": 15 } ] },
+        "fail": { "text": ["You do your best. They'll live, though they wince at every step. They thank you anyway."], "effects": [ { "type": "xp", "amount": 5 } ] } } },
+    { "label": "Ask where the bandits went", "emoji": "🗺️", "skill": "insight", "dc": 12,
+      "outcomes": { "success": { "text": ["The traveler points you to the bandits' camp. You catch them counting the loot."], "effects": [ { "type": "combat", "family": "bandit", "difficulty": "easy" } ] },
+        "fail": { "text": ["Wait — this 'traveler' is a bandit lookout! The ambush springs!"], "effects": [ { "type": "combat", "family": "bandit", "ambush": true, "difficulty": "medium" } ] } } },
+    { "label": "Leave them be", "emoji": "🚶", "outcomes": { "success": { "text": ["You walk on. Somewhere, a bard makes a note: 'not very heroic'."], "effects": [ { "type": "doom", "amount": 1 } ] } } }
+   ] },
+ { "id": "mushroom_ring", "title": "The Fairy Ring", "emoji": "🍄", "biomes": ["forest", "swamp"], "weight": 1, "time": ["evening", "night"], "tags": ["magic"],
+   "text": ["A perfect circle of glowing mushrooms pulses softly in the dusk. Tiny laughter tinkles from somewhere.", "Music drifts from a ring of toadstools. Dancing lights bob within."],
+   "options": [
+    { "label": "Step into the ring", "emoji": "💃", "skill": "performance", "dc": 13, "best": { "classes": ["bard"], "species": ["elf"] }, "minigame": "rhythm",
+      "outcomes": { "crit": { "text": ["{actor} dances so well the fey crown them Midsummer Monarch! They gift the party fey wine and blessings."], "effects": [ { "type": "heal", "dice": "4d6", "who": "party" }, { "type": "inspiration", "who": "party" }, { "type": "title", "text": "Fey Monarch" } ] },
+        "success": { "text": ["The fey are delighted with {actor}'s dancing and bless the party."], "effects": [ { "type": "heal", "dice": "2d6", "who": "party" }, { "type": "sp", "amount": 2, "who": "party" } ] },
+        "partial": { "text": ["{actor} dances for what feels like an hour. It was a day. Still, the fey were amused."], "effects": [ { "type": "doom", "amount": 1 }, { "type": "xp", "amount": 15 } ] },
+        "fail": { "text": ["{actor} trips. The fey are insulted and pelt everyone with acorns."], "effects": [ { "type": "damage", "dice": "1d4", "who": "party" } ] },
+        "fumble": { "text": ["{actor} is spun around and around... and wakes up three days later. Time has passed."], "effects": [ { "type": "doom", "amount": 2 } ] } } },
+    { "label": "Study it from outside", "emoji": "🔍", "skill": "nature", "dc": 12,
+      "outcomes": { "success": { "text": ["{actor} identifies rare moonshrooms at the edge. They make excellent potions."], "effects": [ { "type": "itemId", "id": "ether_greater" }, { "type": "xp", "amount": 10 } ] },
+        "fail": { "text": ["The spores make everyone sneeze for an hour. Nothing gained."], "effects": [] } } },
+    { "label": "Back away slowly", "emoji": "🚶", "outcomes": { "success": { "text": ["Wise. Probably."], "effects": [] } } }
+   ] },
+ { "id": "abandoned_cart", "title": "An Abandoned Cart", "emoji": "🛒", "biomes": ["plains", "forest", "desert", "coast"], "weight": 2, "tags": ["loot"],
+   "text": ["A merchant's cart lies on its side, oxen gone, crates still strapped down. Too quiet.", "A cart, overturned. Barrels, crates, and one very suspicious silence."],
+   "options": [
+    { "label": "Search it carefully", "emoji": "🔍", "skill": "perception", "dc": 12, "minigame": "scan",
+      "outcomes": { "crit": { "text": ["{actor} finds a false bottom stuffed with treasure!"], "effects": [ { "type": "gold", "amount": 60 }, { "type": "item", "rarity": "rare" } ] },
+        "success": { "text": ["Among the crates: useful supplies and a small purse."], "effects": [ { "type": "gold", "amount": 25 }, { "type": "item", "rarity": "common", "slot": "consumable" } ] },
+        "partial": { "text": ["A few coins and a jar of pickles. Good pickles, though."], "effects": [ { "type": "gold", "amount": 10 } ] },
+        "fail": { "text": ["A crate was a trap! Spring-loaded darts hit {actor}."], "effects": [ { "type": "damage", "dice": "2d4", "who": "actor", "dmg": "piercing" } ] },
+        "fumble": { "text": ["The 'crate' opens its mouth. MIMIC!"], "effects": [ { "type": "combat", "monsters": ["mimic"], "difficulty": "medium" } ] } } },
+    { "label": "Check for an ambush first", "emoji": "👀", "skill": "stealth", "dc": 13, "best": { "classes": ["rogue"] },
+      "outcomes": { "success": { "text": ["{actor} spots the bandits hiding in the trees and you get the drop on them!"], "effects": [ { "type": "combat", "family": "bandit", "difficulty": "easy" } ] },
+        "fail": { "text": ["Bandits leap from the trees!"], "effects": [ { "type": "combat", "family": "bandit", "ambush": true, "difficulty": "medium" } ] } } }
+   ] },
+ { "id": "shrine_old_god", "title": "Shrine of a Forgotten God", "emoji": "🗿", "biomes": ["ruins", "mountains", "forest"], "weight": 1, "tags": ["magic", "safe"],
+   "text": ["A mossy shrine to a god nobody remembers. Offerings of old coins lie at its feet, and the air hums.", "A statue with too many arms smiles serenely at you from an overgrown altar."],
+   "options": [
+    { "label": "Pray", "emoji": "🙏", "skill": "religion", "dc": 12, "best": { "classes": ["cleric", "paladin"] }, "minigame": "hum",
+      "outcomes": { "crit": { "text": ["The god remembers itself through {actor}! Divine light fills the party."], "effects": [ { "type": "heal", "dice": "6d6", "who": "party" }, { "type": "doom", "amount": -1 }, { "type": "title", "text": "Voice of the Forgotten" } ] },
+        "success": { "text": ["A warm presence answers {actor}'s prayer. Wounds close and spirits lift."], "effects": [ { "type": "heal", "dice": "3d6", "who": "party" }, { "type": "sp", "amount": 2, "who": "party" } ] },
+        "fail": { "text": ["Silence. The god, if it's listening, isn't saying."], "effects": [] } } },
+    { "label": "Take the offerings", "emoji": "💰", "skill": "deception", "dc": 14, "best": { "classes": ["rogue"] },
+      "outcomes": { "success": { "text": ["You pocket the coins. The statue's smile seems... thinner."], "effects": [ { "type": "gold", "amount": 40 } ] },
+        "fail": { "text": ["The statue's eyes flare. A curse settles on {actor}!"], "effects": [ { "type": "gold", "amount": 40 }, { "type": "curse" }, { "type": "doom", "amount": 1 } ] } } },
+    { "label": "Leave an offering", "emoji": "🪙", "cost": { "gold": 15 }, "outcomes": { "success": { "text": ["You leave some coins. A gentle warmth follows the party for days."], "effects": [ { "type": "inspiration", "who": "party" } ] } } }
+   ] },
+ { "id": "wolf_howl", "title": "Howls in the Dark", "emoji": "🐺", "biomes": ["forest", "plains", "mountains"], "time": ["evening", "night"], "weight": 2, "tags": ["danger"],
+   "text": ["Howls rise all around you. Yellow eyes glint between the trees. The pack is circling.", "The wolves have your scent. You hear them, closer every minute."],
+   "options": [
+    { "label": "Stand and fight", "emoji": "⚔️", "outcomes": { "success": { "text": ["You form up back-to-back as the pack charges!"], "effects": [ { "type": "combat", "family": "wolf", "difficulty": "medium" } ] } } },
+    { "label": "Scare them off with fire", "emoji": "🔥", "skill": "intimidation", "dc": 13, "minigame": "shout",
+      "outcomes": { "success": { "text": ["{actor} waves a flaming branch and bellows. The wolves slink away."], "effects": [ { "type": "xp", "amount": 20 } ] },
+        "fail": { "text": ["The alpha isn't fooled. The pack attacks!"], "effects": [ { "type": "combat", "family": "wolf", "difficulty": "medium" } ] } } },
+    { "label": "Speak to the alpha", "emoji": "🐾", "skill": "nature", "dc": 15, "best": { "species": ["elf"] },
+      "outcomes": { "crit": { "text": ["{actor} and the alpha share a long look. The pack escorts you safely — and one pup follows you home."], "effects": [ { "type": "xp", "amount": 30 }, { "type": "itemId", "id": "fang_charm" }, { "type": "move", "amount": 1 } ] },
+        "success": { "text": ["The alpha dips its head and leads the pack away."], "effects": [ { "type": "xp", "amount": 25 } ] },
+        "fail": { "text": ["The alpha snarls. That's a no."], "effects": [ { "type": "combat", "family": "wolf", "difficulty": "medium", "ambush": true } ] } } }
+   ] },
+ { "id": "tavern_brawl", "title": "Tavern Brawl", "emoji": "🍻", "biomes": ["plains", "coast"], "weight": 1, "tags": ["social"],
+   "text": ["A roadside tavern. Someone spills someone's ale. Chairs start flying.", "'He looked at my goat!' A brawl erupts in the roadhouse."],
+   "options": [
+    { "label": "Join in!", "emoji": "👊", "skill": "athletics", "dc": 13, "best": { "classes": ["barbarian", "warrior"], "species": ["dwarf", "orc"] }, "minigame": "swing",
+      "outcomes": { "crit": { "text": ["{actor} is the last one standing on the bar. The crowd chants their name."], "effects": [ { "type": "gold", "amount": 30 }, { "type": "title", "text": "Barroom Legend" }, { "type": "xp", "amount": 25 } ] },
+        "success": { "text": ["{actor} wins the brawl and the respect of the regulars. Drinks are free."], "effects": [ { "type": "heal", "dice": "1d8", "who": "party" }, { "type": "xp", "amount": 15 } ] },
+        "fail": { "text": ["{actor} gets a stool to the face. Everyone has a great time, mostly."], "effects": [ { "type": "damage", "dice": "1d6", "who": "actor", "dmg": "bludgeoning" } ] } } },
+    { "label": "Calm everyone down", "emoji": "🕊️", "skill": "persuasion", "dc": 14, "best": { "classes": ["bard", "paladin"] },
+      "outcomes": { "success": { "text": ["{actor}'s speech brings tears to the eyes of hardened mercenaries. The innkeeper insists you stay free."], "effects": [ { "type": "rest", "kind": "short" }, { "type": "rep", "faction": "gilded", "amount": 1 } ] },
+        "fail": { "text": ["Somebody throws a pie at {actor}. That's it, you're all thrown out."], "effects": [] } } },
+    { "label": "Pick pockets in the chaos", "emoji": "👛", "skill": "stealth", "dc": 13, "best": { "classes": ["rogue"] }, "minigame": "twofinger",
+      "outcomes": { "success": { "text": ["Nobody notices {actor} lifting purses amid the flying furniture."], "effects": [ { "type": "gold", "amount": 35 } ] },
+        "fail": { "text": ["Caught! {actor} is chased out with a broom."], "effects": [ { "type": "rep", "faction": "wardens", "amount": -1 } ] } } }
+   ] },
+ { "id": "rope_bridge", "title": "The Rope Bridge", "emoji": "🪢", "biomes": ["mountains", "forest"], "weight": 1, "tags": ["hazard"],
+   "text": ["A frayed rope bridge sways over a dizzying chasm. The wind is picking up.", "The only way forward is a rope bridge with more holes than planks."],
+   "options": [
+    { "label": "Cross carefully, one at a time", "emoji": "🤸", "skill": "acrobatics", "dc": 12, "group": true, "minigame": "tilt",
+      "outcomes": { "success": { "text": ["One by one, you make it across. Your knees will stop shaking eventually."], "effects": [ { "type": "xp", "amount": 15 }, { "type": "move", "amount": 1 } ] },
+        "partial": { "text": ["Most of you cross fine. {actor} nearly falls and is hauled up, bruised."], "effects": [ { "type": "damage", "dice": "1d6", "who": "actor" } ] },
+        "fail": { "text": ["A plank snaps! Several of you dangle before scrambling across."], "effects": [ { "type": "damage", "dice": "1d6", "who": "party" } ] } } },
+    { "label": "Find another way around", "emoji": "🧭", "outcomes": { "success": { "text": ["The long way is safe but slow."], "effects": [ { "type": "doom", "amount": 1 } ] } } }
+   ] },
+ { "id": "goblin_toll", "title": "Goblin Checkpoint", "emoji": "👺", "biomes": ["forest", "mountains", "plains"], "weight": 2, "tags": ["social", "danger"],
+   "text": ["Three goblins have built a 'checkpoint' out of sticks. 'Papers!' squeaks one. 'Or gold!' squeaks another.", "A hand-painted sign reads 'GOBLIN ROAD. PAY OR ELSE.' Goblins giggle behind it."],
+   "options": [
+    { "label": "Bluff with fake papers", "emoji": "📜", "skill": "deception", "dc": 11, "best": { "classes": ["rogue", "bard"] },
+      "outcomes": { "crit": { "text": ["{actor}'s 'papers' (a laundry list) are so official the goblins salute and give you THEIR gold."], "effects": [ { "type": "gold", "amount": 20 }, { "type": "xp", "amount": 20 } ] },
+        "success": { "text": ["The goblins squint, nod importantly, and wave you through."], "effects": [ { "type": "xp", "amount": 15 } ] },
+        "fail": { "text": ["'These are a drawing of a duck!' The goblins attack!"], "effects": [ { "type": "combat", "family": "goblin", "difficulty": "easy" } ] } } },
+    { "label": "Charge the checkpoint", "emoji": "⚔️", "outcomes": { "success": { "text": ["You charge! The goblins scream and draw their tiny swords."], "effects": [ { "type": "combat", "family": "goblin", "difficulty": "easy" } ] } } },
+    { "label": "Pay them off", "emoji": "💰", "cost": { "gold": 10 }, "outcomes": { "success": { "text": ["The goblins count the coins six times, then let you pass."], "effects": [] } } }
+   ] },
+ { "id": "hermit_hut", "title": "The Hermit's Hut", "emoji": "🛖", "biomes": ["forest", "mountains", "swamp"], "weight": 1, "tags": ["social", "safe"],
+   "text": ["Smoke curls from a crooked hut. An old hermit peers at you suspiciously through a cracked window.", "A hut built into a tree. A sign reads: 'GO AWAY (unless you brought soup)'."],
+   "options": [
+    { "label": "Ask for wisdom", "emoji": "🧠", "skill": "insight", "dc": 12, "best": { "classes": ["cleric", "wizard"] },
+      "outcomes": { "crit": { "text": ["The hermit takes a liking to {actor} and reveals a secret about {antagonist}: a weakness, and a path."], "effects": [ { "type": "reveal", "radius": 3 }, { "type": "lore", "key": "hermit", "text": "The hermit spoke of {antagonist}'s weakness." }, { "type": "xp", "amount": 30 } ] },
+        "success": { "text": ["The hermit draws you a crude map of the area."], "effects": [ { "type": "reveal", "radius": 3 }, { "type": "xp", "amount": 15 } ] },
+        "fail": { "text": ["The hermit shouts 'SOUP!' and slams the door."], "effects": [] } } },
+    { "label": "Trade for supplies", "emoji": "🧺", "outcomes": { "success": { "text": ["The hermit has a surprising stock of potions, at surprising prices."], "effects": [ { "type": "shop" } ] } } }
+   ] },
+ { "id": "haunted_well", "title": "The Whispering Well", "emoji": "🪣", "biomes": ["ruins", "plains", "swamp"], "weight": 1, "tags": ["magic", "danger"],
+   "text": ["An old stone well. Faint whispers rise from the darkness below... they seem to know your names.", "A well in the middle of nowhere. Something at the bottom is glowing."],
+   "options": [
+    { "label": "Listen closely", "emoji": "👂", "skill": "perception", "dc": 13, "minigame": "quiet",
+      "outcomes": { "crit": { "text": ["The whispers reveal where an old adventurer hid their treasure!"], "effects": [ { "type": "item", "rarity": "rare" }, { "type": "gold", "amount": 30 } ] },
+        "success": { "text": ["The whispers speak of {antagonist}'s plans. Useful."], "effects": [ { "type": "xp", "amount": 20 }, { "type": "reveal", "radius": 2 } ] },
+        "fail": { "text": ["The whispers turn to screams. {actor} reels back, shaken."], "effects": [ { "type": "condition", "id": "frightened", "turns": 2, "who": "actor" }, { "type": "damage", "dice": "1d6", "who": "actor", "dmg": "psychic" } ] } } },
+    { "label": "Climb down", "emoji": "🧗", "skill": "athletics", "dc": 14, "best": { "classes": ["barbarian", "warrior"] },
+      "outcomes": { "success": { "text": ["At the bottom: bones, coins, and a glowing trinket."], "effects": [ { "type": "item", "rarity": "uncommon", "slot": "trinket" }, { "type": "gold", "amount": 20 } ] },
+        "fail": { "text": ["{actor} slips and wakes the things living in the well!"], "effects": [ { "type": "combat", "family": "skeleton", "difficulty": "easy" } ] } } },
+    { "label": "Toss in a coin and wish", "emoji": "🪙", "cost": { "gold": 5 }, "outcomes": { "success": { "text": ["Plink. You feel slightly luckier."], "effects": [ { "type": "inspiration", "who": "actor" } ] } } }
+   ] },
+ { "id": "storm_shelter", "title": "Caught in the Storm", "emoji": "⛈️", "biomes": ["any"], "weather": ["storm", "rain"], "weight": 2, "tags": ["hazard"],
+   "text": ["The storm hits hard. Lightning splits a tree nearby. You need shelter, fast.", "Rain falls in sheets. The trail is turning to mud and the thunder is getting closer."],
+   "options": [
+    { "label": "Find a cave", "emoji": "🕳️", "skill": "nature", "dc": 12, "minigame": "scan",
+      "outcomes": { "success": { "text": ["{actor} finds a dry cave. You wait out the storm in relative comfort."], "effects": [ { "type": "rest", "kind": "short" } ] },
+        "fail": { "text": ["The cave is occupied. By a bear. An annoyed bear."], "effects": [ { "type": "combat", "monsters": ["brown_bear"], "difficulty": "medium" } ] } } },
+    { "label": "Push through", "emoji": "🥶", "skill": "athletics", "dc": 13, "group": true,
+      "outcomes": { "success": { "text": ["You march on through the storm, soaked but determined."], "effects": [ { "type": "move", "amount": 1 } ] },
+        "fail": { "text": ["Exhausted and chilled, everyone suffers."], "effects": [ { "type": "damage", "dice": "1d6", "who": "party", "dmg": "cold" } ] } } }
+   ] },
+ { "id": "lost_child_event", "title": "A Lost Child", "emoji": "🧒", "biomes": ["forest", "plains", "swamp"], "weight": 1, "tags": ["social", "safe"],
+   "text": ["A small child sits crying on a stump. 'I followed the pretty lights and now I can't find home!'", "'Are you heroes?' A muddy child looks up at you hopefully."],
+   "options": [
+    { "label": "Take them home", "emoji": "🏠", "skill": "perception", "dc": 11,
+      "outcomes": { "success": { "text": ["You return the child to their overjoyed family, who insist on rewarding you."], "effects": [ { "type": "gold", "amount": 25 }, { "type": "rep", "faction": "wardens", "amount": 1 }, { "type": "xp", "amount": 20 }, { "type": "heal", "dice": "2d6", "who": "party" } ] },
+        "fail": { "text": ["It takes all day, but you find the family eventually."], "effects": [ { "type": "doom", "amount": 1 }, { "type": "xp", "amount": 20 } ] } } },
+    { "label": "Cheer them up first", "emoji": "🎭", "skill": "performance", "dc": 10, "best": { "classes": ["bard"] },
+      "outcomes": { "success": { "text": ["{actor}'s silly song stops the tears instantly. The child points the way home and gives you a 'magic' pebble."], "effects": [ { "type": "itemId", "id": "ironwood_charm" }, { "type": "xp", "amount": 20 } ] },
+        "fail": { "text": ["The child cries harder. Still, you get them home."], "effects": [ { "type": "xp", "amount": 10 } ] } } }
+   ] },
+ { "id": "merchant_caravan", "title": "Merchant Caravan", "emoji": "🐪", "biomes": ["plains", "desert", "coast"], "weight": 2, "tags": ["shop", "safe"],
+   "text": ["A colorful caravan rolls by. 'Wares! Wares from distant lands! Mostly legal!'", "A caravan has stopped to water its camels. The merchant waves you over eagerly."],
+   "options": [
+    { "label": "Browse the wares", "emoji": "🛍️", "outcomes": { "success": { "text": ["The merchant spreads out a blanket of goods."], "effects": [ { "type": "shop" } ] } } },
+    { "label": "Haggle for a deal", "emoji": "🤝", "skill": "persuasion", "dc": 13, "best": { "classes": ["bard"], "species": ["human"] },
+      "outcomes": { "success": { "text": ["{actor} haggles so well the merchant throws in a free potion out of respect."], "effects": [ { "type": "itemId", "id": "potion_greater" }, { "type": "shop" } ] },
+        "fail": { "text": ["The merchant is offended and raises all prices. You buy nothing."], "effects": [] } } }
+   ] },
+ { "id": "ancient_door", "title": "The Sealed Door", "emoji": "🚪", "biomes": ["ruins", "mountains"], "weight": 1, "tags": ["puzzle"],
+   "text": ["A massive stone door carved with glowing runes blocks a tunnel. Something valuable lies beyond.", "Runes glow on an ancient vault door. A riddle is carved above: 'Draw what has no end.'"],
+   "options": [
+    { "label": "Decipher the runes", "emoji": "✍️", "skill": "arcana", "dc": 13, "best": { "classes": ["wizard"] }, "minigame": "rune",
+      "outcomes": { "crit": { "text": ["{actor} traces the master rune. The door swings open on a forgotten armory!"], "effects": [ { "type": "item", "rarity": "epic" } ] },
+        "success": { "text": ["The runes flare and the door grinds open. Treasure!"], "effects": [ { "type": "item", "rarity": "rare" } ] },
+        "fail": { "text": ["Wrong rune. Lightning crackles from the door!"], "effects": [ { "type": "damage", "dice": "2d6", "who": "actor", "dmg": "lightning" } ] } } },
+    { "label": "Force it open", "emoji": "💪", "skill": "athletics", "dc": 16, "best": { "classes": ["barbarian"], "species": ["dwarf"] },
+      "outcomes": { "success": { "text": ["With a mighty heave, {actor} drags the door open."], "effects": [ { "type": "item", "rarity": "uncommon" }, { "type": "gold", "amount": 30 } ] },
+        "fail": { "text": ["The door doesn't budge. {actor} pulls a muscle."], "effects": [ { "type": "damage", "dice": "1d4", "who": "actor" } ] } } }
+   ] },
+ { "id": "cult_procession", "title": "Dark Procession", "emoji": "🕯️", "biomes": ["ruins", "swamp", "plains"], "time": ["evening", "night"], "weight": 1, "minDoom": 2, "tags": ["danger", "story"],
+   "text": ["Hooded figures walk in a line, chanting {antagonist}'s name. They carry a bound prisoner.", "Torches in the dark: a cult procession heading toward a ritual site."],
+   "options": [
+    { "label": "Ambush them!", "emoji": "⚔️", "skill": "stealth", "dc": 12, "group": true,
+      "outcomes": { "success": { "text": ["You strike from the shadows and free the prisoner, who reveals a secret of {antagonist}'s."], "effects": [ { "type": "combat", "family": "cult", "difficulty": "easy" }, { "type": "doom", "amount": -1 } ] },
+        "fail": { "text": ["The cultists spot you! 'Seize them for the ritual!'"], "effects": [ { "type": "combat", "family": "cult", "difficulty": "medium" } ] } } },
+    { "label": "Disguise yourselves and join", "emoji": "🥸", "skill": "deception", "dc": 14, "best": { "classes": ["rogue", "bard"] },
+      "outcomes": { "success": { "text": ["Hooded and chanting, you learn the ritual's location and sabotage it."], "effects": [ { "type": "doom", "amount": -2 }, { "type": "xp", "amount": 40 } ] },
+        "fail": { "text": ["'That one's chanting the wrong words!' Busted."], "effects": [ { "type": "combat", "family": "cult", "difficulty": "medium", "ambush": true } ] } } },
+    { "label": "Let them pass", "emoji": "🙈", "outcomes": { "success": { "text": ["The chanting fades. Somewhere, a ritual succeeds."], "effects": [ { "type": "doom", "amount": 1 } ] } } }
+   ] },
+ { "id": "river_crossing", "title": "Swollen River", "emoji": "🌊", "biomes": ["plains", "forest", "swamp", "coast"], "weight": 1, "tags": ["hazard"],
+   "text": ["The river has burst its banks. The ford is a rushing torrent now.", "A fast river, cold and deep. There's a ferry on the far side... with no ferryman."],
+   "options": [
+    { "label": "Swim for it", "emoji": "🏊", "skill": "athletics", "dc": 13, "group": true, "minigame": "shake",
+      "outcomes": { "success": { "text": ["You make it across, soaked and triumphant."], "effects": [ { "type": "move", "amount": 1 }, { "type": "xp", "amount": 10 } ] },
+        "fail": { "text": ["The current batters you against rocks before you claw your way out."], "effects": [ { "type": "damage", "dice": "1d8", "who": "party", "dmg": "bludgeoning" } ] } } },
+    { "label": "Build a raft", "emoji": "🪵", "skill": "nature", "dc": 11,
+      "outcomes": { "success": { "text": ["{actor} lashes together a sturdy raft. Smooth sailing!"], "effects": [ { "type": "xp", "amount": 15 } ] },
+        "fail": { "text": ["The raft falls apart halfway. Everyone swims."], "effects": [ { "type": "damage", "dice": "1d4", "who": "party" } ] } } }
+   ] },
+ { "id": "gambling_imp", "title": "The Gambling Imp", "emoji": "😈", "biomes": ["any"], "weight": 1, "tags": ["magic", "social"],
+   "text": ["A tiny red imp appears in a puff of smoke, shuffling cards. 'Fancy a game? Double or nothing, heroes!'", "'Psst! Wanna bet?' An imp sits on a toadstool, rattling dice in a skull."],
+   "options": [
+    { "label": "Play dice with it", "emoji": "🎲", "skill": "deception", "dc": 13, "best": { "classes": ["rogue", "bard"] },
+      "outcomes": { "crit": { "text": ["{actor} cleans the imp out completely! It vanishes, sobbing, leaving its lucky trinket."], "effects": [ { "type": "gold", "amount": 80 }, { "type": "itemId", "id": "bone_dice" } ] },
+        "success": { "text": ["{actor} wins! The imp pays up, grumbling."], "effects": [ { "type": "gold", "amount": 40 } ] },
+        "fail": { "text": ["The imp wins — of course it does. It takes your coins and cackles."], "effects": [ { "type": "gold", "amount": -25 } ] },
+        "fumble": { "text": ["The imp wins {actor}'s shadow! It'll give it back... eventually. Brrr."], "effects": [ { "type": "gold", "amount": -25 }, { "type": "curse" } ] } } },
+    { "label": "Banish it", "emoji": "✨", "skill": "religion", "dc": 12, "best": { "classes": ["cleric", "paladin"] },
+      "outcomes": { "success": { "text": ["POOF. The imp is gone, leaving only a smell of sulfur and a few coins."], "effects": [ { "type": "gold", "amount": 15 }, { "type": "xp", "amount": 15 } ] },
+        "fail": { "text": ["The imp blows a raspberry and disappears with your lunch."], "effects": [] } } }
+   ] },
+ { "id": "ruined_tower", "title": "The Leaning Tower", "emoji": "🗼", "biomes": ["ruins", "plains", "coast"], "weight": 1, "tags": ["loot", "danger"],
+   "text": ["A wizard's tower leans at an alarming angle. Books flutter from its windows like birds.", "The tower of some long-dead wizard. The door is open. The stairs go up... and also somehow sideways."],
+   "options": [
+    { "label": "Explore the library", "emoji": "📚", "skill": "arcana", "dc": 13, "best": { "classes": ["wizard"] },
+      "outcomes": { "crit": { "text": ["{actor} finds the wizard's spellbook and a pearl of power!"], "effects": [ { "type": "itemId", "id": "pearl_power" }, { "type": "xp", "amount": 30 } ] },
+        "success": { "text": ["You recover several useful scrolls."], "effects": [ { "type": "item", "rarity": "uncommon", "slot": "consumable" }, { "type": "item", "rarity": "common", "slot": "consumable" } ] },
+        "fail": { "text": ["An animated book attacks {actor}. Papercuts. So many papercuts."], "effects": [ { "type": "damage", "dice": "2d4", "who": "actor", "dmg": "slashing" } ] } } },
+    { "label": "Check the basement", "emoji": "🕳️", "skill": "perception", "dc": 12,
+      "outcomes": { "success": { "text": ["The wizard's old guardian is still down there — and so is the treasure."], "effects": [ { "type": "combat", "family": "construct", "difficulty": "easy" }, { "type": "gold", "amount": 40 } ] },
+        "fail": { "text": ["Rats. Giant ones. Of course."], "effects": [ { "type": "combat", "family": "vermin", "difficulty": "easy" } ] } } }
+   ] },
+ { "id": "sleeping_giant", "title": "The Sleeping Ogre", "emoji": "😴", "biomes": ["plains", "forest", "mountains"], "weight": 1, "tags": ["danger", "loot"],
+   "text": ["An ogre snores in a clearing, a sack of loot under its head as a pillow.", "Snoring like rockslides: an ogre, asleep on a pile of stolen goods."],
+   "options": [
+    { "label": "Sneak and steal the sack", "emoji": "🤫", "skill": "stealth", "dc": 13, "best": { "classes": ["rogue"] }, "minigame": "quiet",
+      "outcomes": { "crit": { "text": ["{actor} swaps the sack for a rock. The ogre hugs the rock contentedly."], "effects": [ { "type": "gold", "amount": 60 }, { "type": "item", "rarity": "rare" } ] },
+        "success": { "text": ["{actor} slips the sack free. The ogre mumbles and rolls over."], "effects": [ { "type": "gold", "amount": 40 }, { "type": "item", "rarity": "uncommon" } ] },
+        "fail": { "text": ["SNORT. The ogre opens one eye. Then the other."], "effects": [ { "type": "combat", "monsters": ["ogre"], "difficulty": "medium" } ] } } },
+    { "label": "Attack while it sleeps", "emoji": "🗡️", "outcomes": { "success": { "text": ["You get the first hits in before it wakes!"], "effects": [ { "type": "combat", "monsters": ["ogre"], "difficulty": "easy" } ] } } },
+    { "label": "Tiptoe past", "emoji": "🚶", "outcomes": { "success": { "text": ["You leave the ogre to its dreams."], "effects": [] } } }
+   ] },
+ { "id": "oasis", "title": "Oasis", "emoji": "🌴", "biomes": ["desert"], "weight": 2, "tags": ["safe"],
+   "text": ["Palms and clear water shimmer ahead. Is it real?", "An oasis! Real water, real shade, maybe a real mirage."],
+   "options": [
+    { "label": "Rest at the water", "emoji": "💧", "skill": "perception", "dc": 10,
+      "outcomes": { "success": { "text": ["It's real! You drink deep and rest in the shade."], "effects": [ { "type": "rest", "kind": "short" } ] },
+        "fail": { "text": ["It's real... and so is the giant scorpion living in it."], "effects": [ { "type": "combat", "monsters": ["scorpion_giant"], "difficulty": "medium" } ] } } },
+    { "label": "Keep moving", "emoji": "🐪", "outcomes": { "success": { "text": ["No time to rest."], "effects": [ { "type": "move", "amount": 1 } ] } } }
+   ] },
+ { "id": "shipwreck", "title": "Shipwreck on the Shore", "emoji": "🚢", "biomes": ["coast"], "weight": 2, "tags": ["loot"],
+   "text": ["A broken ship lies on the rocks, gulls wheeling above. Crates bob in the surf.", "The tide reveals a wreck. Its figurehead — a mermaid — seems to watch you."],
+   "options": [
+    { "label": "Salvage the hold", "emoji": "📦", "skill": "athletics", "dc": 12, "minigame": "shake",
+      "outcomes": { "success": { "text": ["You haul out crates of goods and a captain's strongbox."], "effects": [ { "type": "gold", "amount": 50 }, { "type": "item", "rarity": "uncommon" } ] },
+        "fail": { "text": ["The hold is home to sea-devils!"], "effects": [ { "type": "combat", "family": "sahuagin", "difficulty": "medium" } ] } } },
+    { "label": "Read the captain's log", "emoji": "📖", "skill": "insight", "dc": 11,
+      "outcomes": { "success": { "text": ["The log mentions a smuggler's cache nearby."], "effects": [ { "type": "reveal", "radius": 3 }, { "type": "gold", "amount": 20 } ] },
+        "fail": { "text": ["The ink has run. Something about 'never trust the parrot'."], "effects": [] } } }
+   ] },
+ { "id": "swamp_lights", "title": "Lights in the Marsh", "emoji": "💡", "biomes": ["swamp"], "time": ["evening", "night"], "weight": 2, "tags": ["danger", "magic"],
+   "text": ["Blue lights bob over the marsh, beckoning. 'This way,' they seem to say.", "Floating lights drift through the reeds, just out of reach."],
+   "options": [
+    { "label": "Follow them", "emoji": "🚶", "skill": "insight", "dc": 14,
+      "outcomes": { "success": { "text": ["{actor} realizes it's a trap — and leads you around it to the bones of their past victims, and their treasure."], "effects": [ { "type": "item", "rarity": "uncommon" }, { "type": "gold", "amount": 30 } ] },
+        "fail": { "text": ["The lights lead you into deep bog. Then they attack!"], "effects": [ { "type": "combat", "monsters": ["will_o_wisp"], "difficulty": "medium" } ] } } },
+    { "label": "Ignore them", "emoji": "🙉", "skill": "insight", "dc": 10, "group": true,
+      "outcomes": { "success": { "text": ["You resist the lights' pull and slog onward."], "effects": [] },
+        "fail": { "text": ["{actor} wanders off in a trance and gets bitten by things in the water."], "effects": [ { "type": "damage", "dice": "1d8", "who": "actor", "dmg": "poison" } ] } } }
+   ] },
+ { "id": "bard_contest", "title": "Busking Contest", "emoji": "🎤", "biomes": ["plains", "coast"], "weight": 1, "tags": ["social"],
+   "text": ["A crowd gathers at a crossroads. A rival bard sneers: 'Anyone dare challenge me?'", "A busking contest! The prize: a purse of gold and eternal glory (local)."],
+   "options": [
+    { "label": "Take the stage", "emoji": "🎶", "skill": "performance", "dc": 14, "best": { "classes": ["bard"] }, "minigame": "hum",
+      "outcomes": { "crit": { "text": ["{actor}'s song is so good the rival bard quits music forever. The crowd carries you on their shoulders."], "effects": [ { "type": "gold", "amount": 60 }, { "type": "title", "text": "Crowd-Pleaser" }, { "type": "inspiration", "who": "party" } ] },
+        "success": { "text": ["{actor} wins the crowd! The purse is yours."], "effects": [ { "type": "gold", "amount": 40 }, { "type": "xp", "amount": 15 } ] },
+        "fail": { "text": ["Booed off stage. A tomato hits {actor}. It was a good tomato."], "effects": [] } } },
+    { "label": "Heckle the rival", "emoji": "🗣️", "skill": "intimidation", "dc": 12, "minigame": "shout",
+      "outcomes": { "success": { "text": ["The rival bard flees in tears. The crowd awards you the prize by default."], "effects": [ { "type": "gold", "amount": 25 } ] },
+        "fail": { "text": ["The crowd turns on you. You're run out of town with rotten fruit."], "effects": [] } } }
+   ] },
+ { "id": "spider_webs", "title": "The Web-Choked Path", "emoji": "🕸️", "biomes": ["forest", "ruins"], "weight": 1, "tags": ["danger"],
+   "text": ["Thick webs block the path. Cocooned shapes hang from the trees... some of them twitching.", "The trees ahead are draped in silk. Something skitters overhead."],
+   "options": [
+    { "label": "Burn through", "emoji": "🔥", "skill": "arcana", "dc": 11, "minigame": "blow",
+      "outcomes": { "success": { "text": ["The webs go up like paper. The spiders scatter — and a cocooned traveler thanks you with gold."], "effects": [ { "type": "gold", "amount": 25 }, { "type": "xp", "amount": 15 } ] },
+        "fail": { "text": ["The fire draws the brood's attention!"], "effects": [ { "type": "combat", "family": "spider", "difficulty": "medium" } ] } } },
+    { "label": "Cut a way carefully", "emoji": "🔪", "skill": "acrobatics", "dc": 13,
+      "outcomes": { "success": { "text": ["You slip through without touching a single strand."], "effects": [ { "type": "xp", "amount": 15 } ] },
+        "fail": { "text": ["TWANG. The whole web shivers. Here they come."], "effects": [ { "type": "combat", "family": "spider", "difficulty": "medium", "ambush": true } ] } } }
+   ] },
+ { "id": "statue_puzzle", "title": "The Four Statues", "emoji": "🗽", "biomes": ["ruins"], "weight": 1, "tags": ["puzzle"],
+   "text": ["Four statues face inward around a sealed chest. Each holds out an empty hand. Pressure plates lie at their feet.", "A circular chamber, four statues, four pressure plates. A plaque reads: 'Together, or not at all.'"],
+   "options": [
+    { "label": "Step on the plates together", "emoji": "👣", "skill": "perception", "dc": 12, "group": true, "minigame": "sequence",
+      "outcomes": { "success": { "text": ["The statues turn in unison and the chest springs open!"], "effects": [ { "type": "item", "rarity": "rare" }, { "type": "xp", "amount": 25 } ] },
+        "fail": { "text": ["Wrong order. Darts fly from the walls!"], "effects": [ { "type": "damage", "dice": "1d6", "who": "party", "dmg": "piercing" } ] } } },
+    { "label": "Pry the chest open", "emoji": "🔧", "skill": "athletics", "dc": 17,
+      "outcomes": { "success": { "text": ["With brute force you crack it open."], "effects": [ { "type": "item", "rarity": "uncommon" } ] },
+        "fail": { "text": ["The statues come alive to defend it!"], "effects": [ { "type": "combat", "monsters": ["gargoyle"], "difficulty": "medium" } ] } } }
+   ] },
+ { "id": "refugees", "title": "Refugees on the Road", "emoji": "🧳", "biomes": ["plains", "forest", "mountains"], "weight": 1, "minDoom": 3, "tags": ["social", "story"],
+   "text": ["A line of refugees flees the darkness spreading from {fortress}. 'It's getting worse every day,' says an old woman.", "Families with carts piled high trudge past. They're fleeing {antagonist}."],
+   "options": [
+    { "label": "Share your supplies", "emoji": "🍞", "cost": { "gold": 20 }, "outcomes": { "success": { "text": ["The refugees are deeply grateful. Word of your kindness spreads."], "effects": [ { "type": "rep", "faction": "wardens", "amount": 2 }, { "type": "inspiration", "who": "party" }, { "type": "xp", "amount": 20 } ] } } },
+    { "label": "Ask what they saw", "emoji": "❓", "skill": "insight", "dc": 11,
+      "outcomes": { "success": { "text": ["They describe the enemy's patrols. You'll avoid the worst of them."], "effects": [ { "type": "reveal", "radius": 3 }, { "type": "doom", "amount": -1 } ] },
+        "fail": { "text": ["Their stories are terrifying and contradictory. You sleep badly."], "effects": [] } } },
+    { "label": "Rally them to fight", "emoji": "📣", "skill": "persuasion", "dc": 15, "best": { "classes": ["paladin", "bard"] },
+      "outcomes": { "success": { "text": ["Inspired by {actor}, the refugees turn back to defend their homes. The enemy's advance slows."], "effects": [ { "type": "doom", "amount": -2 }, { "type": "title", "text": "Hope of the Lost" } ] },
+        "fail": { "text": ["They're too frightened to listen."], "effects": [] } } }
+   ] },
+ { "id": "dragon_egg", "title": "A Warm Egg", "emoji": "🥚", "biomes": ["mountains", "desert"], "weight": 1, "tags": ["loot", "magic"],
+   "text": ["In a scorched nest sits a single egg, warm to the touch and faintly glowing.", "An egg the size of a melon, scaled and warm. Something inside taps back when you knock."],
+   "options": [
+    { "label": "Take it", "emoji": "🤲", "skill": "stealth", "dc": 13,
+      "outcomes": { "success": { "text": ["You wrap the egg in a cloak and slip away before its mother returns."], "effects": [ { "type": "itemId", "id": "mysterious_egg" }, { "type": "xp", "amount": 20 } ] },
+        "fail": { "text": ["A shriek from above! A young dragon dives at you!"], "effects": [ { "type": "combat", "monsters": ["wyrmling"], "difficulty": "hard" } ] } } },
+    { "label": "Leave it be", "emoji": "🙅", "outcomes": { "success": { "text": ["You leave the egg in peace. Somewhere, a dragon remembers your kindness."], "effects": [ { "type": "xp", "amount": 10 } ] } } }
+   ] },
+ { "id": "quiet_road", "title": "A Quiet Road", "emoji": "🌤️", "biomes": ["any"], "weight": 2, "tags": ["safe"],
+   "text": ["For once, nothing tries to kill you. Birds sing. The road is pleasant.", "A peaceful stretch of road. Someone suggests a song."],
+   "options": [
+    { "label": "Enjoy the moment", "emoji": "😌", "outcomes": { "success": { "text": ["You walk in comfortable silence and arrive refreshed."], "effects": [ { "type": "heal", "dice": "1d8", "who": "party" } ] } } },
+    { "label": "Forage along the way", "emoji": "🌿", "skill": "nature", "dc": 11,
+      "outcomes": { "success": { "text": ["{actor} finds healing herbs and berries."], "effects": [ { "type": "itemId", "id": "potion_healing" }, { "type": "heal", "dice": "1d6", "who": "party" } ] },
+        "fail": { "text": ["{actor} eats the wrong berry. Their tongue is blue for a day."], "effects": [ { "type": "condition", "id": "poisoned", "turns": 1, "who": "actor" } ] } } }
+   ] },
+ { "id": "bounty_board", "title": "Wanted Poster", "emoji": "📜", "biomes": ["plains", "forest", "coast"], "weight": 1, "tags": ["quest"],
+   "text": ["A weathered poster nailed to a tree: 'WANTED: Brave fools. Good pay.'", "A notice flaps on a signpost, offering a bounty."],
+   "options": [
+    { "label": "Take the job", "emoji": "✅", "outcomes": { "success": { "text": ["You tear down the poster. A new quest!"], "effects": [ { "type": "quest" } ] } } },
+    { "label": "Ignore it", "emoji": "🚶", "outcomes": { "success": { "text": ["Somebody else's problem."], "effects": [] } } }
+   ] }
+]

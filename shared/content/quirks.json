@@ -1,0 +1,1192 @@
+[
+ {
+  "id": "elf_bird_fear",
+  "name": "Afraid of Birds",
+  "species": [
+   "elf"
+  ],
+  "desc": "Disadvantage on attacks vs flying foes, but +2 Insight.",
+  "prompt": "Describe the goose incident of your childhood.",
+  "effects": [
+   {
+    "type": "disadvVsTag",
+    "tag": "flying"
+   },
+   {
+    "type": "skill",
+    "skill": "insight",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "elf_ancient_grudge",
+  "name": "Ancient Grudge",
+  "species": [
+   "elf"
+  ],
+  "desc": "+2 damage vs orcs and goblins (they know what they did).",
+  "prompt": "Recount the 300-year-old insult your family still won't forgive.",
+  "effects": [
+   {
+    "type": "damageVsTag",
+    "tag": "goblinoid",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "elf_starwatcher",
+  "name": "Starwatcher",
+  "species": [
+   "elf"
+  ],
+  "desc": "+2 Perception and +2 Arcana; distracted at the worst times (-1 initiative).",
+  "prompt": "Name a constellation and tell its sad story.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "perception",
+    "amount": 2
+   },
+   {
+    "type": "skill",
+    "skill": "arcana",
+    "amount": 2
+   },
+   {
+    "type": "init",
+    "amount": -1
+   }
+  ]
+ },
+ {
+  "id": "elf_snob",
+  "name": "Insufferable Snob",
+  "species": [
+   "elf"
+  ],
+  "desc": "-2 Persuasion, +2 Intimidation. Mortals are so... short-lived.",
+  "prompt": "Critique the local cuisine at length.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "persuasion",
+    "amount": -2
+   },
+   {
+    "type": "skill",
+    "skill": "intimidation",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "elf_leaf_whisper",
+  "name": "Leaf-Whisperer",
+  "species": [
+   "elf"
+  ],
+  "desc": "+3 Nature; +1 to hit vs beasts (they hesitate).",
+  "prompt": "What did the oldest tree you know tell you?",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "nature",
+    "amount": 3
+   },
+   {
+    "type": "attackVsTag",
+    "tag": "beast",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "elf_light_sleeper",
+  "name": "Light Sleeper",
+  "species": [
+   "elf"
+  ],
+  "desc": "Never surprised: +3 initiative.",
+  "prompt": "Describe the sound that woke you last night.",
+  "effects": [
+   {
+    "type": "init",
+    "amount": 3
+   }
+  ]
+ },
+ {
+  "id": "dwarf_beard_pride",
+  "name": "Beard Pride",
+  "species": [
+   "dwarf"
+  ],
+  "desc": "+2 Intimidation; frightened lasts a turn less (minimum 1).",
+  "prompt": "Name your beard and describe its finest braid.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "intimidation",
+    "amount": 2
+   },
+   {
+    "type": "save",
+    "ability": "WIS",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "dwarf_collector",
+  "name": "Compulsive Collector",
+  "species": [
+   "dwarf"
+  ],
+  "desc": "Finds better loot (+10% rarity luck) but insists on picking up every rock.",
+  "prompt": "Show the party your favorite rock. What makes it special?",
+  "effects": [
+   {
+    "type": "lootLuck",
+    "amount": 10
+   }
+  ]
+ },
+ {
+  "id": "dwarf_ale_powered",
+  "name": "Ale-Powered",
+  "species": [
+   "dwarf"
+  ],
+  "desc": "+3 max HP; -1 Stealth (you clink).",
+  "prompt": "What's the finest ale you ever drank, and where?",
+  "effects": [
+   {
+    "type": "hp",
+    "amount": 3
+   },
+   {
+    "type": "skill",
+    "skill": "stealth",
+    "amount": -1
+   }
+  ]
+ },
+ {
+  "id": "dwarf_grudgebearer",
+  "name": "Grudgebearer",
+  "species": [
+   "dwarf"
+  ],
+  "desc": "+1 to hit vs anything that has hurt you this fight... and giants, always.",
+  "prompt": "Read an entry from your Book of Grudges.",
+  "effects": [
+   {
+    "type": "attackVsTag",
+    "tag": "giant",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "dwarf_stone_sense",
+  "name": "Stone Sense",
+  "species": [
+   "dwarf"
+  ],
+  "desc": "+2 Perception and +1 AC (you know where to stand).",
+  "prompt": "Explain, passionately, why this wall is load-bearing.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "perception",
+    "amount": 2
+   },
+   {
+    "type": "ac",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "dwarf_hates_water",
+  "name": "Hates Water",
+  "species": [
+   "dwarf"
+  ],
+  "desc": "-2 Athletics, but resistant to cold.",
+  "prompt": "Describe your one terrible boat trip.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "athletics",
+    "amount": -2
+   },
+   {
+    "type": "resist",
+    "dmg": "cold"
+   }
+  ]
+ },
+ {
+  "id": "human_overachiever",
+  "name": "Overachiever",
+  "species": [
+   "human"
+  ],
+  "desc": "+1 to every skill, but -1 to WIS saves (you overthink).",
+  "prompt": "List three things you're the best at.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "athletics",
+    "amount": 1
+   },
+   {
+    "type": "skill",
+    "skill": "persuasion",
+    "amount": 1
+   },
+   {
+    "type": "skill",
+    "skill": "perception",
+    "amount": 1
+   },
+   {
+    "type": "skill",
+    "skill": "stealth",
+    "amount": 1
+   },
+   {
+    "type": "save",
+    "ability": "WIS",
+    "amount": -1
+   }
+  ]
+ },
+ {
+  "id": "human_lucky_coin",
+  "name": "Lucky Coin",
+  "species": [
+   "human"
+  ],
+  "desc": "Crit range widened by 1 on everything. Flip it before big decisions.",
+  "prompt": "Who gave you the coin, and what did they say?",
+  "effects": [
+   {
+    "type": "critRange",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "human_rhymes",
+  "name": "Rhymes When Nervous",
+  "species": [
+   "human"
+  ],
+  "desc": "+2 Performance, -1 Deception. Speak only in rhymes when hurt below half HP.",
+  "prompt": "Compose a two-line rhyme about your current predicament.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "performance",
+    "amount": 2
+   },
+   {
+    "type": "skill",
+    "skill": "deception",
+    "amount": -1
+   }
+  ]
+ },
+ {
+  "id": "human_merchant_blood",
+  "name": "Merchant's Blood",
+  "species": [
+   "human"
+  ],
+  "desc": "Start with 40 extra gold; +2 Persuasion when money is involved.",
+  "prompt": "Pitch the party a product you just invented.",
+  "effects": [
+   {
+    "type": "gold",
+    "amount": 40
+   },
+   {
+    "type": "skill",
+    "skill": "persuasion",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "human_farmhand",
+  "name": "Former Farmhand",
+  "species": [
+   "human"
+  ],
+  "desc": "+2 Athletics and +2 Nature. Knows a suspicious amount about turnips.",
+  "prompt": "Describe the prize-winning vegetable you grew.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "athletics",
+    "amount": 2
+   },
+   {
+    "type": "skill",
+    "skill": "nature",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "human_chosen_one",
+  "name": "Probably the Chosen One",
+  "species": [
+   "human"
+  ],
+  "desc": "+1 to all saves. A prophecy may or may not be about you.",
+  "prompt": "Recite the part of the prophecy you're sure is about you.",
+  "effects": [
+   {
+    "type": "save",
+    "ability": "STR",
+    "amount": 1
+   },
+   {
+    "type": "save",
+    "ability": "DEX",
+    "amount": 1
+   },
+   {
+    "type": "save",
+    "ability": "CON",
+    "amount": 1
+   },
+   {
+    "type": "save",
+    "ability": "WIS",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "orc_gentle_giant",
+  "name": "Gentle Giant",
+  "species": [
+   "orc"
+  ],
+  "desc": "+3 Persuasion, +2 healing received. Loves small animals.",
+  "prompt": "Introduce the party to the animal you adopted this morning.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "persuasion",
+    "amount": 3
+   },
+   {
+    "type": "healBonus",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "orc_poet",
+  "name": "Secret Poet",
+  "species": [
+   "orc"
+  ],
+  "desc": "+2 Performance and +1 CHA saves. Writes verses about battles.",
+  "prompt": "Recite a haiku about the last thing you hit.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "performance",
+    "amount": 2
+   },
+   {
+    "type": "save",
+    "ability": "CHA",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "orc_battle_scars",
+  "name": "Battle Scars",
+  "species": [
+   "orc"
+  ],
+  "desc": "+4 max HP. Every scar has a story, all of them exaggerated.",
+  "prompt": "Tell the (heavily embellished) story of your biggest scar.",
+  "effects": [
+   {
+    "type": "hp",
+    "amount": 4
+   }
+  ]
+ },
+ {
+  "id": "orc_loud",
+  "name": "Indoor Voice? Never",
+  "species": [
+   "orc"
+  ],
+  "desc": "Shout minigames are easier (+15%), Stealth -2.",
+  "prompt": "Announce your arrival to the room. Loudly.",
+  "effects": [
+   {
+    "type": "minigame",
+    "kind": "shout",
+    "amount": 0.15
+   },
+   {
+    "type": "skill",
+    "skill": "stealth",
+    "amount": -2
+   }
+  ]
+ },
+ {
+  "id": "orc_tusk_polisher",
+  "name": "Tusk Polisher",
+  "species": [
+   "orc"
+  ],
+  "desc": "+2 Intimidation and +1 initiative. Vain about dental care.",
+  "prompt": "Explain your morning tusk routine.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "intimidation",
+    "amount": 2
+   },
+   {
+    "type": "init",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "orc_iron_gut",
+  "name": "Iron Gut",
+  "species": [
+   "orc"
+  ],
+  "desc": "Immune to poisoned. Will eat anything once.",
+  "prompt": "What's the strangest thing you've eaten, and was it good?",
+  "effects": [
+   {
+    "type": "immune",
+    "condition": "poisoned"
+   }
+  ]
+ },
+ {
+  "id": "db_hoarder",
+  "name": "Draconic Hoarder",
+  "species": [
+   "dragonborn"
+  ],
+  "desc": "+15% loot luck; -1 Persuasion when asked to share.",
+  "prompt": "What's the centerpiece of your hoard?",
+  "effects": [
+   {
+    "type": "lootLuck",
+    "amount": 15
+   },
+   {
+    "type": "skill",
+    "skill": "persuasion",
+    "amount": -1
+   }
+  ]
+ },
+ {
+  "id": "db_smoke_rings",
+  "name": "Smoke Rings",
+  "species": [
+   "dragonborn"
+  ],
+  "desc": "Blow minigames +15%; +1 Performance.",
+  "prompt": "Show off your smoke-ring trick (and narrate it).",
+  "effects": [
+   {
+    "type": "minigame",
+    "kind": "blow",
+    "amount": 0.15
+   },
+   {
+    "type": "skill",
+    "skill": "performance",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "db_honor_bound",
+  "name": "Honor-Bound",
+  "species": [
+   "dragonborn"
+  ],
+  "desc": "+1 AC, -2 Deception. Can't tell a convincing lie.",
+  "prompt": "Swear an oath to the party right now.",
+  "effects": [
+   {
+    "type": "ac",
+    "amount": 1
+   },
+   {
+    "type": "skill",
+    "skill": "deception",
+    "amount": -2
+   }
+  ]
+ },
+ {
+  "id": "db_dragon_scholar",
+  "name": "Dragon Scholar",
+  "species": [
+   "dragonborn"
+  ],
+  "desc": "+2 to hit and +2 damage vs dragons; +1 Arcana.",
+  "prompt": "Name the great dragon you claim as an ancestor.",
+  "effects": [
+   {
+    "type": "attackVsTag",
+    "tag": "dragon",
+    "amount": 2
+   },
+   {
+    "type": "damageVsTag",
+    "tag": "dragon",
+    "amount": 2
+   },
+   {
+    "type": "skill",
+    "skill": "arcana",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "db_cold_blooded",
+  "name": "Cold-Blooded",
+  "species": [
+   "dragonborn"
+  ],
+  "desc": "-1 initiative in the morning grogginess, but +2 CON saves.",
+  "prompt": "Describe your ideal sunbathing rock.",
+  "effects": [
+   {
+    "type": "init",
+    "amount": -1
+   },
+   {
+    "type": "save",
+    "ability": "CON",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "db_tail_swish",
+  "name": "Expressive Tail",
+  "species": [
+   "dragonborn"
+  ],
+  "desc": "+2 Insight; -2 Deception (your tail gives you away).",
+  "prompt": "What does your tail do when you're happy?",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "insight",
+    "amount": 2
+   },
+   {
+    "type": "skill",
+    "skill": "deception",
+    "amount": -2
+   }
+  ]
+ },
+ {
+  "id": "wiz_scroll_hoarder",
+  "name": "Scroll Hoarder",
+  "classes": [
+   "wizard"
+  ],
+  "desc": "+2 max Spell Points; you smell like old paper.",
+  "prompt": "What's the most useless scroll you own?",
+  "effects": [
+   {
+    "type": "sp",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "wiz_failed_familiar",
+  "name": "Failed Familiar",
+  "classes": [
+   "wizard"
+  ],
+  "desc": "Your 'familiar' is a confused rock. +1 Insight, +1 Arcana.",
+  "prompt": "Introduce your familiar and its many accomplishments.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "insight",
+    "amount": 1
+   },
+   {
+    "type": "skill",
+    "skill": "arcana",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "wiz_pyromaniac",
+  "name": "Pyromaniac",
+  "classes": [
+   "wizard"
+  ],
+  "desc": "+2 damage on fire spells... applied to everything: +1 damage on all hits.",
+  "prompt": "What's the first thing you ever set on fire?",
+  "effects": [
+   {
+    "type": "damageVsTag",
+    "tag": "any",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "wiz_steady_hand",
+  "name": "Calligrapher",
+  "classes": [
+   "wizard"
+  ],
+  "desc": "Rune drawing is easier (+15%).",
+  "prompt": "Sign your name with a flourish. Describe the flourish.",
+  "effects": [
+   {
+    "type": "minigame",
+    "kind": "rune",
+    "amount": 0.15
+   }
+  ]
+ },
+ {
+  "id": "rog_kleptomaniac",
+  "name": "Kleptomaniac",
+  "classes": [
+   "rogue"
+  ],
+  "desc": "+10% loot luck. Sometimes steals from the party (narratively).",
+  "prompt": "Return something you 'borrowed' from another player.",
+  "effects": [
+   {
+    "type": "lootLuck",
+    "amount": 10
+   }
+  ]
+ },
+ {
+  "id": "rog_dramatic_exit",
+  "name": "Dramatic Exits",
+  "classes": [
+   "rogue"
+  ],
+  "desc": "+2 Acrobatics, +1 AC.",
+  "prompt": "Describe how you leave a room. Every room.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "acrobatics",
+    "amount": 2
+   },
+   {
+    "type": "ac",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "rog_whisperer",
+  "name": "Whisperer",
+  "classes": [
+   "rogue"
+  ],
+  "desc": "Quiet minigames are easier (+15%), +1 Stealth.",
+  "prompt": "Whisper your greatest secret to the person on your left.",
+  "effects": [
+   {
+    "type": "minigame",
+    "kind": "quiet",
+    "amount": 0.15
+   },
+   {
+    "type": "skill",
+    "skill": "stealth",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "rog_wanted",
+  "name": "Wanted Poster",
+  "classes": [
+   "rogue"
+  ],
+  "desc": "+2 Deception, -1 Persuasion. Your face is on posters (badly drawn).",
+  "prompt": "What crime is on the poster, and did you do it?",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "deception",
+    "amount": 2
+   },
+   {
+    "type": "skill",
+    "skill": "persuasion",
+    "amount": -1
+   }
+  ]
+ },
+ {
+  "id": "pal_oath_stickler",
+  "name": "Oath Stickler",
+  "classes": [
+   "paladin"
+  ],
+  "desc": "+2 WIS saves; you correct everyone's manners.",
+  "prompt": "Recite the most oddly specific line of your oath.",
+  "effects": [
+   {
+    "type": "save",
+    "ability": "WIS",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "pal_shiny_armor",
+  "name": "Polished to a Mirror",
+  "classes": [
+   "paladin"
+  ],
+  "desc": "+1 AC, -2 Stealth (you gleam).",
+  "prompt": "Describe your armor-polishing ritual.",
+  "effects": [
+   {
+    "type": "ac",
+    "amount": 1
+   },
+   {
+    "type": "skill",
+    "skill": "stealth",
+    "amount": -2
+   }
+  ]
+ },
+ {
+  "id": "pal_undead_hater",
+  "name": "Undead Hunter",
+  "classes": [
+   "paladin"
+  ],
+  "desc": "+2 to hit vs undead.",
+  "prompt": "Who did the undead take from you?",
+  "effects": [
+   {
+    "type": "attackVsTag",
+    "tag": "undead",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "pal_soft_heart",
+  "name": "Soft Heart",
+  "classes": [
+   "paladin"
+  ],
+  "desc": "+2 to all healing you receive and +1 Persuasion.",
+  "prompt": "Who is the person you'd do anything for?",
+  "effects": [
+   {
+    "type": "healBonus",
+    "amount": 2
+   },
+   {
+    "type": "skill",
+    "skill": "persuasion",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "cle_doubting",
+  "name": "Crisis of Faith",
+  "classes": [
+   "cleric"
+  ],
+  "desc": "+2 Insight; your god occasionally doesn't answer (-1 Religion).",
+  "prompt": "What question would you ask your god face to face?",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "insight",
+    "amount": 2
+   },
+   {
+    "type": "skill",
+    "skill": "religion",
+    "amount": -1
+   }
+  ]
+ },
+ {
+  "id": "cle_preachy",
+  "name": "Preachy",
+  "classes": [
+   "cleric"
+  ],
+  "desc": "+2 Persuasion vs believers, +1 Intimidation. Sermons are long.",
+  "prompt": "Deliver a 10-second sermon to the party.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "persuasion",
+    "amount": 1
+   },
+   {
+    "type": "skill",
+    "skill": "intimidation",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "cle_medic",
+  "name": "Field Medic",
+  "classes": [
+   "cleric"
+  ],
+  "desc": "Your heals restore +2 HP.",
+  "prompt": "Describe the worst wound you've ever stitched.",
+  "effects": [
+   {
+    "type": "healBonus",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "cle_relic_keeper",
+  "name": "Relic Keeper",
+  "classes": [
+   "cleric"
+  ],
+  "desc": "+2 Religion, +1 AC vs undead (they hate the bone).",
+  "prompt": "Show us the holy relic. Whose bone is it?",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "religion",
+    "amount": 2
+   },
+   {
+    "type": "attackVsTag",
+    "tag": "undead",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "bard_one_hit",
+  "name": "One-Hit Wonder",
+  "classes": [
+   "bard"
+  ],
+  "desc": "+2 Performance; everybody knows your one song.",
+  "prompt": "Hum the chorus of your one famous song.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "performance",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "bard_heckler",
+  "name": "Heckler",
+  "classes": [
+   "bard"
+  ],
+  "desc": "Shout minigames +15%; +1 Intimidation.",
+  "prompt": "Heckle the nearest monster (or player).",
+  "effects": [
+   {
+    "type": "minigame",
+    "kind": "shout",
+    "amount": 0.15
+   },
+   {
+    "type": "skill",
+    "skill": "intimidation",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "bard_perfect_pitch",
+  "name": "Perfect Pitch",
+  "classes": [
+   "bard"
+  ],
+  "desc": "Hum and rhythm minigames +10%.",
+  "prompt": "Sing the note of the room you're in.",
+  "effects": [
+   {
+    "type": "minigame",
+    "kind": "hum",
+    "amount": 0.1
+   },
+   {
+    "type": "minigame",
+    "kind": "rhythm",
+    "amount": 0.1
+   }
+  ]
+ },
+ {
+  "id": "bard_gossip",
+  "name": "Incurable Gossip",
+  "classes": [
+   "bard"
+  ],
+  "desc": "+2 Insight and +2 Deception; everyone tells you things.",
+  "prompt": "Share some (made-up) gossip about another player's character.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "insight",
+    "amount": 2
+   },
+   {
+    "type": "skill",
+    "skill": "deception",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "barb_short_fuse",
+  "name": "Short Fuse",
+  "classes": [
+   "barbarian"
+  ],
+  "desc": "+2 initiative; -1 Persuasion.",
+  "prompt": "Name the tiny thing that makes you furious.",
+  "effects": [
+   {
+    "type": "init",
+    "amount": 2
+   },
+   {
+    "type": "skill",
+    "skill": "persuasion",
+    "amount": -1
+   }
+  ]
+ },
+ {
+  "id": "barb_big_softie",
+  "name": "Big Softie",
+  "classes": [
+   "barbarian"
+  ],
+  "desc": "+2 Insight, +2 healing received. Cries at weddings.",
+  "prompt": "What made you cry last?",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "insight",
+    "amount": 2
+   },
+   {
+    "type": "healBonus",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "barb_unga",
+  "name": "Speaks in Grunts",
+  "classes": [
+   "barbarian"
+  ],
+  "desc": "+2 Intimidation, -2 Persuasion. Surprisingly eloquent grunts.",
+  "prompt": "Explain the plan. Using only grunts.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "intimidation",
+    "amount": 2
+   },
+   {
+    "type": "skill",
+    "skill": "persuasion",
+    "amount": -2
+   }
+  ]
+ },
+ {
+  "id": "barb_swinger",
+  "name": "Wild Swinger",
+  "classes": [
+   "barbarian"
+  ],
+  "desc": "Swing minigames +15%.",
+  "prompt": "Demonstrate your signature swing (carefully).",
+  "effects": [
+   {
+    "type": "minigame",
+    "kind": "swing",
+    "amount": 0.15
+   }
+  ]
+ },
+ {
+  "id": "war_drill_sergeant",
+  "name": "Drill Sergeant",
+  "classes": [
+   "warrior"
+  ],
+  "desc": "+2 Intimidation; +1 initiative. Barks orders.",
+  "prompt": "Give the party a motivational drill command.",
+  "effects": [
+   {
+    "type": "skill",
+    "skill": "intimidation",
+    "amount": 2
+   },
+   {
+    "type": "init",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "war_weapon_namer",
+  "name": "Names Their Weapons",
+  "classes": [
+   "warrior"
+  ],
+  "desc": "+1 to hit. Your sword has a name and feelings.",
+  "prompt": "Introduce your weapon by name and tell us its feelings.",
+  "effects": [
+   {
+    "type": "attackVsTag",
+    "tag": "any",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "war_veteran",
+  "name": "Grizzled Veteran",
+  "classes": [
+   "warrior"
+  ],
+  "desc": "+3 max HP, +1 Insight. 'I've seen worse.'",
+  "prompt": "Tell us about the time you saw worse.",
+  "effects": [
+   {
+    "type": "hp",
+    "amount": 3
+   },
+   {
+    "type": "skill",
+    "skill": "insight",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "war_shield_lover",
+  "name": "Shield Enthusiast",
+  "classes": [
+   "warrior"
+  ],
+  "desc": "+1 AC; collects shields.",
+  "prompt": "What's painted on your shield, and why?",
+  "effects": [
+   {
+    "type": "ac",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "any_hungry",
+  "name": "Always Hungry",
+  "desc": "+2 healing from potions and rests... and food. Mostly food.",
+  "prompt": "What snack did you bring on this adventure?",
+  "effects": [
+   {
+    "type": "healBonus",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "any_spider_fear",
+  "name": "Arachnophobe",
+  "desc": "-2 to hit vs spiders, +2 Perception (you're always looking).",
+  "prompt": "Act out finding a spider in your boot.",
+  "effects": [
+   {
+    "type": "attackVsTag",
+    "tag": "spider",
+    "amount": -2
+   },
+   {
+    "type": "skill",
+    "skill": "perception",
+    "amount": 2
+   }
+  ]
+ },
+ {
+  "id": "any_lucky",
+  "name": "Born Lucky",
+  "desc": "Crit on 19-20 with everything; trip over flat ground.",
+  "prompt": "Describe the most unlikely thing that ever went right for you.",
+  "effects": [
+   {
+    "type": "critRange",
+    "amount": 1
+   }
+  ]
+ },
+ {
+  "id": "any_tough",
+  "name": "Tough as Boots",
+  "desc": "+3 max HP.",
+  "prompt": "What's the hardest thing you ever survived?",
+  "effects": [
+   {
+    "type": "hp",
+    "amount": 3
+   }
+  ]
+ }
+]
