@@ -144,6 +144,13 @@ export function hostCommand(g: Game, cmd: HostCommand): string | null {
       return null;
     case 'continue':
       return typeof cmd.saveId === 'string' ? continueCampaign(g, cmd.saveId) : 'Bad save id';
+    case 'deleteSave': {
+      if (g.state.scene.kind !== 'title') return 'Campaigns can only be removed from the title screen.';
+      if (typeof cmd.saveId !== 'string' || !g.deleteSave(cmd.saveId)) return 'Could not remove that campaign.';
+      g.state.scene = { kind: 'title', saves: g.listSaves() };
+      g.dirty();
+      return null;
+    }
     case 'start': {
       if (g.state.phase !== 'lobby') return 'Nothing to start.';
       const players = [...g.players.values()].filter((p) => p.connected || p.isBot);

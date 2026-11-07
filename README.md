@@ -147,3 +147,7 @@ All content is validated with zod when the server starts; a broken JSON file sto
 the file name and the failing path.
 
 See [DECISIONS.md](DECISIONS.md) for design decisions, simplifications and known issues.
+
+## Credits
+
+Monster art comes from [game-icons.net](https://game-icons.net) (CC BY 3.0); fonts are Young Serif and Merriweather (SIL OFL). See [CREDITS.md](CREDITS.md). To change a monster's icon, edit the map in `scripts/gen-monster-icons.mjs` and run `node scripts/gen-monster-icons.mjs`.

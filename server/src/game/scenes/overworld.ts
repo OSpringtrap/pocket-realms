@@ -89,7 +89,7 @@ async function chooseMove(g: Game, leaderId: string): Promise<MoveChoice> {
     opts.push({
       id: k,
       label: poi ? `${poi.emoji} ${poi.name}` : t.revealed ? `${t.name ?? t.biome}` : 'Unexplored land',
-      desc: `${v.cost} move${v.cost === 1 ? '' : 's'}${poi?.cleared ? ' · cleared' : ''}`,
+      desc: `${v.cost} move${v.cost === 1 ? '' : 's'}${poi?.cleared ? ' — cleared' : ''}`,
       group: poi ? 'Places' : 'Wilds',
       emoji: poi ? poi.emoji : t.revealed ? biomeEmoji(t.biome) : '🌫️',
     });

@@ -201,7 +201,7 @@ export async function eventScene(g: Game, card: EventCard): Promise<CombatOutcom
     id: String(i),
     label: o.label,
     emoji: o.emoji,
-    desc: [o.skill ? `${o.skill} DC ${scaledDc(g, o.dc)}` : '', o.group ? 'everyone rolls' : '', bestFitText(o) ? `best: ${bestFitText(o)}` : '', o.minigame ? `minigame: ${o.minigame}` : ''].filter(Boolean).join(' · ') || undefined,
+    desc: [o.skill ? `${o.skill} DC ${scaledDc(g, o.dc)}` : '', o.group ? 'everyone rolls' : '', bestFitText(o) ? `best: ${bestFitText(o)}` : '', o.minigame ? `minigame: ${o.minigame}` : ''].filter(Boolean).join(' — ') || undefined,
     cost: o.cost?.gold ? `${o.cost.gold}g` : undefined,
     disabled: o.cost?.gold && s.party.gold < o.cost.gold ? 'Not enough gold' : undefined,
   }));

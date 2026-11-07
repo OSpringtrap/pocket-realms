@@ -662,7 +662,7 @@ export class Game {
       weather: w.weather,
       doom: w.doom,
       doomMax: w.doomMax,
-      antagonist: { name: w.antagonist.name, title: w.antagonist.title, emoji: w.antagonist.emoji, desc: w.antagonist.desc },
+      antagonist: { name: w.antagonist.name, title: w.antagonist.title, emoji: w.antagonist.emoji, bossId: w.antagonist.bossId, desc: w.antagonist.desc },
       objective: w.objective,
       factions: w.factions,
       npcs: w.npcs.filter((n) => n.met),
@@ -814,6 +814,18 @@ export class Game {
       }
     }
     return out.sort((a, b) => b.updated - a.updated).slice(0, 8);
+  }
+
+  /** Permanently removes a save file. */
+  deleteSave(id: string): boolean {
+    const dir = this.opts.savesDir;
+    if (!dir || !/^[a-z0-9_-]+$/i.test(id)) return false;
+    try {
+      fs.unlinkSync(path.join(dir, `${id}.json`));
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   loadSave(id: string): boolean {

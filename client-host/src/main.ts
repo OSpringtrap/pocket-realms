@@ -2,6 +2,7 @@ import '../../shared/src/browser/theme.css';
 import './host.css';
 import { sfx } from '../../shared/src/browser/audio.js';
 import { DiceTray } from '../../shared/src/browser/dice3d.js';
+import { heartIcon, monsterArt, sparkIcon } from '../../shared/src/browser/glyphs.js';
 import { Slot, clear, h, hash, toast } from '../../shared/src/browser/dom.js';
 import { renderHexMap } from '../../shared/src/browser/hexmap.js';
 import { Net } from '../../shared/src/browser/net.js';
@@ -74,17 +75,21 @@ function bar(cls: string, cur: number, max: number, label?: string) {
   return h('div', { class: `bar ${cls}`, title: label ?? `${cur}/${max}` }, h('i', { style: `width:${Math.max(0, Math.min(100, (cur / Math.max(1, max)) * 100))}%` }));
 }
 /** Icon, value and a thin meter, as in a status block. */
-function statLine(icon: string, cls: string, cur: number, max: number) {
+function statLine(icon: Node, cls: string, cur: number, max: number) {
   return h('div', { class: 'stat-line' }, h('span', { class: 'ic' }, icon), h('span', { class: 'v' }, `${Math.max(0, cur)} / ${max}`), bar(cls, cur, max));
 }
-/** Numbered section header: "01  Status". */
-function sect(n: number, label: string) {
-  return h('div', { class: 'sect' }, h('i', null, String(n).padStart(2, '0')), h('span', null, label));
+/** Section header with a trailing rule. */
+function sect(label: string) {
+  return h('div', { class: 'sect' }, h('span', null, label));
 }
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 const COND_EMOJI: Record<string, string> = { poisoned: '🤢', stunned: '💫', frightened: '😱', prone: '🛌', blinded: '🙈', charmed: '😍', burning: '🔥', slowed: '🐌', blessed: '🙏', inspired: '✨' };
 function conds(list: { id: string }[]) {
   return h('span', { class: 'conds' }, ...list.map((c) => h('span', { title: c.id }, COND_EMOJI[c.id] ?? '•')));
+}
+/** Conditions as labelled chips (sidebar). */
+function condChips(list: { id: string }[]) {
+  return list.map((c) => h('span', { class: 'cond', title: c.id }, `${COND_EMOJI[c.id] ?? ''} ${c.id}`));
 }
 function playerColor(id: string) {
   return view?.players.find((p) => p.id === id)?.color ?? '#5a4326';
@@ -130,9 +135,9 @@ function renderTop(force = false) {
   if (force) topSlot.invalidate();
   topSlot.render(hash([view.code, view.campaign?.name, view.world?.kingdomName, view.party.name, net.status, role, view.paused, view.scene.kind]), () => [
     h('div', { class: 'logo' }, h('span', { class: 'glyph' }, '❖'), 'Pocket Realms'),
-    view!.campaign && view!.scene.kind !== 'title' ? h('div', { class: 'small muted' }, `${view!.party.name ? `${view!.party.name} · ` : ''}${view!.world?.kingdomName ?? ''} · seed ${view!.campaign.seed}`) : null,
+    view!.campaign && view!.scene.kind !== 'title' ? h('div', { class: 'small muted' }, `${view!.party.name ? `${view!.party.name} — ` : ''}${view!.world?.kingdomName ?? ''} — seed ${view!.campaign.seed}`) : null,
     h('div', { class: 'spacer' }),
-    h('div', { class: 'code' }, 'Room ', h('b', null, view!.code), h('span', { class: 'small muted' }, ` · ${view!.lanUrl.replace('https://', '')}`)),
+    h('div', { class: 'code' }, 'Room ', h('b', null, view!.code), h('span', { class: 'small muted' }, ` — ${view!.lanUrl.replace('https://', '')}`)),
     h('span', { class: `status-dot${net.status === 'open' ? '' : ' off'}`, title: net.status }),
     role === 'host' && view!.scene.kind !== 'title' ? h('button', { onclick: () => cmd({ cmd: 'skip' }), title: 'Auto-resolve everything we are waiting on' }, '⏩ Skip') : null,
     h('button', { onclick: () => ((modal = 'journal'), renderModal()) }, '📖 Journal'),
@@ -154,7 +159,7 @@ function renderStage(sc: SceneView) {
     case 'combat':
       return renderCombat(sc.combat as never);
     case 'town':
-      return h('div', { class: 'col' }, h('div', { class: 'card center' }, h('h1', null, `🏘️ ${sc.name}`), h('div', { class: 'txt' }, sc.text), h('div', { class: 'muted' }, 'Shop, visit the shrine and take quests on your phones.')), sc.shop ? h('div', { class: 'shopgrid' }, ...sc.shop.items.slice(0, 12).map((s) => h('div', { class: 'card small' }, h('b', { class: `rarity-${s.item.rarity}` }, `${s.item.emoji} ${s.item.name}`), h('div', { class: 'muted' }, `${s.price}g · ${s.item.rarity}`)))) : null);
+      return h('div', { class: 'col' }, h('div', { class: 'card center' }, h('h1', null, `🏘️ ${sc.name}`), h('div', { class: 'txt' }, sc.text), h('div', { class: 'muted' }, 'Shop, visit the shrine and take quests on your phones.')), sc.shop ? h('div', { class: 'shopgrid' }, ...sc.shop.items.slice(0, 12).map((s) => h('div', { class: 'card small' }, h('b', { class: `rarity-${s.item.rarity}` }, `${s.item.emoji} ${s.item.name}`), h('div', { class: 'muted' }, `${s.price}g — ${s.item.rarity}`)))) : null);
     case 'camp':
       return h('div', { class: 'col center', style: 'margin-top:4vh' }, h('div', { style: 'font-size:7em' }, '🔥'), h('h1', null, sc.text), sc.prompt ? h('div', { class: 'card', style: 'max-width:900px;margin:0 auto;font-size:1.5em' }, h('div', { class: 'muted small' }, `Campfire moment — ${sc.prompt.a} & ${sc.prompt.b}`), sc.prompt.text) : null);
     case 'dungeon':
@@ -210,11 +215,25 @@ function renderTitle(saves: { id: string; name: string; updated: number; day: nu
         { class: 'card col' },
         h('h2', null, '📖 Continue campaign'),
         saves.length
-          ? h('div', { class: 'col' }, ...saves.map((sv) => h('button', { class: 'savebtn', disabled: role !== 'host', onclick: () => cmd({ cmd: 'continue', saveId: sv.id }) }, h('b', null, sv.name), h('div', { class: 'small muted' }, `Day ${sv.day} · ${sv.mode} · ${new Date(sv.updated).toLocaleString()}`), h('div', { class: 'small' }, sv.heroes.join(', ')))))
+          ? h(
+              'div',
+              { class: 'col' },
+              ...saves.map((sv) =>
+                h(
+                  'div',
+                  { class: 'saverow' },
+                  h('button', { class: 'savebtn', disabled: role !== 'host', onclick: () => cmd({ cmd: 'continue', saveId: sv.id }) }, h('b', null, sv.name), h('div', { class: 'small muted' }, `Day ${sv.day} — ${sv.mode} — ${new Date(sv.updated).toLocaleString()}`), h('div', { class: 'small' }, sv.heroes.join(', '))),
+                  role === 'host'
+                    ? h('button', { class: 'ghost savedel', title: `Remove ${sv.name}`, 'aria-label': `Remove ${sv.name}`, onclick: () => confirm(`Remove “${sv.name}” for good? This cannot be undone.`) && cmd({ cmd: 'deleteSave', saveId: sv.id }) }, '✕')
+                    : null,
+                ),
+              ),
+            )
           : h('div', { class: 'muted' }, 'No saved campaigns yet. Campaigns autosave at the end of every scene.'),
       ),
     ),
     role !== 'host' ? h('div', { class: 'center muted' }, 'This screen is a spectator. Open the host link from the terminal to control the game.') : null,
+    h('div', { class: 'credits' }, 'Monster art by Lorc, Delapouite, Skoll, Caro Asercion, Cathelineau, Carl Olsen & others from game-icons.net, CC BY 3.0. Full list in CREDITS.md.'),
   );
 }
 
@@ -287,7 +306,7 @@ function renderOverworld() {
     'div',
     { class: 'card mapwrap' },
     map,
-    h('div', { class: 'card panel mapinfo' }, h('b', null, `🧭 ${leader?.name ?? 'The leader'} chooses the path`), h('div', { class: 'small muted' }, `${w.movesLeft} moves · glowing tiles are reachable · tap one to move for them`)),
+    h('div', { class: 'card panel mapinfo' }, h('b', null, `🧭 ${leader?.name ?? 'The leader'} chooses the path`), h('div', { class: 'small muted' }, `${w.movesLeft} moves — glowing tiles are reachable — tap one to move for them`)),
   );
 }
 
@@ -296,12 +315,11 @@ function renderSide() {
   const w = v.world;
   const current = (v.scene as { combat?: { current?: string } }).combat?.current;
   const els: HTMLElement[] = [];
-  let n = 1;
   if (w) {
     const pips = Array.from({ length: w.doomMax }, (_, i) => h('div', { class: `pip${i < w.doom ? ' on' : ''}` }));
     const timeIcon = { morning: '🌅', afternoon: '☀️', evening: '🌇', night: '🌙' }[w.time];
     els.push(
-      sect(n++, 'The Realm'),
+      sect('The Realm'),
       h(
         'div',
         { class: 'cluster' },
@@ -309,7 +327,7 @@ function renderSide() {
         h(
           'div',
           { class: 'card panel doom' },
-          h('div', { class: 'dh' }, h('span', null, w.antagonist.emoji), h('span', { class: 'grow' }, 'Doom Clock'), h('span', null, `${w.doom} / ${w.doomMax}`)),
+          h('div', { class: 'dh' }, monsterArt(w.antagonist.bossId, w.antagonist.emoji, 'dh-ic'), h('span', { class: 'grow' }, 'Doom Clock'), h('span', null, `${w.doom} / ${w.doomMax}`)),
           h('div', { class: 'clock' }, ...pips),
           h('div', { class: 'meta' }, `🔑 ${w.objective.keyName}: ${w.objective.keys} / ${w.objective.keysNeeded}`),
         ),
@@ -326,19 +344,26 @@ function renderSide() {
         'div',
         { class: `card panel member${c.dead ? ' dead' : c.down ? ' down' : ''}${current === c.id ? ' active' : ''}`, style: `--c:${p.color}`, 'data-uid': c.id },
         h('div', { class: 'av' }, avatar(c)),
-        h('div', { class: 'row', style: 'gap:6px' }, h('span', { class: 'nm' }, c.name), p.connected ? null : h('span', { title: 'reconnecting' }, '📴'), c.inspiration ? h('span', { class: 'tag', title: 'Inspiration' }, `✨${c.inspiration}`) : null),
+        h(
+          'div',
+          { class: 'nmrow' },
+          h('span', { class: 'nm' }, c.name),
+          p.connected ? null : h('span', { title: 'reconnecting' }, '📴'),
+          c.inspiration ? h('span', { class: 'cond', title: 'Inspiration' }, `✨ ${c.inspiration}`) : null,
+          c.dead ? h('span', { class: 'cond bad' }, '💀 fallen') : c.down ? h('span', { class: 'cond bad' }, `☠️ dying ${c.death.successes}✔ ${c.death.failures}✖`) : null,
+          ...condChips(c.conditions),
+        ),
         h('div', { class: 'lv' }, h('small', null, 'LV.'), h('b', null, String(c.level).padStart(2, '0'))),
-        h('div', { class: 'sub' }, `${C.species[c.species]?.name ?? ''} • ${C.classes[c.cls].name}`),
-        h('div', { class: 'bars' }, statLine('♥', 'hp', c.hp, c.maxHp), c.maxSp ? statLine('✦', 'sp', c.sp, c.maxSp) : null),
-        c.dead || c.down || c.conditions.length ? h('div', { class: 'foot' }, c.dead ? '💀 fallen' : c.down ? `☠️ dying (${c.death.successes}✔ ${c.death.failures}✖)` : null, conds(c.conditions)) : null,
+        h('div', { class: 'sub' }, `${C.species[c.species]?.name ?? ''} ${C.classes[c.cls].name}`),
+        h('div', { class: 'bars' }, statLine(heartIcon(), 'hp', c.hp, c.maxHp), c.maxSp ? statLine(sparkIcon(), 'sp', c.sp, c.maxSp) : null),
       ),
     );
   }
-  els.push(sect(n++, 'The Company'), party);
+  els.push(sect('The Company'), party);
   const active = w?.quests.filter((q) => q.status === 'active') ?? [];
   if (active.length)
     els.push(
-      sect(n++, 'Tracked Objectives'),
+      sect('Tracked Objectives'),
       h(
         'div',
         { class: 'card goals' },
@@ -373,7 +398,7 @@ function renderEvent(ev: Extract<SceneView, { kind: 'event' }>['event']) {
               { class: `opt${ev.chosen === i ? ' chosen' : ''}` },
               ev.votes?.[i] ? h('span', { class: 'votes' }, '🗳️'.repeat(ev.votes[i]!)) : null,
               h('b', null, `${o.emoji} ${o.label}`),
-              h('div', { class: 'small muted' }, [o.skill ? `${o.skill} DC ${o.dc}` : '', o.group ? 'everyone rolls' : '', o.best ? `best: ${o.best}` : '', o.cost ?? ''].filter(Boolean).join(' · ')),
+              h('div', { class: 'small muted' }, [o.skill ? `${o.skill} DC ${o.dc}` : '', o.group ? 'everyone rolls' : '', o.best ? `best: ${o.best}` : '', o.cost ?? ''].filter(Boolean).join(' — ')),
             ),
           ),
         )
@@ -398,7 +423,20 @@ function renderCombat(cb: { title: string; round: number; order: string[]; curre
     h('b', null, cb.round ? `Round ${cb.round}` : 'Initiative!'),
     ...cb.order.map((id) => {
       const m = cb.monsters.find((x) => x.id === id);
-      return h('span', { class: `ini${id === cb.current ? ' cur' : ''}${m && m.side === 'enemy' ? ' foe' : ''}${isGone(id) ? ' gone' : ''}` }, `${m ? m.emoji : v.chars[id] ? C.classes[v.chars[id]!.cls].emoji : ''} ${unitName(id)}`);
+      const c = v.chars[id];
+      const cur = id === cb.current;
+      const hp = m ?? c;
+      return h(
+        'span',
+        { class: `ini${cur ? ' cur' : ''}${m && m.side === 'enemy' ? ' foe' : ''}${isGone(id) ? ' gone' : ''}` },
+        h('span', { class: 'ini-ic' }, m ? monsterArt(m.defId, m.emoji) : c ? avatar(c) : ''),
+        h(
+          'span',
+          { class: 'ini-body' },
+          h('span', { class: 'ini-n' }, unitName(id)),
+          cur && hp ? h('span', { class: 'ini-x' }, bar('hp', hp.hp, hp.maxHp), h('small', null, `${Math.max(0, hp.hp)} / ${hp.maxHp} HP${m ? `\u2003AC ${m.ac}` : ''}`)) : null,
+        ),
+      );
     }),
   );
   const unit = (m: Monster) =>
@@ -406,10 +444,10 @@ function renderCombat(cb: { title: string; round: number; order: string[]; curre
       'div',
       { class: `card panel unit${m.side === 'enemy' ? ' foe' : ''}${m.boss ? ' boss' : ''}${m.dead || m.fled ? ' dead' : ''}${m.id === cb.current ? ' cur' : ''}`, 'data-uid': m.id },
       m.telegraph ? h('div', { class: 'tele' }, `⚠️ ${m.attacks[m.telegraph.attackIndex]?.name} → ${m.telegraph.targetId === 'all' ? 'EVERYONE' : unitName(m.telegraph.targetId)}`) : null,
-      h('div', { class: 'big' }, m.emoji),
+      h('div', { class: 'big' }, monsterArt(m.defId, m.emoji)),
       h('div', { class: 'uname' }, m.name, m.elite ? ' ⭐' : ''),
       bar('hp', m.hp, m.maxHp),
-      h('div', { class: 'small' }, `${m.hp}/${m.maxHp} · AC ${m.ac} `, conds(m.conditions)),
+      h('div', { class: 'small' }, `${m.hp} / ${m.maxHp}\u2003AC ${m.ac} `, conds(m.conditions)),
       m.weakness && !m.dead ? h('div', { class: 'small muted' }, `weak: ${m.weakness}`) : null,
     );
   const foes = cb.monsters.filter((m) => m.side === 'enemy');
@@ -449,7 +487,7 @@ function renderJackbox(sc: Extract<SceneView, { kind: 'jackbox' }>) {
           'div',
           { class: 'answers' },
           ...sc.answers.map((a) =>
-            h('div', { class: `card${sc.winner === a.id && sc.stage === 'result' ? ' win' : ''}` }, h('div', null, `“${a.text}”`), sc.stage === 'result' ? h('div', { class: 'small muted' }, `${a.author ?? ''}${a.votes !== undefined ? ` · ${'⭐'.repeat(a.votes)}` : ''}`) : null),
+            h('div', { class: `card${sc.winner === a.id && sc.stage === 'result' ? ' win' : ''}` }, h('div', null, `“${a.text}”`), sc.stage === 'result' ? h('div', { class: 'small muted' }, `${a.author ?? ''}${a.votes !== undefined ? ` — ${'⭐'.repeat(a.votes)}` : ''}`) : null),
           ),
         )
       : null,
@@ -470,7 +508,7 @@ function renderEnding(sc: Extract<SceneView, { kind: 'ending' }>) {
       h('tr', null, ...['Hero', 'Level', 'Defeated', 'Crits', 'Damage', 'Healed', ''].map((t) => h('th', null, t))),
       ...sc.stats.heroes.map((x) => h('tr', null, h('td', null, `${x.name} ${x.title}`), h('td', null, x.level), h('td', null, x.kills), h('td', null, x.crits), h('td', null, x.damage), h('td', null, x.healed), h('td', null, x.dead ? '💀' : ''))),
     ),
-    h('div', { class: 'muted' }, `${sc.stats.days} days · ${sc.stats.turns} turns · Doom ${sc.stats.doom}`),
+    h('div', { class: 'muted' }, `${sc.stats.days} days — ${sc.stats.turns} turns — Doom ${sc.stats.doom}`),
     role === 'host' ? h('div', { class: 'row center' }, h('button', { class: 'primary', onclick: () => cmd({ cmd: 'title' }) }, '🏰 Back to the title screen')) : null,
   );
 }
@@ -581,7 +619,7 @@ function renderModal() {
           view!.party.motto ? h('div', { class: 'small' }, `Motto: “${view!.party.motto}”`) : null,
           w ? h('div', { class: 'small' }, ...w.factions.map((f) => h('span', { class: 'tag' }, `${f.emoji} ${f.name} ${f.rep >= 0 ? '+' : ''}${f.rep}`))) : null,
           h('hr'),
-          ...[...view!.journal].reverse().map((e) => h('div', { class: 'e' }, h('span', { class: 'muted small' }, `Day ${e.day} · `), e.text, e.author ? h('span', { class: 'muted small' }, ` — ${e.author}`) : null)),
+          ...[...view!.journal].reverse().map((e) => h('div', { class: 'e' }, h('span', { class: 'muted small' }, `Day ${e.day} — `), e.text, e.author ? h('span', { class: 'muted small' }, ` — ${e.author}`) : null)),
         ),
       );
     }

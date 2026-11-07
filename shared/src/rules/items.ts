@@ -173,5 +173,5 @@ export function itemStatLine(it: ItemInstance): string {
   for (const [k, v] of Object.entries(it.skillBonus ?? {})) parts.push(`${(v ?? 0) > 0 ? '+' : ''}${v} ${k}`);
   if (it.resist?.length) parts.push(`resist ${it.resist.join('/')}`);
   if (it.cursed) parts.push('CURSED');
-  return parts.join(' · ');
+  return parts.join(' — ');
 }

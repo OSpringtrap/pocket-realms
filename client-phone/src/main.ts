@@ -2,6 +2,7 @@ import '../../shared/src/browser/theme.css';
 import './phone.css';
 import { sfx } from '../../shared/src/browser/audio.js';
 import { Slot, h, hash, toast } from '../../shared/src/browser/dom.js';
+import { heartIcon, sparkIcon } from '../../shared/src/browser/glyphs.js';
 import { Net } from '../../shared/src/browser/net.js';
 import { content } from '../../shared/src/content/index.js';
 import { PROTOCOL_VERSION, type C2S, type Fx, type PhoneView } from '../../shared/src/protocol.js';
@@ -36,7 +37,7 @@ const LS = {
   },
 };
 
-function hudLine(icon: string, cls: string, cur: number, max: number) {
+function hudLine(icon: Node, cls: string, cur: number, max: number) {
   const pct = Math.max(0, Math.min(100, (cur / Math.max(1, max)) * 100));
   return h('div', { class: 'stat-line' }, h('span', { class: 'ic' }, icon), h('span', { class: 'v' }, `${Math.max(0, cur)} / ${max}`), h('div', { class: `bar ${cls}` }, h('i', { style: `width:${pct}%` })));
 }
@@ -181,8 +182,8 @@ function render(force = false) {
         'div',
         { class: 'bars' },
         h('div', { class: 'row', style: 'gap:6px' }, h('span', { class: 'nm' }, c.name), c.dead ? h('span', null, '💀') : c.down ? h('span', null, '☠️') : null, c.inspiration ? h('span', { class: 'badge' }, `✨${c.inspiration}`) : null),
-        hudLine('♥', 'hp', c.hp, c.maxHp),
-        c.maxSp ? hudLine('✦', 'sp', c.sp, c.maxSp) : null,
+        hudLine(heartIcon(), 'hp', c.hp, c.maxHp),
+        c.maxSp ? hudLine(sparkIcon(), 'sp', c.sp, c.maxSp) : null,
       ),
       h('div', { class: 'lv' }, h('small', null, 'LV.'), h('b', null, String(c.level).padStart(2, '0')), h('span', { class: 'gold' }, `💰 ${v.party.gold}`)),
     ),

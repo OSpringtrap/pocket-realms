@@ -37,6 +37,8 @@ export interface ChoiceOption {
   cost?: string;
   group?: string;
   tag?: string; // small badge, e.g. "Bonus", "Best fit"
+  /** monster def id: phones draw its art instead of the emoji */
+  monster?: string;
 }
 
 interface PromptBase {
@@ -94,7 +96,7 @@ export interface WorldView {
   weather: Weather;
   doom: number;
   doomMax: number;
-  antagonist: { name: string; title: string; emoji: string; desc: string };
+  antagonist: { name: string; title: string; emoji: string; bossId?: string; desc: string };
   objective: { text: string; fortress?: { q: number; r: number }; keysNeeded: number; keys: number; keyName: string };
   factions: Faction[];
   npcs: Npc[];
@@ -297,6 +299,7 @@ export type Intent =
 export type HostCommand =
   | { cmd: 'newCampaign'; settings?: Partial<Settings>; seed?: string }
   | { cmd: 'continue'; saveId: string }
+  | { cmd: 'deleteSave'; saveId: string }
   | { cmd: 'start' }
   | { cmd: 'settings'; settings: Partial<Settings> }
   | { cmd: 'kick'; playerId: string }

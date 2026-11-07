@@ -154,7 +154,7 @@ function gameController(g: Game, ctx: CombatCtx): CombatController {
       const timeout = g.state.settings.turnTimer > 0 ? g.state.settings.turnTimer * 1000 : undefined;
       const choices = options.map(optionToChoice);
       if (cctx.combat.actorBonusUsed) choices.push({ id: 'endTurn', label: 'End turn', emoji: '⏭️', group: 'Actions', desc: 'Finish your turn now.' });
-      const status = `${hpBar(c)}${c.maxSp ? ` · ${c.sp}/${c.maxSp} SP` : ''}${c.conditions.length ? ` · ${c.conditions.map((x) => x.id).join(', ')}` : ''}`;
+      const status = `${hpBar(c)}${c.maxSp ? ` — ${c.sp}/${c.maxSp} SP` : ''}${c.conditions.length ? ` — ${c.conditions.map((x) => x.id).join(', ')}` : ''}`;
       let picked: string;
       for (;;) {
         picked = await g.choose(c.id, `Your turn, ${c.name}!`, choices, {
@@ -187,7 +187,7 @@ function gameController(g: Game, ctx: CombatCtx): CombatController {
               const u = getUnit(cctx, id)!;
               const tele = !isChar(u) && u.telegraph ? ' ⚠️ winding up!' : '';
               const conds = u.conditions.map((x) => x.id).join(', ');
-              return { id, label: `${isChar(u) ? '🧑' : u.emoji} ${u.name}`, desc: `${hpBar(u)}${conds ? ` · ${conds}` : ''}${tele}`, emoji: isChar(u) ? '🛡️' : '🎯' };
+              return { id, label: isChar(u) ? `🧑 ${u.name}` : u.name, desc: `${hpBar(u)}${conds ? ` — ${conds}` : ''}${tele}`, emoji: isChar(u) ? '🛡️' : u.emoji, monster: isChar(u) ? undefined : u.defId };
             });
             tOpts.push({ id: '__back', label: 'Back', emoji: '↩️' });
             const t = await g.choose(c.id, n > 1 ? `Pick your first target (up to ${n} hit)` : `Target for ${opt.label}`, tOpts, { style: 'target', timeoutMs: timeout, fallback: cands[0], urgent: true });

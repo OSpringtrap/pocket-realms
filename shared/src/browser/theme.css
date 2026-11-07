@@ -2,13 +2,11 @@
    Two surfaces: dark bronze-trimmed panels (status, chrome) and layered parchment cards (content).
    Text colours are scoped variables, so anything inside a .card reads as ink and anything on a
    panel or the backdrop reads as bone — components only ever use var(--ink*) and stay correct. */
-@import '@fontsource/cormorant-garamond/latin-500.css';
-@import '@fontsource/cormorant-garamond/latin-600.css';
-@import '@fontsource/cormorant-garamond/latin-700.css';
-@import '@fontsource/cormorant-garamond/latin-500-italic.css';
-@import '@fontsource/eb-garamond/latin-400.css';
-@import '@fontsource/eb-garamond/latin-500.css';
-@import '@fontsource/eb-garamond/latin-400-italic.css';
+@import '@fontsource/young-serif/latin-400.css';
+@import '@fontsource/merriweather/latin-300.css';
+@import '@fontsource/merriweather/latin-400.css';
+@import '@fontsource/merriweather/latin-400-italic.css';
+@import '@fontsource/merriweather/latin-700.css';
 
 :root {
   /* backdrop & panels */
@@ -47,8 +45,8 @@
   --line: var(--edge-soft);
   --shadow: 0 1px 0 rgba(0, 0, 0, 0.35), 0 10px 24px rgba(0, 0, 0, 0.35);
   --radius: 3px;
-  --font-title: 'Cormorant Garamond', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
-  --font-body: 'EB Garamond', Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
+  --font-title: 'Young Serif', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --font-body: 'Merriweather', Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
   --scale: 1;
   color-scheme: dark;
 }
@@ -78,19 +76,20 @@ body {
     radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(20, 16, 12, 0.55) 100%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-attachment: fixed;
-  font-size: calc(16px * var(--scale));
+  font-size: calc(15px * var(--scale));
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   font-variant-numeric: lining-nums;
   overflow-x: hidden;
 }
-h1, h2, h3, .title { font-family: var(--font-title); font-weight: 600; letter-spacing: 0.01em; margin: 0.2em 0; line-height: 1.1; }
+h1, h2, h3, .title { font-family: var(--font-title); font-weight: 400; letter-spacing: 0.01em; margin: 0.2em 0; line-height: 1.1; }
 h1 { font-size: 2.3em; }
 h2 { font-size: 1.55em; }
 h3 { font-size: 1.25em; }
 hr { border: 0; border-top: 1px solid var(--line); margin: 10px 0; }
 .small { font-size: 0.85em; }
 .muted { color: var(--ink-3); }
-.caps { font-family: var(--font-title); font-variant: small-caps; letter-spacing: 0.08em; text-transform: lowercase; }
+.caps { font-family: var(--font-title); text-transform: uppercase; letter-spacing: 0.08em; text-transform: lowercase; }
 
 /* --- parchment card: a little stack of sheets --- */
 .card {
@@ -122,9 +121,8 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 10px 0; }
 .ribbon::before { content: ''; position: absolute; inset: 4px 4px 10px; border: 1px solid rgba(240, 217, 181, 0.35); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%); }
 
 /* numbered section header: "01  STATUS CLUSTER ———" */
-.sect { display: flex; align-items: baseline; gap: 10px; color: var(--ink-2); margin: 6px 0 2px; }
-.sect i { font-family: var(--font-title); font-style: italic; font-weight: 500; font-size: 1.5em; color: var(--ochre); opacity: 0.85; }
-.sect span { font-family: var(--font-title); font-variant: small-caps; text-transform: lowercase; letter-spacing: 0.12em; font-weight: 600; font-size: 1em; }
+.sect { display: flex; align-items: center; gap: 12px; color: var(--ink-2); margin: 8px 0 2px; }
+.sect span { font-family: var(--font-title); text-transform: uppercase; letter-spacing: 0.16em; font-weight: 400; font-size: 0.78em; }
 .sect::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); align-self: center; }
 
 /* row with a diamond marker (objectives, options) */
@@ -132,18 +130,18 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 10px 0; }
 .goal:first-of-type { border-top: 0; }
 .goal::before { content: ''; grid-row: 1; grid-column: 1; width: 11px; height: 11px; transform: rotate(45deg); background: var(--ink); box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--ink-3); justify-self: center; }
 .goal.is-main::before { background: var(--rust); }
-.goal .gt { grid-row: 1; grid-column: 2; font-family: var(--font-title); font-weight: 600; font-size: 1.12em; line-height: 1.15; }
+.goal .gt { grid-row: 1; grid-column: 2; font-family: var(--font-title); font-weight: 400; font-size: 1.12em; line-height: 1.15; }
 .goal .gd { grid-row: 2; grid-column: 2; font-size: 0.86em; color: var(--ink-2); line-height: 1.25; }
 .goal .gp { grid-row: 2; grid-column: 3; font-size: 0.85em; color: var(--ink-2); font-variant-numeric: lining-nums tabular-nums; }
-.cardhead { display: flex; align-items: center; gap: 10px; padding-bottom: 8px; margin-bottom: 2px; border-bottom: 1px solid var(--line); font-family: var(--font-title); font-size: 1.35em; font-weight: 600; padding-right: 50px; }
+.cardhead { display: flex; align-items: center; gap: 10px; padding-bottom: 8px; margin-bottom: 2px; border-bottom: 1px solid var(--line); font-family: var(--font-title); font-size: 1.35em; font-weight: 400; padding-right: 50px; }
 .cardhead .glyph { color: var(--ink-2); font-size: 0.9em; }
 
 /* --- buttons: pressed-paper bars; dark slabs on panels; rust for primary --- */
 button, .btn {
   font-family: var(--font-title);
-  font-weight: 600;
-  font-size: 1.05em;
-  letter-spacing: 0.02em;
+  font-weight: 400;
+  font-size: 1em;
+  letter-spacing: 0.01em;
   color: var(--ink);
   background: linear-gradient(180deg, #e4d6b8, #d2c09b);
   border: 1px solid var(--paper-edge);
@@ -195,9 +193,9 @@ input:focus, textarea:focus { outline: 2px solid rgba(201, 160, 80, 0.6); }
 .bar.xp > i { background: linear-gradient(90deg, #8e8a80, #c9c3b6); }
 .bar.doom > i { background: linear-gradient(90deg, #3b1a3f, #8b2a1e); }
 
-/* labelled stat line: icon · bar · value */
+/* labelled stat line: icon — bar — value */
 .stat-line { display: grid; grid-template-columns: 18px 1fr; gap: 2px 8px; align-items: center; }
-.stat-line .ic { grid-row: 1 / span 2; font-size: 0.95em; text-align: center; filter: saturate(0.6); }
+.stat-line .ic { grid-row: 1 / span 2; font-size: 0.95em; text-align: center; display: flex; justify-content: center; }
 .stat-line .v { justify-self: end; font-size: 0.78em; color: var(--ink-2); font-variant-numeric: tabular-nums; line-height: 1; }
 
 .tag { display: inline-block; font-size: 0.75em; padding: 1px 8px; border-radius: 2px; border: 1px solid var(--line); background: rgba(0, 0, 0, 0.08); margin-left: 6px; white-space: nowrap; }
@@ -213,7 +211,7 @@ input:focus, textarea:focus { outline: 2px solid rgba(201, 160, 80, 0.6); }
 .toast.out { opacity: 0; transform: translateY(10px); }
 
 .hexmap { width: 100%; height: 100%; display: block; }
-.hexmap .hexlabel { font-family: var(--font-title); font-weight: 700; fill: #2a2119; paint-order: stroke; stroke: rgba(235, 223, 198, 0.9); stroke-width: 3px; }
+.hexmap .hexlabel { font-family: var(--font-title); font-weight: 400; fill: #2a2119; paint-order: stroke; stroke: rgba(235, 223, 198, 0.9); stroke-width: 3px; }
 .hexmap .hex.reach polygon:first-child { filter: brightness(1.08); }
 .hexmap .reach-ring { animation: pulse 1.4s ease-in-out infinite; }
 .hexmap .party-token { transition: transform 0.35s ease-in-out; }
@@ -227,3 +225,15 @@ input:focus, textarea:focus { outline: 2px solid rgba(201, 160, 80, 0.6); }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 @keyframes glowPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(201, 160, 80, 0.55), 0 8px 20px rgba(0, 0, 0, 0.35); } 50% { box-shadow: 0 0 0 6px rgba(201, 160, 80, 0), 0 8px 20px rgba(0, 0, 0, 0.35); } }
 .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+
+/* vector glyphs */
+.gl { display: inline-flex; width: 1em; height: 1em; vertical-align: -0.12em; }
+.gl svg { width: 100%; height: 100%; }
+.gl-heart { color: #c0603c; }
+.gl-spark { color: #d9b464; }
+.mart { display: inline-flex; align-items: center; justify-content: center; width: 1em; height: 1em; line-height: 1; vertical-align: -0.15em; }
+.mart svg { width: 100%; height: 100%; overflow: visible; }
+.mart.emoji { width: auto; height: auto; }
+/* condition chips beside a name */
+.cond { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72em; padding: 1px 8px; border: 1px solid var(--line); background: rgba(0, 0, 0, 0.22); color: var(--ink-2); white-space: nowrap; text-transform: capitalize; line-height: 1.6; }
+.cond.bad { border-color: rgba(208, 96, 60, 0.6); color: #f0a080; }

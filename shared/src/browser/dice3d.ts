@@ -212,8 +212,6 @@ function buildShapes(): Record<string, Shape> {
 
 const SHAPES = buildShapes();
 
-/** Final resting tilt: top leans away from the viewer, slight turn to the side. */
-const SETTLE_TILT = qmul(qaxis([0, 1, 0], -0.22), qaxis([1, 0, 0], -0.3));
 /** Camera distance (in die radii) for the perspective projection. */
 const CAM = 5;
 /** Max projected radius of a die (circumradius ≤ 1.12 under perspective). */
@@ -392,8 +390,8 @@ export class DiceTray {
       const up1 = qrot(q1, face.up);
       const ang = Math.atan2(up1[0], -up1[1]);
       const q2 = qaxis([0, 0, 1], -ang);
-      // tip the die back a little so neighbouring faces show and it reads as a solid
-      d.settleTo = qmul(SETTLE_TILT, qmul(q2, q1));
+      // rest square-on: the rolled face looks straight at the screen
+      d.settleTo = qmul(q2, q1);
       d.settleStart = startAt;
     });
     return new Promise((res) => {

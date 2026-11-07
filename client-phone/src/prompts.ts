@@ -1,3 +1,4 @@
+import { monsterArt } from '../../shared/src/browser/glyphs.js';
 import { sfx } from '../../shared/src/browser/audio.js';
 import { DiceTray, dieName } from '../../shared/src/browser/dice3d.js';
 import { h, clear } from '../../shared/src/browser/dom.js';
@@ -135,7 +136,7 @@ function optButton(o: ChoiceOption, onPick: () => void) {
   return h(
     'button',
     { disabled: !!o.disabled, onclick: onPick, title: o.disabled ?? '' },
-    h('span', { class: 'em' }, o.emoji ?? '•'),
+    h('span', { class: 'em' }, o.monster ? monsterArt(o.monster, o.emoji ?? '•') : o.emoji ?? '•'),
     h('span', null, h('div', { class: 'lbl' }, o.label, o.tag ? h('span', { class: 'badge' }, o.tag) : null), o.desc ? h('div', { class: 'ds' }, o.desc) : null, o.disabled ? h('div', { class: 'ds', style: 'color:var(--red)' }, o.disabled) : null),
     o.cost ? h('span', { class: 'cost' }, o.cost) : h('span'),
   );
@@ -299,7 +300,7 @@ export function renderContext(app: App) {
       const mine = cb.current === c.id;
       return [
         c.dead ? waitCard('👻', 'Your spirit lingers', 'You will get to nudge the battle on your turn.') : c.down ? waitCard('☠️', 'You are dying!', `Death saves: ${c.death.successes}✔ ${c.death.failures}✖ — roll on your turn.`) : waitCard(mine ? '⚔️' : '⏳', mine ? 'Your turn!' : cb.round === 0 ? 'Rolling initiative...' : `Round ${cb.round} — wait for your turn`, cb.current ? `Now acting: ${v.chars[cb.current]?.name ?? cb.monsters.find((m) => m.id === cb.current)?.name ?? ''}` : undefined),
-        h('div', { class: 'card col small' }, h('b', null, 'Enemies'), ...foes.map((m) => h('div', { class: 'row' }, h('span', null, m.emoji), h('span', { class: 'grow' }, `${m.name}${m.telegraph ? ' ⚠️' : ''}`), h('span', null, `${m.hp}/${m.maxHp}`)))),
+        h('div', { class: 'card col small' }, h('b', null, 'Enemies'), ...foes.map((m) => h('div', { class: 'row' }, monsterArt(m.defId, m.emoji, 'foe-ic'), h('span', { class: 'grow' }, `${m.name}${m.telegraph ? ' ⚠️' : ''}`), h('span', null, `${m.hp} / ${m.maxHp}`)))),
         c.conditions.length ? h('div', { class: 'card small' }, `Conditions: ${c.conditions.map((x) => x.id).join(', ')}`) : null,
         footer,
       ];

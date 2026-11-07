@@ -1,1 +1,1 @@
-{"name":"@pr/shared","version":"0.1.0","private":true,"type":"module","exports":{".":"./src/index.ts","./*":"./src/*"},"dependencies":{"@fontsource/cormorant-garamond":"^5.3.0","@fontsource/eb-garamond":"^5.3.0","zod":"^3.25.0"}}
+{"name":"@pr/shared","version":"0.1.0","private":true,"type":"module","exports":{".":"./src/index.ts","./*":"./src/*"},"dependencies":{"@fontsource/merriweather":"^5.3.0","@fontsource/young-serif":"^5.3.0","zod":"^3.25.0"}}

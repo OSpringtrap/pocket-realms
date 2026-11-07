@@ -39,7 +39,7 @@ function sheet(c: Character) {
       h('div', { class: 'row' }, c.portrait ? h('img', { src: c.portrait, style: 'width:64px;height:64px;border-radius:50%;border:2px solid var(--ink-2)' }) : h('span', { style: 'font-size:2.6em' }, cls.emoji), h('div', null, h('h2', null, `${c.name} ${c.titles.length ? c.titles[c.titles.length - 1] : ''}`), h('div', null, `Level ${c.level} ${sp.name} ${cls.name}${c.ancestry ? ` (${c.ancestry})` : ''}`))),
       h('div', { class: 'muted' }, `“${c.personality}”`),
       h('div', { class: 'bar xp', title: 'XP' }, h('i', { style: `width:${Math.min(100, ((c.xp - (XP_TABLE[c.level - 1] ?? 0)) / Math.max(1, nextXp - (XP_TABLE[c.level - 1] ?? 0))) * 100)}%` })),
-      h('div', { class: 'small muted' }, `${c.xp} XP · next level at ${nextXp}`),
+      h('div', { class: 'small muted' }, `${c.xp} XP — next level at ${nextXp}`),
     ),
     h(
       'div',
@@ -51,12 +51,12 @@ function sheet(c: Character) {
       h('div', { class: 'card stat' }, h('span', { class: 'small' }, 'Attack'), h('b', null, signed(wp.toHit)), h('span', { class: 'small' }, `${wp.dice}+${wp.damageBonus}`)),
       cls.castAbility ? h('div', { class: 'card stat' }, h('span', { class: 'small' }, 'Spell DC'), h('b', null, spellDC(c))) : h('div', { class: 'card stat' }, h('span', { class: 'small' }, 'Insp.'), h('b', null, c.inspiration)),
     ),
-    h('div', { class: 'sheet-grid' }, ...ABILITIES.map((a) => h('div', { class: 'card stat' }, h('span', { class: 'small' }, a), h('b', null, stat(c, a)), h('span', { class: 'small' }, `${signed(mod(stat(c, a)))} · save ${signed(saveBonus(c, a))}`)))),
+    h('div', { class: 'sheet-grid' }, ...ABILITIES.map((a) => h('div', { class: 'card stat' }, h('span', { class: 'small' }, a), h('b', null, stat(c, a)), h('span', { class: 'small' }, `${signed(mod(stat(c, a)))} — save ${signed(saveBonus(c, a))}`)))),
     h('div', { class: 'card col small' }, h('b', null, 'Skills'), h('div', { class: 'row wrap' }, ...SKILLS.map((s) => h('span', { class: 'tag', style: c.skills.includes(s) ? 'font-weight:bold;border-width:2px' : '' }, `${s} ${signed(skillBonus(c, s))}`)))),
     h('div', { class: 'card col small' }, h('b', null, 'Traits & quirks'), ...sp.traits.map((t) => h('div', null, `🧬 ${t.name}: ${t.desc}`)), ...c.quirks.map((q) => h('div', null, `🎭 ${C.quirks[q]?.name}: ${C.quirks[q]?.desc}`, h('div', { class: 'muted', style: 'font-style:italic' }, C.quirks[q]?.prompt ?? '')))),
     Object.keys(c.resources).length ? h('div', { class: 'card col small' }, h('b', null, 'Resources'), ...Object.values(c.resources).map((r) => h('div', null, `${r.name}: ${r.cur}/${r.max} (recovers on ${r.recover} rest)`))) : null,
     c.titles.length ? h('div', { class: 'card small' }, h('b', null, 'Titles: '), c.titles.join(', ')) : null,
-    h('div', { class: 'card small' }, h('b', null, 'Deeds: '), `${c.stats.kills} foes defeated · ${c.stats.crits} crits · ${c.stats.damageDealt} damage · ${c.stats.healed} healed · ${c.stats.minigamesAced} perfect minigames`),
+    h('div', { class: 'card small' }, h('b', null, 'Deeds: '), `${c.stats.kills} foes defeated — ${c.stats.crits} crits — ${c.stats.damageDealt} damage — ${c.stats.healed} healed — ${c.stats.minigamesAced} perfect minigames`),
   ];
 }
 
@@ -90,7 +90,7 @@ function bag(app: App, c: Character) {
     ...eq,
     h('h2', null, `🎒 Your bag (${c.inventory.length})`),
     ...(inv.length ? inv : [h('div', { class: 'muted' }, 'Empty.')]),
-    h('h2', null, `📦 Party stash (${v.party.stash.length}) · 💰 ${v.party.gold}g`),
+    h('h2', null, `📦 Party stash (${v.party.stash.length}) — 💰 ${v.party.gold}g`),
     h('div', { class: 'small muted' }, 'Loot from fights lands here. First come, first served — be nice!'),
     ...(stash.length ? stash : [h('div', { class: 'muted' }, 'Empty.')]),
   ];
@@ -138,7 +138,7 @@ function journal(app: App, c: Character) {
   const test = h('div', { class: 'small muted' });
   return [
     v.me.secrets.length ? h('div', { class: 'card col secret' }, h('b', null, '🤫 Secrets (only you can see these)'), ...v.me.secrets.map((s) => h('div', null, `• ${s.text}`))) : null,
-    w ? h('div', { class: 'card col small' }, h('b', null, `🎯 ${w.objective.text}`), h('div', null, `🔑 ${w.objective.keyName}: ${w.objective.keys}/${w.objective.keysNeeded} · ⏳ Doom ${w.doom}/${w.doomMax}`), ...w.quests.filter((q) => q.status === 'active').map((q) => h('div', null, `📜 ${q.title}${q.privateFor ? ' (secret)' : ''} — ${q.desc}`))) : null,
+    w ? h('div', { class: 'card col small' }, h('b', null, `🎯 ${w.objective.text}`), h('div', null, `🔑 ${w.objective.keyName}: ${w.objective.keys}/${w.objective.keysNeeded} — ⏳ Doom ${w.doom}/${w.doomMax}`), ...w.quests.filter((q) => q.status === 'active').map((q) => h('div', null, `📜 ${q.title}${q.privateFor ? ' (secret)' : ''} — ${q.desc}`))) : null,
     w ? h('div', { class: 'card small' }, ...w.factions.map((f) => h('span', { class: 'tag' }, `${f.emoji} ${f.name} ${f.rep >= 0 ? '+' : ''}${f.rep}`))) : null,
     h('div', { class: 'card col small' }, h('b', null, `📖 Chronicle of ${w?.kingdomName ?? 'the Realm'}`), ...[...v.journal].reverse().slice(0, 30).map((e) => h('div', null, h('span', { class: 'muted' }, `D${e.day} `), e.text))),
     h(
@@ -152,7 +152,7 @@ function journal(app: App, c: Character) {
         setTimeout(stopMic, 1500);
       } }, '🎤 Test mic'), h('button', { onclick: () => (haptic([100, 50, 100]), sfx.unlock(), sfx.play('coin')) }, '🔔 Test buzz')),
       test,
-      h('div', { class: 'small muted' }, `Sensors: motion ${caps.motion ? '✓' : '?'} · orientation ${caps.orientation ? '✓' : '?'} · mic ${caps.mic ? '✓' : '?'} · vibration ${caps.vibrate ? '✓' : '✗ (screen flash instead)'}${DEBUG ? ' · DEBUG' : ''}`),
+      h('div', { class: 'small muted' }, `Sensors: motion ${caps.motion ? '✓' : '?'} — orientation ${caps.orientation ? '✓' : '?'} — mic ${caps.mic ? '✓' : '?'} — vibration ${caps.vibrate ? '✓' : '✗ (screen flash instead)'}${DEBUG ? ' — DEBUG' : ''}`),
       h('a', { href: `${location.pathname}?debug=1`, class: 'small' }, 'Open sensor debug mode'),
       h('button', { class: 'ghost small', onclick: () => {
         if (!confirm('Leave this game on this phone? Your hero stays with the party.')) return;
@@ -164,6 +164,6 @@ function journal(app: App, c: Character) {
         location.reload();
       } }, '🚪 Leave game on this device'),
     ),
-    h('div', { class: 'small muted center' }, `${c.name} · room ${v.code}`),
+    h('div', { class: 'small muted center' }, `${c.name} — room ${v.code}`),
   ];
 }

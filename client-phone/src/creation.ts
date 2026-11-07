@@ -83,7 +83,7 @@ export function renderCreation(app: App) {
               h('span', { class: 'em' }, sp.emoji),
               h('b', null, sp.name),
               h('span', { class: 'ds' }, sp.desc),
-              h('span', { class: 'ds' }, sp.traits.map((t) => t.name).join(' · ')),
+              h('span', { class: 'ds' }, sp.traits.map((t) => t.name).join(' — ')),
             );
           }),
         ),
@@ -131,7 +131,7 @@ export function renderCreation(app: App) {
               h('span', { class: 'em' }, cl.emoji),
               h('b', null, cl.name),
               h('span', { class: 'ds' }, cl.desc),
-              h('span', { class: 'ds' }, `❤️ d${cl.hitDie} · ${cl.primary}${cl.sp ? ' · spells' : ''}`),
+              h('span', { class: 'ds' }, `❤️ d${cl.hitDie} — ${cl.primary}${cl.sp ? ' — spells' : ''}`),
               taken ? h('span', { class: 'badge' }, 'someone has this') : null,
             );
           }),
