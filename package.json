@@ -2,7 +2,7 @@
   "name": "pocket-realms",
   "version": "0.1.0",
   "private": true,
-  "description": "Pocket Realms — a Jackbox-style local multiplayer fantasy RPG (5e-lite) played on phones with a shared main screen.",
+  "description": "Pocket Realms \u2014 a Jackbox-style local multiplayer fantasy RPG (5e-lite) played on phones with a shared main screen.",
   "type": "module",
   "workspaces": [
     "shared",
@@ -20,6 +20,7 @@
     "build:server": "node scripts/build-server.mjs",
     "start": "npm run build && node dist/server/index.js",
     "serve": "node dist/server/index.js",
+    "voice:setup": "node scripts/voice-setup.mjs",
     "dev": "tsx watch server/src/index.ts --dev",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",

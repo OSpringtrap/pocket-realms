@@ -52,6 +52,7 @@ function sanitizeSettings(raw: Partial<Settings> | undefined): Partial<Settings>
   if (typeof raw.music === 'boolean') out.music = raw.music;
   if (typeof raw.colorblind === 'boolean') out.colorblind = raw.colorblind;
   if (typeof raw.reduceMotion === 'boolean') out.reduceMotion = raw.reduceMotion;
+  if (typeof raw.voice === 'boolean') out.voice = raw.voice;
   const num = (v: unknown, lo: number, hi: number) => (typeof v === 'number' && Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : undefined);
   const ts = num(raw.textSpeed, 0.5, 2.5);
   if (ts !== undefined) out.textSpeed = ts;
@@ -166,6 +167,7 @@ export function hostCommand(g: Game, cmd: HostCommand): string | null {
     }
     case 'settings': {
       Object.assign(g.state.settings, sanitizeSettings(cmd.settings));
+      if (!g.state.settings.voice) g.voice?.stop();
       g.dirty();
       return null;
     }
@@ -317,7 +319,7 @@ export function playerIntent(g: Game, pid: string, intent: Intent): string | nul
       if (idx < 0) return 'Someone already took it!';
       const [it] = g.state.party.stash.splice(idx, 1);
       c.inventory.push(it!);
-      g.narrate(`${c.name} takes ${it!.emoji} ${it!.name} from the stash.`);
+      g.narrate(`${c.name} takes ${it!.emoji} ${it!.name} from the stash.`, 'normal', { quiet: true });
       return finish(g, null);
     }
     case 'give': {
@@ -350,7 +352,7 @@ export function playerIntent(g: Game, pid: string, intent: Intent): string | nul
       }
       if (it.use.sp) target.sp = Math.min(target.maxSp, target.sp + it.use.sp);
       if (it.use.cleanse) target.conditions = target.conditions.filter((x) => x.id === 'blessed' || x.id === 'inspired');
-      g.narrate(`${c.name} uses ${it.emoji} ${it.name}${target !== c ? ` on ${target.name}` : ''}.`);
+      g.narrate(`${c.name} uses ${it.emoji} ${it.name}${target !== c ? ` on ${target.name}` : ''}.`, 'normal', { quiet: true });
       g.fx({ kind: 'sound', name: 'potion' });
       return finish(g, null);
     }
@@ -382,7 +384,7 @@ export function playerIntent(g: Game, pid: string, intent: Intent): string | nul
         }
         if (e.type === 'removeCondition') for (const t of targets) t.conditions = t.conditions.filter((x) => (e.ids ? !e.ids.includes(x.id) : x.id === 'blessed' || x.id === 'inspired'));
       }
-      g.narrate(`${c.name} casts ${a.emoji} ${a.name}.`, 'good');
+      g.narrate(`${c.name} casts ${a.emoji} ${a.name}.`, 'good', { quiet: true });
       g.fx({ kind: 'sound', name: 'heal' });
       return finish(g, null);
     }

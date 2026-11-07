@@ -30,6 +30,8 @@ export function makeRoomCode(): string {
 export class Room {
   conns = new Set<Conn>();
   private nextId = 1;
+  /** main screen reported a sentence as played (voice) */
+  onSpeechPlayed?: (sid: number) => void;
   private flushTimer?: NodeJS.Timeout;
   private heartbeat: NodeJS.Timeout;
 
@@ -97,6 +99,22 @@ export class Room {
     ws.on('error', () => {});
   }
 
+  /** Speech goes to the main screen(s) only. */
+  hostCount(): number {
+    return [...this.conns].filter((c) => c.role === 'host' && c.ws.readyState === 1).length;
+  }
+  sendHosts(msg: S2C | Buffer) {
+    for (const c of this.conns) {
+      if (c.role !== 'host' || c.ws.readyState !== 1) continue;
+      try {
+        if (Buffer.isBuffer(msg)) c.ws.send(msg, { binary: true });
+        else c.ws.send(JSON.stringify(msg));
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
   private send(conn: Conn, msg: S2C) {
     if (conn.ws.readyState !== 1) return;
     try {
@@ -121,6 +139,9 @@ export class Room {
     const err = (m: string | null | undefined) => m && this.send(conn, { t: 'error', msg: m });
     if ('v' in msg && msg.v !== PROTOCOL_VERSION) return this.send(conn, { t: 'error', msg: 'The game was updated — please refresh this page.', fatal: true });
     switch (msg.t) {
+      case 'speech:played':
+        if (conn.role === 'host') this.onSpeechPlayed?.(Number(msg.sid));
+        return;
       case 'ping':
         return this.send(conn, { t: 'pong', at: Number(msg.at) || 0 });
       case 'hello': {

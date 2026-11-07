@@ -1,0 +1,7 @@
+# NVIDIA (CUDA), AMD (ROCm) or CPU. torch/torchaudio are installed first from the matching
+# PyTorch index by scripts/voice-setup.mjs; qwen-tts pins its own transformers.
+qwen-tts==0.1.1
+numpy>=2
+soundfile>=0.13
+websockets>=13
+huggingface_hub>=0.34

@@ -1,6 +1,7 @@
 import '../../shared/src/browser/theme.css';
 import './host.css';
 import { sfx } from '../../shared/src/browser/audio.js';
+import { VoicePlayer } from '../../shared/src/browser/voice.js';
 import { DiceTray } from '../../shared/src/browser/dice3d.js';
 import { heartIcon, monsterArt, sparkIcon } from '../../shared/src/browser/glyphs.js';
 import { Slot, clear, h, hash, toast } from '../../shared/src/browser/dom.js';
@@ -45,6 +46,14 @@ unlock.addEventListener('click', () => {
   void document.documentElement.requestFullscreen?.().catch(() => {});
 });
 
+// voices (narrator and characters) stream from the server as audio frames
+const voice = new VoicePlayer(sfx);
+voice.onPlayed = (sid) => net.send({ t: 'speech:played', sid });
+voice.onSpeaking = (who) => {
+  sfx.duck(!!who);
+  document.body.classList.toggle('speaking', !!who);
+};
+
 const net = new Net<PublicView>({
   onOpen: (n) => n.hello('host', hostKey),
   onWelcome: (m) => {
@@ -56,6 +65,12 @@ const net = new Net<PublicView>({
     render();
   },
   onFx: (fx) => fx.forEach(handleFx),
+  onSpeech: (m) => {
+    if (m.t === 'speech') voice.speech(m.sid, m.job, m.who);
+    else if (m.t === 'speechEnd') voice.end(m.sid);
+    else voice.stop();
+  },
+  onAudio: (buf) => voice.frame(buf),
   onError: (msg) => toast(msg, 'error'),
   onStatus: () => renderTop(true),
 });
@@ -529,6 +544,10 @@ function readMs(text: string, min = 1600) {
 }
 
 type NarrLine = NarrationLine;
+/** Spoken lines read as `Name: “line”`. */
+function lineText(l: NarrLine) {
+  return l.style === 'say' && l.who ? `${l.who}: “${l.text}”` : l.text;
+}
 /** Lines waiting their turn: each is typed, then held for its reading time before the next. */
 const narrQueue: NarrLine[] = [];
 let narrShown: NarrLine[] = [];
@@ -565,10 +584,10 @@ async function runNarration() {
     while (narrQueue.length > 6) narrShown.push(narrQueue.shift()!);
     const line = narrQueue.shift()!;
     clear(narrOld);
-    for (const l of narrShown.slice(-2)) narrOld.appendChild(h('div', null, l.text));
+    for (const l of narrShown.slice(-2)) narrOld.appendChild(h('div', null, lineText(l)));
     narrShown = [...narrShown.slice(-4), line];
     narrLine.className = `line ${line.style ?? ''}`;
-    const text = line.text;
+    const text = lineText(line);
     const settings = view?.settings;
     const hurry = narrQueue.length >= 3 ? 0.6 : 1;
     if (!settings || settings.reduceMotion) {
@@ -599,7 +618,7 @@ async function runNarration() {
 
 function renderModal() {
   if (!view) return;
-  modalSlot.render(hash([modal, modal === 'settings' ? view.settings : modal === 'journal' ? view.journal.length : 0]), () => {
+  modalSlot.render(hash([modal, modal === 'settings' ? [view.settings, view.voice] : modal === 'journal' ? view.journal.length : 0]), () => {
     if (!modal) return null;
     const close = () => {
       modal = null;
@@ -648,12 +667,27 @@ function renderModal() {
         h('div', null, `Turn timer (${s.turnTimer ? `${s.turnTimer}s, then auto-play` : 'off'})`),
         slider('turnTimer', 0, 180, 15),
         h('label', { class: 'row' }, h('input', { type: 'checkbox', checked: s.music, style: 'width:auto', onchange: (e: Event) => set({ music: (e.target as HTMLInputElement).checked }) }), 'Ambient music'),
+        h('label', { class: 'row' }, h('input', { type: 'checkbox', checked: s.voice, style: 'width:auto', onchange: (e: Event) => set({ voice: (e.target as HTMLInputElement).checked }) }), 'Voices (narrator and characters)'),
+        h('div', { class: 'small muted' }, voiceStatusText(view!.voice)),
         h('label', { class: 'row' }, h('input', { type: 'checkbox', checked: s.colorblind, style: 'width:auto', onchange: (e: Event) => set({ colorblind: (e.target as HTMLInputElement).checked }) }), 'Color-blind-safe palette'),
         h('label', { class: 'row' }, h('input', { type: 'checkbox', checked: s.reduceMotion, style: 'width:auto', onchange: (e: Event) => set({ reduceMotion: (e.target as HTMLInputElement).checked }) }), 'Reduce motion'),
         role === 'host' && view!.scene.kind !== 'title' ? h('button', { class: 'ghost', onclick: () => confirm('Return to the title screen? Progress is autosaved at the end of each scene.') && (cmd({ cmd: 'title' }), close()) }, '🏰 Quit to title') : null,
       ),
     );
   });
+}
+
+function voiceStatusText(v: PublicView['voice']): string {
+  switch (v?.state) {
+    case 'ready':
+      return `🎙️ Voice worker ready (${v.backend} on ${v.device}).`;
+    case 'starting':
+      return '🎙️ Voice worker is loading…';
+    case 'unavailable':
+      return `🎙️ Voice worker unavailable${v.detail ? `: ${v.detail}` : ''}.`;
+    default:
+      return `🎙️ Voices are not installed${v?.detail ? ` (${v.detail})` : ''}. Run \`npm run voice:setup\` once on this computer.`;
+  }
 }
 
 // ------------------------------------------------------------ fx
@@ -787,6 +821,9 @@ function handleFx(f: Fx) {
       break;
     case 'banner':
       banner(f.text, f.style);
+      break;
+    case 'say':
+      if (f.source) atUnit(f.source, h('div', null, h('div', { class: 'speech-bubble' }, f.text)), Math.min(6000, 1800 + f.text.length * 60));
       break;
     case 'minigame': {
       const pct = Math.round(f.score * 100);

@@ -18,9 +18,14 @@ export class Client {
       this.ws = new WebSocket(URL_, { rejectUnauthorized: false });
       this.ws.on('open', () => res());
       this.ws.on('error', rej);
-      this.ws.on('message', (d) => this.onMsg(JSON.parse(d.toString()) as S2C));
+      this.ws.on('message', (d, isBinary) => {
+        if (isBinary) return this.onBinary(d as Buffer);
+        this.onMsg(JSON.parse(d.toString()) as S2C);
+      });
     });
   }
+  /** audio frames (main screen only) */
+  onBinary(_buf: Buffer) {}
   send(m: unknown) {
     this.ws.send(JSON.stringify(m));
   }

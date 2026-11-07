@@ -41,7 +41,7 @@ export async function applyEffects(g: Game, effects: EventEffect[], actorId: str
         const before = s.party.gold;
         s.party.gold = Math.max(0, s.party.gold + e.amount);
         const d = s.party.gold - before;
-        if (d) g.narrate(d > 0 ? `💰 +${d} gold.` : `💸 ${-d} gold lost.`, d > 0 ? 'good' : 'bad');
+        if (d) g.narrate(d > 0 ? `💰 +${d} gold.` : `💸 ${-d} gold lost.`, d > 0 ? 'good' : 'bad', { quiet: true });
         if (d > 0) g.fx({ kind: 'sound', name: 'coin' });
         break;
       }
@@ -103,7 +103,7 @@ export async function applyEffects(g: Game, effects: EventEffect[], actorId: str
       case 'condition': {
         const targets = e.who === 'party' ? chars : actor ? [actor] : [];
         for (const c of targets) if (!c.conditions.some((x) => x.id === e.id)) c.conditions.push({ id: e.id, turns: e.turns });
-        g.narrate(`${targets.map((c) => c.name).join(', ')}: ${e.id}!`, e.id === 'blessed' || e.id === 'inspired' ? 'good' : 'bad');
+        g.narrate(`${targets.map((c) => c.name).join(', ')}: ${e.id}!`, e.id === 'blessed' || e.id === 'inspired' ? 'good' : 'bad', { quiet: true });
         break;
       }
       case 'rep': {
@@ -111,7 +111,7 @@ export async function applyEffects(g: Game, effects: EventEffect[], actorId: str
         const f = e.faction === 'random' ? g.rng.pick(w.factions) : w.factions.find((x) => x.id === e.faction);
         if (!f) break;
         f.rep = Math.max(-10, Math.min(10, f.rep + e.amount));
-        g.narrate(`${f.emoji} ${f.name} ${e.amount > 0 ? 'likes' : 'dislikes'} that. (Reputation ${f.rep >= 0 ? '+' : ''}${f.rep})`, e.amount > 0 ? 'good' : 'bad');
+        g.narrate(`${f.emoji} ${f.name} ${e.amount > 0 ? 'likes' : 'dislikes'} that. (Reputation ${f.rep >= 0 ? '+' : ''}${f.rep})`, e.amount > 0 ? 'good' : 'bad', { quiet: true });
         break;
       }
       case 'reveal':

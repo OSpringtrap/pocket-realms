@@ -2,6 +2,7 @@ import { z } from 'zod';
 import abilitiesJson from '../../content/abilities.json';
 import affixesJson from '../../content/affixes.json';
 import antagonistsJson from '../../content/antagonists.json';
+import barksJson from '../../content/barks.json';
 import campJson from '../../content/camp.json';
 import classesJson from '../../content/classes.json';
 import eventsJson from '../../content/events.json';
@@ -20,6 +21,7 @@ import {
   zAbilityDef,
   zAffixDef,
   zAntagonist,
+  zBark,
   zCampPrompt,
   zClassDef,
   zEventCard,
@@ -36,6 +38,7 @@ import {
   type AbilityDef,
   type AffixDef,
   type AntagonistDef,
+  type BarkDef,
   type ClassDef,
   type EventCard,
   type ItemBase,
@@ -93,6 +96,7 @@ export interface Content {
   npcs: NpcArchetype[];
   factions: z.infer<typeof zFactionDef>[];
   antagonists: AntagonistDef[];
+  barks: Record<string, BarkDef>;
   quests: z.infer<typeof zQuestTemplate>[];
   prompts: z.infer<typeof zJackboxPrompt>[];
   camp: z.infer<typeof zCampPrompt>[];
@@ -112,6 +116,7 @@ export function loadContent(): Content {
   const npcs = parseList('npcs.json', zNpcArchetype, npcsJson);
   const factions = parseList('factions.json', zFactionDef, factionsJson);
   const antagonists = parseList('antagonists.json', zAntagonist, antagonistsJson);
+  const barkList = parseList('barks.json', zBark, barksJson);
   const quests = parseList('quests.json', zQuestTemplate, questsJson);
   const prompts = parseList('prompts.json', zJackboxPrompt, promptsJson);
   const camp = parseList('camp.json', zCampPrompt, campJson);
@@ -135,6 +140,7 @@ export function loadContent(): Content {
     npcs,
     factions,
     antagonists,
+    barks: byId(barkList),
     quests,
     prompts,
     camp,
@@ -187,6 +193,11 @@ function crossCheck(c: Content) {
     need(!!c.monsters[a.bossId]?.boss, `antagonist ${a.id}: boss ${a.bossId} missing or not a boss`);
     for (const f of a.minions) need(families.has(f), `antagonist ${a.id}: unknown family ${f}`);
   }
+  for (const b of Object.values(c.barks)) {
+    need(!!c.monsters[b.id] || families.has(b.id), `barks ${b.id}: not a monster id or family`);
+    need(!!b.silent || !!b.voice, `barks ${b.id}: needs a voice (or silent: true)`);
+  }
+  for (const n of c.npcs) if (n.voices) need(n.voices.length === n.names.length, `npc ${n.id}: voices must match names one to one`);
   if (errs.length) throw new ContentError(`Content cross-reference errors:\n  - ${errs.join('\n  - ')}`);
 }
 

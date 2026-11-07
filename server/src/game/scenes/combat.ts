@@ -33,6 +33,7 @@ import {
 import type { Game } from '../Game.js';
 import { handleLevelUps } from './levelup.js';
 import { checkGoals } from '../goals.js';
+import { bark, barkHurt, barkTurnEnd, barkTurnStart, canSpeak, resetBarks } from '../speech.js';
 
 export interface CombatOptions {
   encounter: BuiltEncounter;
@@ -67,11 +68,29 @@ export function gameCombatIO(g: Game, ctx: CombatCtx): CombatIO {
     emit: (e: CombatEvent) => {
       const fx = combatFx(e);
       if (fx) g.fx(fx);
+      combatBarks(g, ctx, e);
       g.dirty();
     },
     pause: (ms) => g.sleep(ms),
   };
-  void ctx;
+}
+
+/** Monsters speak up when something happens to them (see speech.ts). */
+function combatBarks(g: Game, ctx: CombatCtx, e: CombatEvent) {
+  const mon = (id: string) => {
+    const u = getUnit(ctx, id);
+    return u && !isChar(u) ? u : undefined;
+  };
+  if (e.k === 'telegraph') {
+    const m = mon(e.source);
+    if (m) bark(g, m, 'windup', 0.9);
+  } else if (e.k === 'damage') {
+    const m = mon(e.target);
+    if (m) barkHurt(g, m);
+  } else if (e.k === 'death') {
+    const m = mon(e.target);
+    if (m) bark(g, m, 'death', m.boss ? 1 : 0.55);
+  }
 }
 
 function combatFx(e: CombatEvent): Fx | undefined {
@@ -217,12 +236,16 @@ function gameController(g: Game, ctx: CombatCtx): CombatController {
       (g.state.scene as { combat?: { current?: string } }).combat!.current = id;
       const u = getUnit(cctx, id);
       if (u && isChar(u) && !u.dead) g.fx({ kind: 'haptic', pattern: [80, 60, 80], playerId: id });
+      barkTurnStart(g);
       g.dirty();
     },
     async onTurnEnd(id: string, cctx: CombatCtx) {
       const u = getUnit(cctx, id);
+      if (u && !isChar(u)) barkTurnEnd(g, u);
       g.dirty();
       await g.sleep(g.opts.instantBots ? 0 : u && !isChar(u) ? 1100 : 500);
+      // Let a spoken line finish before the next turn starts (capped).
+      if (!g.opts.instantBots && g.voice?.busy() && g.state.settings.voice) await g.voice.idle(4000);
     },
   };
   void ctx;
@@ -259,6 +282,9 @@ export async function combatScene(g: Game, opts: CombatOptions): Promise<CombatO
   g.fx({ kind: 'sound', name: opts.isFinal || opts.bossFight ? 'boss' : 'battle' });
   const foes = monsters.filter((m) => m.side === 'enemy');
   g.narrate(`${opts.ambush ? 'Ambush! ' : ''}${listNames(foes.map((m) => `${m.emoji} ${m.name}`))} ${foes.length > 1 ? 'block' : 'blocks'} the way!`, 'bad');
+  resetBarks(g);
+  const speaker = foes.find((m) => m.boss && canSpeak(m)) ?? foes.find(canSpeak);
+  if (speaker) bark(g, speaker, 'taunt', speaker.boss ? 1 : 0.8);
   await g.beat(1200);
 
   // Initiative: everyone rolls at once on their phones

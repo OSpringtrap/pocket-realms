@@ -14,6 +14,8 @@ import { Game } from './game/Game.js';
 import { installHandlers, toTitle } from './game/director.js';
 import { lanIps, openBrowser } from './net.js';
 import { Room, makeRoomCode } from './room.js';
+import { SpeechQueue } from './voice/speech.js';
+import { TtsWorker } from './voice/worker.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 // Works both from dist/server/index.js and server/src/index.ts
@@ -45,6 +47,14 @@ function main() {
   installHandlers(game);
   toTitle(game);
   const room = new Room(game, code, hostKey);
+
+  // Optional voices: narrator and characters, spoken on the main screen.
+  const tts = new TtsWorker(ROOT);
+  const speech = new SpeechQueue(tts, { hosts: () => room.hostCount(), json: (m) => room.sendHosts(m as never), binary: (b) => room.sendHosts(b) });
+  tts.onStatus = () => game.dirty();
+  room.onSpeechPlayed = (sid) => speech.played(sid);
+  game.voice = speech;
+  tts.start();
 
   const app = express();
   app.disable('x-powered-by');
@@ -107,8 +117,10 @@ function main() {
       /* ignore */
     }
     room.close();
+    tts.stop();
     process.exit(0);
   };
+  process.on('exit', () => tts.stop());
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
   process.on('uncaughtException', (e) => console.error('[uncaught]', e));

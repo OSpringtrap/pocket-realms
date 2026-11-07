@@ -91,11 +91,44 @@ result (validated against the die).
 campfire moments (the group votes to award Inspiration), shop, and manage your bag and the party
 stash on your phone. Some players get secret goals or whispered temptations…
 
+## Voices (optional)
+
+The main screen can speak: a **narrator** reads the story, and NPCs and monsters say their lines in
+their own voices (a goblin cackles, a ghost rasps, the innkeeper grumbles). The lines are written in
+the game's content files; the voices are spoken by **Qwen3-TTS**, running on the host computer.
+Nothing goes online during play. Without the voice install the game plays exactly as before, silently.
+
+Install once (needs Python 3.10–3.13, 3.12 recommended, and about 4–6 GB of disk for the model and
+libraries):
+
+```bash
+npm run voice:setup
+npm start            # starts the voice worker by itself
+```
+
+The setup picks a backend for the computer:
+
+| Machine | Backend | Notes |
+|---|---|---|
+| Mac with Apple Silicon | MLX (Metal) | 1.7B model, first audio in about 0.3 s |
+| NVIDIA GPU (Windows or Linux) | PyTorch + CUDA 12.8 | 1.7B model; needs a recent NVIDIA driver |
+| AMD GPU on Linux | PyTorch + ROCm 6.4 | 1.7B model; needs the `amdgpu` driver with ROCm support |
+| AMD GPU on Windows, or no GPU | PyTorch on CPU | 0.6B model; about 2× slower than real time, so lines start a few seconds late |
+
+On Windows with an AMD card, PyTorch has no official ROCm build, so the setup falls back to the CPU.
+If AMD publishes ROCm PyTorch wheels for your card, point the setup at them:
+`TORCH_INDEX_URL=<index url> npm run voice:setup` (PowerShell: `$env:TORCH_INDEX_URL="<index url>"; npm run voice:setup`).
+
+Other switches: `VOICE=0 npm start` plays without voices; `VOICE_BACKEND=mlx|torch|fake` forces a
+backend (`fake` speaks beeps, for testing without models); **Voices** in ⚙️ Settings turns them off for
+a session and shows whether the voice worker is ready. The voices themselves are the clips in
+`voice/voices/` (see [voice/README.md](voice/README.md)).
+
 ## Modes and settings (main screen ⚙️)
 
 - **Length:** One-shot (~30–45 min, 1 key) or Campaign (2–4 h, 3 keys, bigger map, home-base upgrades)
 - **Difficulty:** Story / Normal / Heroic, plus an **adaptive director** toggle
-- Text speed, text size, volume, ambient music, **color-blind-safe palette**, reduce motion, turn timer
+- Text speed, text size, volume, ambient music, **voices**, **color-blind-safe palette**, reduce motion, turn timer
 - **Seed:** the same seed reproduces the same world
 
 The campaign **autosaves** to `saves/*.json` at the end of every scene. On the title screen choose
@@ -127,6 +160,7 @@ HOST_KEY=testkey ROOM_CODE=TEST PORT=9443 HTTP_PORT=9080 node dist/server/index.
 npx tsx scripts/smoke-clients.ts            # 6 phones join, drop, rejoin, auto-play
 npx tsx scripts/smoke-continue.ts start     # then restart the server and:
 npx tsx scripts/smoke-continue.ts resume
+npx tsx scripts/smoke-voice.ts              # with voices installed: narrator + monster lines, audio flows
 ```
 
 ### Project layout
@@ -140,7 +174,10 @@ shared/          types, protocol, rules engine, content schemas, generators, bro
 server/          Express + ws over HTTPS; Game (state, prompts, saves) and scene scripts
 client-host/     main screen (Vite + vanilla TS)
 client-phone/    phone controller (Vite + vanilla TS), sensors and minigames
-scripts/         build, simulator, smoke tests
+scripts/         build, simulator, smoke tests, voice setup
+voice/           optional TTS worker (Python): MLX, PyTorch (CUDA/ROCm/CPU) or fake backends
+  voices/        reference clips, one per voice (designed once, cloned for every line)
+server/src/voice worker launcher and the speech queue (server side of the voices)
 ```
 
 All content is validated with zod when the server starts; a broken JSON file stops the server with

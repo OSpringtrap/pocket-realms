@@ -9,6 +9,9 @@ export interface NetHandlers<V extends PublicView | PhoneView> {
   onWelcome?(msg: Extract<S2C, { t: 'welcome' }>): void;
   onError?(msg: string, fatal?: boolean): void;
   onStatus?(s: Status): void;
+  /** speech messages and binary audio frames (main screen only) */
+  onSpeech?(msg: Extract<S2C, { t: 'speech' | 'speechEnd' | 'speechStop' }>): void;
+  onAudio?(buf: ArrayBuffer): void;
   /** called on every (re)connect: send hello/resume */
   onOpen(net: Net<V>): void;
 }
@@ -41,6 +44,7 @@ export class Net<V extends PublicView | PhoneView> {
     this.setStatus('connecting');
     const url = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`;
     const ws = new WebSocket(url);
+    ws.binaryType = 'arraybuffer';
     this.ws = ws;
     ws.onopen = () => {
       this.retry = 0;
@@ -50,6 +54,10 @@ export class Net<V extends PublicView | PhoneView> {
       this.pingTimer = window.setInterval(() => this.send({ t: 'ping', at: Date.now() }), 10000);
     };
     ws.onmessage = (ev) => {
+      if (ev.data instanceof ArrayBuffer) {
+        this.h.onAudio?.(ev.data);
+        return;
+      }
       let msg: S2C;
       try {
         msg = JSON.parse(ev.data as string) as S2C;
@@ -95,6 +103,11 @@ export class Net<V extends PublicView | PhoneView> {
         break;
       case 'pong':
         this.latency = Date.now() - msg.at;
+        break;
+      case 'speech':
+      case 'speechEnd':
+      case 'speechStop':
+        this.h.onSpeech?.(msg);
         break;
     }
   }

@@ -4,6 +4,7 @@ import { applyEffects, avgLevel } from '../effects.js';
 import { makeQuest } from '../quests.js';
 import type { CombatOutcome } from './combat.js';
 import { chooseActor, heroCheck, partyVote, scaledDc } from './event.js';
+import { npcReact, npcSpeaker } from '../speech.js';
 
 const APPROACHES: { id: string; label: string; emoji: string; skill: Skill; mini: 'shout' | 'hum'; lines: string[] }[] = [
   { id: 'persuade', label: 'Kind words', emoji: '🕊️', skill: 'persuasion', mini: 'hum', lines: ['"We only want to help — truly."', '"You have our word as heroes."', '"Together, we can fix this."'] },
@@ -28,11 +29,11 @@ export async function socialScene(g: Game, npcArg?: Npc): Promise<CombatOutcome 
   const intro = `${npc.emoji} ${npc.name} the ${npc.title}, who wants to ${npc.motivation}.`;
   g.state.scene = { kind: 'social', npc, text: intro, line: greet };
   g.narrate(intro, 'title');
-  g.narrate(`${npc.name}: ${greet}`);
+  g.say(npcSpeaker(npc), greet);
   g.dirty();
   await g.beat(1800);
   g.state.scene = { kind: 'social', npc, text: intro, line: ask };
-  g.narrate(`${npc.name}: ${ask}`);
+  g.say(npcSpeaker(npc), ask);
   g.dirty();
   await g.beat(1500);
 
@@ -54,6 +55,7 @@ export async function socialScene(g: Game, npcArg?: Npc): Promise<CombatOutcome 
   if (pick === 'bribe') {
     g.state.party.gold -= bribe;
     g.narrate(`Coins change hands. ${npc.name} brightens considerably.`);
+    npcReact(g, npc, true);
   } else if (app) {
     const actor = await chooseActor(g, { label: app.label, skill: app.skill, emoji: app.emoji, dc: 12, group: false, outcomes: { success: { text: [''], effects: [] } } } as never);
     actorId = actor.id;
@@ -108,6 +110,7 @@ export async function socialScene(g: Game, npcArg?: Npc): Promise<CombatOutcome 
   if (success || pick === 'bribe') {
     npc.attitude = Math.min(3, npc.attitude + (degree === 'crit' ? 2 : 1));
     const fac = npc.factionId;
+    if (pick !== 'bribe') npcReact(g, npc, true);
     g.narrate(`${npc.name} ${degree === 'crit' ? 'is utterly won over' : 'agrees to help'}!`, 'good');
     const fx: import('@pr/shared').EventEffect[] = [{ type: 'xp', amount: 25 }];
     if (fac) fx.push({ type: 'rep', faction: fac, amount: 1 });
@@ -123,6 +126,7 @@ export async function socialScene(g: Game, npcArg?: Npc): Promise<CombatOutcome 
     g.journal('event', `Met ${npc.name} the ${npc.title}, who now thinks well of the party.`);
   } else {
     npc.attitude = Math.max(-3, npc.attitude - 1);
+    npcReact(g, npc, false);
     g.narrate(`${npc.name} is not impressed.${degree === 'fumble' ? ' At all.' : ''}`, 'bad');
     if (npc.factionId) await applyEffects(g, [{ type: 'rep', faction: npc.factionId, amount: -1 }], actorId);
     g.journal('event', `Met ${npc.name} the ${npc.title}. It went poorly.`);

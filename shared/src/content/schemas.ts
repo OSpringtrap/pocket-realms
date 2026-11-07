@@ -420,6 +420,27 @@ export const zEventCard = z.object({
 });
 export type EventCard = z.infer<typeof zEventCard>;
 
+// ---------------------------------------------------------------- voices and barks
+
+/** Reference voices in voice/voices/ (cloned by the TTS worker). */
+export const VOICE_IDS = ['narrator', 'villain', 'gruff', 'goblin', 'brute', 'undead', 'crone', 'zealot', 'man', 'woman', 'lady', 'elder', 'youth', 'sly'] as const;
+export type VoiceId = (typeof VOICE_IDS)[number];
+
+/** Short scripted lines a monster says in combat. `id` is a monster id or a family (monster id wins). */
+export const zBark = z.object({
+  id: z.string(),
+  voice: z.enum(VOICE_IDS).optional(),
+  silent: z.boolean().optional(),
+  taunt: z.array(z.string()).default([]), // the fight begins
+  attack: z.array(z.string()).default([]), // after acting on its turn
+  hurt: z.array(z.string()).default([]), // first drop under half HP
+  windup: z.array(z.string()).default([]), // winding up a telegraphed attack
+  death: z.array(z.string()).default([]),
+  flee: z.array(z.string()).default([]),
+});
+export type BarkDef = z.infer<typeof zBark>;
+export type BarkKind = 'taunt' | 'attack' | 'hurt' | 'windup' | 'death' | 'flee';
+
 // ---------------------------------------------------------------- NPCs, factions, antagonists, quests, prompts
 
 export const zNpcArchetype = z.object({
@@ -431,6 +452,10 @@ export const zNpcArchetype = z.object({
   faction: z.string().optional(),
   greet: z.array(z.string()).min(1),
   ask: z.array(z.string()).min(1), // what they want from the party
+  /** one voice per name (same order), see VOICE_IDS */
+  voices: z.array(z.enum(VOICE_IDS)).optional(),
+  pleased: z.array(z.string()).default([]), // said when the party wins them over
+  displeased: z.array(z.string()).default([]), // said when it goes badly
   tags: z.array(z.string()).default([]),
 });
 export type NpcArchetype = z.infer<typeof zNpcArchetype>;

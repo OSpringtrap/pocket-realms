@@ -1,0 +1,8 @@
+# Apple Silicon (TTS on Metal). Same pins as solo-dm.
+mlx==0.32.4
+mlx-lm==0.32.2
+mlx-audio==0.6.3
+numpy>=2
+soundfile>=0.13
+websockets>=13
+huggingface_hub>=0.34

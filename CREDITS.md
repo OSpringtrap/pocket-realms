@@ -19,3 +19,10 @@ Monster icons from [game-icons.net](https://game-icons.net), licensed under [CC 
 
 - [Young Serif](https://github.com/noirblancrouge/YoungSerif) by Bastien Sozeau — SIL Open Font License 1.1
 - [Merriweather](https://github.com/SorkinType/Merriweather) by Sorkin Type — SIL Open Font License 1.1
+
+## Voices
+
+- Speech by [Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS) (Qwen team, Alibaba) — Apache License 2.0.
+  On Apple Silicon it runs through [mlx-audio](https://github.com/Blaizzy/mlx-audio) (MIT).
+- The reference voices in `voice/voices/` were generated with Qwen3-TTS VoiceDesign from text
+  descriptions; the narrator, villain and gruff voices come from the author's solo-dm project.

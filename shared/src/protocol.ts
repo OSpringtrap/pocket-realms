@@ -194,12 +194,23 @@ export interface Settings {
   textSize: number; // 1..1.6
   turnTimer: number; // seconds, 0 = off
   reduceMotion: boolean;
+  voice: boolean; // narrator and character voices (needs the voice worker)
 }
 
 export interface NarrationLine {
   id: number;
   text: string;
-  style?: 'normal' | 'title' | 'good' | 'bad' | 'whisper';
+  style?: 'normal' | 'title' | 'good' | 'bad' | 'whisper' | 'say';
+  /** a character speaking (style 'say'): their display name */
+  who?: string;
+}
+
+/** The voice worker as the main screen sees it. */
+export interface VoiceStatus {
+  state: 'off' | 'starting' | 'ready' | 'unavailable';
+  backend?: string;
+  device?: string;
+  detail?: string;
 }
 
 export interface WaitingOn {
@@ -223,6 +234,7 @@ export interface PublicView {
   waiting: WaitingOn[];
   campaign?: { id: string; name: string; seed: string; started: number };
   paused?: string;
+  voice?: VoiceStatus;
 }
 
 export interface Secret {
@@ -277,6 +289,7 @@ export type Fx =
   | { kind: 'sound'; name: string }
   | { kind: 'telegraph'; source: string; target: string; text: string }
   | { kind: 'banner'; text: string; style?: 'good' | 'bad' | 'title' }
+  | { kind: 'say'; who: string; text: string; source?: string }
   | { kind: 'enemyRoll'; who: string; label: string; rolls: number[]; total: number; dc?: number; success?: boolean }
   | { kind: 'haptic'; pattern: number[]; playerId?: string }
   | { kind: 'minigame'; playerId: string; name: string; game: string; score: number };
@@ -324,7 +337,8 @@ export type C2S =
   | { t: 'input:result'; id: string; data: unknown }
   | { t: 'intent'; intent: Intent }
   | { t: 'host'; key?: string; command: HostCommand }
-  | { t: 'ping'; at: number };
+  | { t: 'ping'; at: number }
+  | { t: 'speech:played'; sid: number };
 
 export type S2C =
   | { t: 'welcome'; v: number; role: 'host' | 'phone' | 'spectator'; playerId?: string; token?: string; code: string }
@@ -332,7 +346,11 @@ export type S2C =
   | { t: 'patch'; seq: number; ops: PatchOp[] }
   | { t: 'fx'; fx: Fx[] }
   | { t: 'error'; msg: string; fatal?: boolean }
-  | { t: 'pong'; at: number };
+  | { t: 'pong'; at: number }
+  // Voice (main screen only). Audio follows as binary AUD0 frames tagged with `job`.
+  | { t: 'speech'; sid: number; job: number; who: string; voice: string }
+  | { t: 'speechEnd'; sid: number }
+  | { t: 'speechStop' };
 
 export const PLAYER_COLORS = ['#c0392b', '#2471a3', '#229954', '#d68910', '#7d3c98', '#17a589'];
 export const MAX_PLAYERS = 6;

@@ -32,6 +32,7 @@ import {
   type SceneView,
   type Secret,
   type Settings,
+  type VoiceStatus,
   type WaitingOn,
   type WorldState,
   type WorldView,
@@ -39,6 +40,25 @@ import {
 } from '@pr/shared';
 import { randomBytes } from 'node:crypto';
 import type { Clock } from '../clock.js';
+
+/** Someone speaking aloud: a display name, a voice and (in combat) the unit id for a speech bubble. */
+export interface Speaker {
+  name: string;
+  voice: string;
+  source?: string;
+}
+
+/** The voice layer (server/src/voice). Absent in tests and the simulator, so play never depends on it. */
+export interface VoiceHooks {
+  narrate(text: string): void;
+  say(speaker: Speaker, text: string): void;
+  /** true when nothing is being said and nothing waits to be said */
+  busy(): boolean;
+  /** resolves when everything queued has been heard, or after maxMs */
+  idle(maxMs: number): Promise<void>;
+  stop(): void;
+  status(): VoiceStatus | undefined;
+}
 
 export class Aborted extends Error {
   constructor() {
@@ -110,6 +130,7 @@ export const DEFAULT_SETTINGS: Settings = {
   textSize: 1,
   turnTimer: 75,
   reduceMotion: false,
+  voice: true,
 };
 
 export const DISCONNECT_GRACE_MS = 60_000;
@@ -143,6 +164,7 @@ export class Game {
   stateCombat?: import('@pr/shared').CombatCtx;
   legacyQueue: { playerId: string; level: number; gear: ItemInstance[]; oldName: string }[] = [];
   pings: { q: number; r: number; playerId: string; at: number }[] = [];
+  voice?: VoiceHooks;
 
   constructor(public opts: GameOptions) {
     this.state = Game.blankState();
@@ -258,11 +280,26 @@ export class Game {
 
   // ------------------------------------------------------------ narration / journal
 
-  narrate(text: string, style: NarrationLine['style'] = 'normal') {
-    const line: NarrationLine = { id: ++this.narrSeq, text: this.fillTemplate(text), style };
+  /** A line on the main screen, read aloud by the narrator unless `quiet` (bookkeeping lines). */
+  narrate(text: string, style: NarrationLine['style'] = 'normal', opts: { quiet?: boolean } = {}) {
+    const line = this.pushLine({ id: ++this.narrSeq, text: this.fillTemplate(text), style });
+    if (!opts.quiet && this.state.settings.voice) this.voice?.narrate(line.text);
+  }
+
+  /** A character says a line aloud, in their own voice. Shown as `Name: "line"`. */
+  say(speaker: Speaker, text: string) {
+    const clean = this.fillTemplate(text).trim().replace(/^['"“‘]+|['"”’]+$/g, '');
+    if (!clean) return;
+    this.pushLine({ id: ++this.narrSeq, text: clean, style: 'say', who: speaker.name });
+    this.fx({ kind: 'say', who: speaker.name, text: clean, source: speaker.source });
+    if (this.state.settings.voice) this.voice?.say(speaker, clean);
+  }
+
+  private pushLine(line: NarrationLine): NarrationLine {
     this.state.narration.push(line);
     if (this.state.narration.length > 14) this.state.narration.splice(0, this.state.narration.length - 14);
     this.dirty();
+    return line;
   }
 
   journal(kind: JournalEntry['kind'], text: string, author?: string) {
@@ -288,7 +325,10 @@ export class Game {
   /** Delay scaled by the text-speed setting (narration pacing). */
   async beat(ms = 1600) {
     const speed = this.state.settings.textSpeed || 1;
-    await this.sleep(ms / speed);
+    const ep = this.epoch;
+    // With voices on, let what was said finish before moving on (capped so play never stalls).
+    await Promise.all([this.clock.sleep(ms / speed), this.voice && this.state.settings.voice ? this.voice.idle(ms / speed + 9000) : undefined]);
+    if (ep !== this.epoch) throw new Aborted();
   }
 
   async sleep(ms: number) {
@@ -613,6 +653,7 @@ export class Game {
   /** Abort the running director, all prompts and waits. */
   reset() {
     this.epoch++;
+    this.voice?.stop();
     for (const p of this.pending.values()) {
       if (p.timer !== undefined) this.clock.clearTimeout(p.timer);
       p.reject(new Aborted());
@@ -727,6 +768,7 @@ export class Game {
       waiting: this.waitingOn(),
       campaign: s.id ? { id: s.id, name: s.name, seed: s.seed, started: s.created } : undefined,
       paused: this.pausedReason,
+      voice: this.voice?.status(),
     };
   }
 

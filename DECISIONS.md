@@ -119,6 +119,48 @@ Each entry: **decision** — why.
   "convincing" by the rest of the party lowers it further. Success can produce quests, map reveals and loot.
 - **Campaign side quests** sometimes reward one of the antagonist's seal-keys, tying side content to the main arc.
 
+## Voices
+
+- **Voices are optional and live in a separate Python worker** (`voice/`), started by the server when
+  `voice/.venv` exists. The game never waits on it for rules: with no worker, a crashed worker or no
+  main screen connected, lines are simply not spoken. Same split as solo-dm: the Node server owns the
+  game, the worker owns the model.
+- **Only TTS, no language model** (user, 7 Nov). An earlier plan had a tiny LLM (Gemma E2B) write
+  short lines on the fly; dropped in favour of scripted lines: NPC `greet`/`ask` plus new
+  `pleased`/`displeased` reactions in `npcs.json`, and monster lines in `barks.json` (taunt, attack,
+  hurt, windup, death, flee).
+- **Design once, then clone** (from solo-dm): each voice was designed once from a text description
+  (Qwen3-TTS VoiceDesign, `voice/tools/design_voices.py`) and the clip is committed. Play only needs
+  the Base model, which clones the clip for every line, so a voice stays the same from line to line
+  and players never need VoiceDesign. Each clip reads an in-character line (a clone keeps the delivery
+  as well as the timbre). All 14 clips were checked with Parakeet speech-to-text against their transcripts.
+- **Backends for every GPU vendor** (user: one player is on NVIDIA, another on AMD): MLX on Apple
+  Silicon; PyTorch with the official `qwen-tts` package elsewhere. PyTorch's ROCm build exposes AMD
+  GPUs through `torch.cuda`, so CUDA and ROCm share one code path. `npm run voice:setup` detects the
+  GPU (`nvidia-smi`, `/dev/kfd`/`rocminfo`, or the Windows video controller name) and installs matching
+  wheels. AMD on Windows has no official PyTorch ROCm build, so it falls back to the CPU with the 0.6B
+  model unless `TORCH_INDEX_URL` points at one. The PyTorch path was tested here on CPU (Mac, 0.6B):
+  all test lines transcribed correctly, but synthesis took about twice the audio's length (4.5 s for
+  2 s), so on CPU lines start late and the queue keeps them twice as long before dropping them. The
+  CUDA and ROCm installs have not been run on real hardware yet.
+- **The PyTorch backend loads the cached snapshot by path.** qwen-tts asks the Hub for model info even
+  when the model is cached, which fails with the worker's `HF_HUB_OFFLINE=1`.
+- **qwen-tts returns whole utterances, mlx-audio streams 0.32 s chunks.** The speech queue sends one
+  sentence at a time with two in flight, so on PyTorch the first sentence starts once it is fully
+  synthesized and the next one is synthesized while it plays.
+- **One global speech queue, never two voices at once** (as in solo-dm). Narration is split into
+  sentences. Stale lines are dropped (narration after 14 s, character lines after 7 s), and the oldest
+  narration goes first when more than 8 lines wait. A sentence counts as heard when the main screen
+  reports it played, or after its length plus 4 s if no report comes.
+- **Pacing follows speech, with caps.** `beat()` waits for queued speech to finish (at most the beat
+  plus 9 s), and a monster's turn waits up to 4 s for its line. With voices off nothing changes.
+- **Barks are cosmetic and use `Math.random`, not the seeded RNG**, so a seed plays the same with or
+  without them, and the simulator (`instantBots`) skips them. A minimum gap between barks (5 s for
+  chatter, less for taunts, wind-ups and last words) keeps fights from becoming a shouting match;
+  beasts, oozes, constructs and the like have no lines.
+- **Bookkeeping lines are not read aloud** (`narrate(..., { quiet: true })`), and the speech text drops
+  emoji, `*stage directions*` and bracketed numbers such as "(Reputation +1)".
+
 ## Simplifications / stubs
 
 - **Camera** features were skipped (optional in the brief).

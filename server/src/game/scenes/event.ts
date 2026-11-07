@@ -226,7 +226,7 @@ export async function eventScene(g: Game, card: EventCard): Promise<CombatOutcom
     const dc = scaledDc(g, opt.dc);
     if (opt.group) {
       const chars = g.partyChars().filter((c) => !c.dead && !c.down);
-      g.narrate(`Everyone rolls ${opt.skill ?? opt.ability} (DC ${dc})!`);
+      g.narrate(`Everyone rolls ${opt.skill ?? opt.ability} (DC ${dc})!`, 'normal', { quiet: true });
       const results = await Promise.all(chars.map((c) => heroCheck(g, c, { ...opt, label: opt.label }, dc)));
       const passes = results.filter((r) => r.degree === 'success' || r.degree === 'crit').length;
       const crits = results.filter((r) => r.degree === 'crit').length;

@@ -67,7 +67,7 @@ async function personalShop(g: Game, pid: string, stock: ItemInstance[], disc: n
       g.state.party.gold -= price;
       stock.splice(idx, 1);
       c.inventory.push(it);
-      g.narrate(`${c.name} buys ${it.emoji} ${it.name} for ${price} gold.`);
+      g.narrate(`${c.name} buys ${it.emoji} ${it.name} for ${price} gold.`, 'normal', { quiet: true });
       g.fx({ kind: 'sound', name: 'coin' });
     } else if (pick.startsWith('sell:')) {
       const idx = c.inventory.findIndex((x) => `sell:${x.uid}` === pick);
@@ -76,7 +76,7 @@ async function personalShop(g: Game, pid: string, stock: ItemInstance[], disc: n
       c.inventory.splice(idx, 1);
       g.state.party.gold += sellValue(it);
       stock.push(it);
-      g.narrate(`${c.name} sells ${it.name} for ${sellValue(it)} gold.`);
+      g.narrate(`${c.name} sells ${it.name} for ${sellValue(it)} gold.`, 'normal', { quiet: true });
       g.fx({ kind: 'sound', name: 'coin' });
     }
     const scene = g.state.scene;

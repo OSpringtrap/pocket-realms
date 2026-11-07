@@ -5,3 +5,6 @@ saves/*.json
 *.log
 .DS_Store
 references/
+voice/.venv/
+voice/config.json
+__pycache__/

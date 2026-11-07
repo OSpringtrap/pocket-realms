@@ -8,6 +8,13 @@ import { eventScene, heroCheck, pickEventCard, scaledDc } from './event.js';
 import { campScene } from './jackbox.js';
 import { shopScene, shrineVisit, townScene } from './town.js';
 
+const MERCHANT_GREETINGS = [
+  'Come, come! Bargains for brave souls!',
+  'Ah, customers! Real ones, with pockets!',
+  'Everything must go. Some of it may even work.',
+  "Swords, salves and secrets. The secrets cost extra.",
+];
+
 /** Resolve arriving at a point of interest. Returns 'defeat' on a total party wipe. */
 export async function poiScene(g: Game, tile: HexTile): Promise<CombatOutcome | 'ended' | undefined> {
   const poi = tile.poi!;
@@ -17,7 +24,8 @@ export async function poiScene(g: Game, tile: HexTile): Promise<CombatOutcome | 
       await townScene(g, poi);
       return;
     case 'merchant':
-      g.narrate(`🛒 ${poi.name}: "Come, come! Bargains for brave souls!"`, 'title');
+      g.narrate(`🛒 ${poi.name}`, 'title', { quiet: true });
+      g.say({ name: poi.name, voice: 'sly' }, MERCHANT_GREETINGS[Math.floor(Math.random() * MERCHANT_GREETINGS.length)]!);
       await shopScene(g, poi.name, 7);
       return;
     case 'camp': {

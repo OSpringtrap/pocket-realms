@@ -273,7 +273,8 @@ export function renderContext(app: App) {
   const c = v.chars[v.me.id]!;
   const player = v.players.find((p) => p.id === v.me.id)!;
   const sc = v.scene;
-  const lastLine = v.narration[v.narration.length - 1]?.text;
+  const last = v.narration[v.narration.length - 1];
+  const lastLine = last && (last.style === 'say' && last.who ? `${last.who}: “${last.text}”` : last.text);
   const waitingOthers = v.waiting.filter((w) => w.playerId !== v.me.id).map((w) => w.label);
   const footer = h('div', { class: 'col' }, lastLine ? h('div', { class: 'card small' }, `📜 ${lastLine}`) : null, waitingOthers.length ? h('div', { class: 'small muted center' }, `⏳ Waiting for ${waitingOthers.join(', ')}`) : null);
   switch (sc.kind) {

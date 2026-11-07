@@ -32,6 +32,11 @@ export class Sfx {
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
   }
 
+  /** Lower the ambience while someone speaks. */
+  duck(on: boolean) {
+    if (this.ctx && this.ambGain) this.ambGain.gain.setTargetAtTime(on ? 0.07 : 0.25, this.ctx.currentTime, on ? 0.08 : 0.4);
+  }
+
   setVolume(v: number) {
     this.volume = v;
     if (this.master) this.master.gain.value = v;
