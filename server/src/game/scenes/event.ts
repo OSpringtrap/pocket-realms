@@ -28,8 +28,21 @@ function bestFitText(o: EventOption): string | undefined {
   return parts.length ? parts.join(' / ') : undefined;
 }
 
+/** Day/night and weather shift some checks: night favors stealth, fog hurts perception, storms hurt footing. */
+export function envModifier(g: Game, skill?: string): number {
+  const w = g.state.world;
+  if (!w || !skill) return 0;
+  let m = 0;
+  if (w.time === 'night' && skill === 'stealth') m += 2;
+  if ((w.time === 'night' || w.weather === 'fog') && skill === 'perception') m -= 2;
+  if (w.weather === 'storm' && (skill === 'athletics' || skill === 'acrobatics')) m -= 2;
+  if (w.weather === 'heat' && skill === 'athletics') m -= 1;
+  if (w.weather === 'rain' && skill === 'stealth') m += 1;
+  return m;
+}
+
 export function checkBonus(g: Game, c: Character, o: EventOption): number {
-  if (o.skill) return skillBonus(c, o.skill, { biome: currentBiome(g) });
+  if (o.skill) return skillBonus(c, o.skill, { biome: currentBiome(g) }) + envModifier(g, o.skill);
   if (o.ability) return abilityCheckBonus(c, o.ability);
   return 0;
 }
@@ -71,7 +84,7 @@ export async function partyVote(g: Game, title: string, options: ChoiceOption[],
 }
 
 /** Ask who attempts the check: first volunteer wins; otherwise the best-suited hero. */
-async function chooseActor(g: Game, o: EventOption): Promise<Character> {
+export async function chooseActor(g: Game, o: EventOption): Promise<Character> {
   const chars = g.partyChars().filter((c) => !c.dead && !c.down);
   const ranked = [...chars].sort((a, b) => checkBonus(g, b, o) + (isBestFit(b, o) ? 2 : 0) - (checkBonus(g, a, o) + (isBestFit(a, o) ? 2 : 0)));
   if (chars.length <= 1) return chars[0] ?? g.partyChars()[0]!;
@@ -192,6 +205,7 @@ export async function eventScene(g: Game, card: EventCard): Promise<CombatOutcom
     cost: o.cost?.gold ? `${o.cost.gold}g` : undefined,
     disabled: o.cost?.gold && s.party.gold < o.cost.gold ? 'Not enough gold' : undefined,
   }));
+  const tempt = maybeTempt(g, card.options.map((o) => o.label));
   const idx = await partyVote(g, `${card.emoji} ${card.title}: what do you do?`, options, {
     text,
     onTally: (t) => {
@@ -200,6 +214,7 @@ export async function eventScene(g: Game, card: EventCard): Promise<CombatOutcom
   });
   const opt = card.options[idx]!;
   view.chosen = idx;
+  if (tempt) resolveTemptation(g, tempt, idx);
   g.narrate(`The party decides: ${opt.emoji} ${opt.label}.`);
   g.dirty();
   await g.beat(900);
@@ -256,4 +271,41 @@ export function pickEventCard(g: Game, filter: (c: EventCard) => boolean = () =>
   if (!pool.length) pool = all.filter((c) => !w.recentEvents.slice(0, 5).includes(c.id) && filter(c));
   if (!pool.length) pool = all;
   return g.rng.weighted(pool.map((c) => ({ item: c, weight: c.weight })));
+}
+
+// ------------------------------------------------------------ traitor-style temptations
+
+interface Temptation {
+  playerId: string;
+  target: number;
+  label: string;
+}
+
+/** Occasionally one hero is privately tempted to steer the vote. Shown only on their phone. */
+export function maybeTempt(g: Game, labels: string[]): Temptation | undefined {
+  const humans = g.partyIds().filter((id) => !g.players.get(id)?.isBot && !g.state.chars[id]?.dead);
+  if (humans.length < 3 || labels.length < 2 || !g.rng.chance(0.18)) return undefined;
+  const pid = g.rng.pick(humans);
+  const target = g.rng.int(0, labels.length - 1);
+  const label = labels[target]!;
+  const text = `A cold voice in your ear: "Make them choose '${label}'. Do it, and I will reward you..." (Keep it secret! If the party picks it, you gain a reward — but the Doom Clock ticks.)`;
+  (g.state.secrets[pid] ??= []).push({ id: `t${g.rng.int(0, 1e9)}`, text: `You were tempted to steer the party toward "${label}".`, kind: 'traitor' });
+  g.fxFor(pid, { kind: 'haptic', pattern: [30, 60, 30, 60, 30], playerId: pid });
+  void g.ask(pid, { kind: 'notice', title: '🤫 A whisper...', text, okLabel: 'I understand', urgent: false }, { timeoutMs: 40000, fallback: () => true, bot: () => true }).catch(() => {});
+  g.dirty();
+  return { playerId: pid, target, label };
+}
+
+function resolveTemptation(g: Game, t: Temptation, chosen: number) {
+  g.cancelPromptsFor(t.playerId);
+  const c = g.state.chars[t.playerId];
+  if (!c) return;
+  if (chosen === t.target) {
+    c.inspiration++;
+    g.state.party.gold += 25;
+    if (g.state.world) g.state.world.doom = Math.min(g.state.world.doomMax, g.state.world.doom + 1);
+    (g.state.secrets[t.playerId] ??= []).push({ id: `t${g.rng.int(0, 1e9)}`, text: 'The voice kept its promise: +1 Inspiration, and 25 gold mysteriously appeared in the party purse.', kind: 'traitor' });
+    g.narrate('Somewhere, something laughs softly. (The Doom Clock ticks.)', 'whisper');
+  }
+  g.dirty();
 }

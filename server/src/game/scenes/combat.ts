@@ -32,6 +32,7 @@ import {
 } from '@pr/shared';
 import type { Game } from '../Game.js';
 import { handleLevelUps } from './levelup.js';
+import { checkGoals } from '../goals.js';
 
 export interface CombatOptions {
   encounter: BuiltEncounter;
@@ -164,7 +165,7 @@ function gameController(g: Game, ctx: CombatCtx): CombatController {
           allowNone: undefined,
           urgent: true,
         });
-        if (picked === '__auto' || !picked) return auto();
+        if (picked === '__auto' || !picked) return g.players.get(c.id)?.connected === false ? { type: 'defend' } : auto();
         if (picked === 'endTurn') return { type: 'endTurn' };
         const opt = options.find((o) => o.key === picked);
         if (!opt) return auto();
@@ -329,6 +330,7 @@ async function resolveCombatEnd(g: Game, ctx: CombatCtx, opts: CombatOptions, ou
   }
   updateDirector(g, ctx, outcome);
   for (const c of chars) clearCombatState(c);
+  checkGoals(g);
   g.dirty();
   if (outcome === 'defeat') return outcome;
   await handleDeaths(g);

@@ -170,10 +170,11 @@ export async function applyEffects(g: Game, effects: EventEffect[], actorId: str
         break;
       case 'npc':
         if (w) {
-          const npc = w.npcs.find((n) => !n.met);
+          const npc = w.npcs.find((n) => !n.met && (!e.archetype || n.archetypeId === e.archetype)) ?? w.npcs.find((n) => !n.met);
           if (npc) {
-            npc.met = true;
-            g.narrate(`You meet ${npc.emoji} ${npc.name} the ${npc.title}, who wants to ${npc.motivation}.`);
+            const { socialScene } = await import('./scenes/social.js');
+            combat = (await socialScene(g, npc)) ?? combat;
+            if (combat === 'defeat') return combat;
           }
         }
         break;

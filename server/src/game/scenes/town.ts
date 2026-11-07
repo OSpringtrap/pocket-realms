@@ -135,6 +135,12 @@ export async function townScene(g: Game, poi: Poi) {
     await jackboxRound(g, 'tavern');
     await jackboxRound(g, 'rumor');
   }
+  if (firstVisit && w.npcs.some((n) => !n.met) && g.rng.chance(isHome ? 0.4 : 0.7)) {
+    const { socialScene } = await import('./social.js');
+    const res = await socialScene(g);
+    if (res === 'defeat') return;
+    g.state.scene = { kind: 'town', name: poi.name, text };
+  }
 
   const stock = shopStock(g, poi.id, 6 + (isHome ? (w.home?.shop ?? 1) * 2 : 0));
   const board: ReturnType<typeof makeQuest>[] = [makeQuest(g), makeQuest(g)].filter(Boolean);

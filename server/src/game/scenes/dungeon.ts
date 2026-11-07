@@ -111,19 +111,20 @@ async function trapRoom(g: Game): Promise<void> {
 
 async function puzzleRoom(g: Game): Promise<void> {
   const chars = g.partyChars().filter((c) => !c.dead && !c.down);
-  const kinds: MinigameKind[] = ['sequence', 'rune', 'hold'];
+  const kinds: MinigameKind[] = ['sequence', 'rune', 'plates', 'plates'];
   const kind = g.rng.pick(kinds);
   const desc =
     kind === 'sequence'
       ? 'Glowing tiles flash in a pattern. Everyone must repeat it — together!'
       : kind === 'rune'
         ? 'A great rune is carved into the door. Everyone traces their part of it.'
-        : 'Pressure plates! Everyone must hold their plate down at the same time.';
+        : 'Pressure plates! Everyone must hold their plate down at the same time — together!';
   g.narrate(`🧩 ${desc}`);
   const param = kind === 'rune' ? g.rng.pick(['circle', 'triangle', 'star', 'spiral', 'zigzag']) : undefined;
   const scores = await Promise.all(chars.map((c) => g.minigame(c.id, kind, `Puzzle: ${desc}`, param)));
   const avg = scores.reduce((a, b) => a + b, 0) / Math.max(1, scores.length);
-  const tier = miniTier(avg);
+  // pressure plates only work if EVERYONE holds theirs
+  const tier = miniTier(kind === 'plates' ? Math.min(...scores) + 0.1 : avg);
   if (tier !== 'none') {
     g.narrate(`The mechanism clunks open — ${tier === 'great' ? 'flawlessly!' : 'just barely.'}`, 'good');
     const it = rollLoot(g.rng, { level: avgLevel(g), boost: tier === 'great' ? 25 : 10 });
@@ -149,6 +150,14 @@ export async function dungeonScene(g: Game, poi: Poi): Promise<CombatOutcome | '
   g.fx({ kind: 'sound', name: 'dungeon' });
   g.narrate(`🕳️ ${poi.name}. Cold air breathes from the dark.`, 'title');
   await g.beat(1500);
+  // Shortcut: on a return visit, skip straight to the deepest room you reached
+  const deepest = [...data.rooms].filter((r) => r.cleared && r.kind !== 'entrance' && r.kind !== 'secret').sort((a, b) => b.id - a.id)[0];
+  if (deepest) {
+    data.current = deepest.id;
+    g.narrate(`You remember the way: a shortcut leads straight back to the ${deepest.name}.`, 'good');
+    view();
+    await g.beat(1000);
+  }
   for (let guard = 0; guard < 30; guard++) {
     const room = data.rooms[data.current]!;
     room.revealed = true;

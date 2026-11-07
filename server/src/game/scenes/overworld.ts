@@ -22,6 +22,7 @@ import { eventScene, pickEventCard } from './event.js';
 import { campScene, jackboxRound } from './jackbox.js';
 import { poiScene } from './poi.js';
 import { botUpkeep } from '../botUpkeep.js';
+import { checkGoals } from '../goals.js';
 
 const TIMES: TimeOfDay[] = ['morning', 'afternoon', 'evening', 'night'];
 const TIME_EMOJI: Record<TimeOfDay, string> = { morning: '🌅', afternoon: '☀️', evening: '🌇', night: '🌙' };
@@ -223,6 +224,7 @@ async function endTurn(g: Game) {
     }
   }
   if (w.doom >= w.doomMax - 2 && w.doom < w.doomMax) g.narrate(`⚠️ The Doom Clock nearly strikes! ${w.doomMax - w.doom} turn${w.doomMax - w.doom > 1 ? 's' : ''} left!`, 'bad');
+  checkGoals(g);
   g.dirty();
   g.save();
 }

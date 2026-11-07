@@ -24,6 +24,7 @@ import { Aborted, Game, type PlayerRec } from './Game.js';
 import { avgLevel } from './effects.js';
 import { jackboxRound } from './scenes/jackbox.js';
 import { overworldLoop } from './scenes/overworld.js';
+import { assignGoals } from './goals.js';
 
 export function toTitle(g: Game) {
   g.reset();
@@ -121,8 +122,10 @@ async function lobbyThenPlay(g: Game, resumed: boolean) {
         g.narrate(`The banner of ${w.kingdomName} is raised!`, 'good');
       }
     }
+    assignGoals(g);
     g.save();
   } else {
+    assignGoals(g);
     s.phase = 'playing';
     s.scene = { kind: 'overworld' };
     g.narrate(`Day ${s.world?.day}. The heroes regroup and press on.`, 'title');
@@ -252,6 +255,7 @@ function finishCreation(g: Game, p: PlayerRec, d: CharacterDraft) {
   } else if (g.state.phase === 'playing') g.narrate(`${c.name} the ${content().species[c.species].name} ${content().classes[c.cls].name} joins the adventure!`, 'good');
   g.state.chars[p.id] = c;
   p.ready = true;
+  if (g.state.phase === 'playing') queueMicrotask(() => assignGoals(g));
   p.creating = undefined;
   if (g.state.creation[p.id]) g.state.creation[p.id]!.error = undefined;
   g.dirty();

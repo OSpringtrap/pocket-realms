@@ -33,6 +33,9 @@ const INFO: Record<string, { title: string; how: string; fallback: string; senso
   twofinger: { title: '✌️ Two-finger trick', how: 'Hold BOTH circles at once with two fingers!', fallback: 'Tap the two circles back and forth, fast!' },
   quiet: { title: '🤫 Stay silent...', how: 'Be completely quiet. Shhh!', fallback: 'Keep your finger perfectly still on the button.', sensor: 'mic' },
   tap: { title: '👆 Tap frenzy!', how: 'Tap as fast as you can!', fallback: '' },
+  search: { title: '🔍 Search by touch', how: 'Rub away the dust to find what is hidden. Be quick — and tidy!', fallback: '' },
+  listen: { title: '👂 Listen closely', how: 'Something faint will sound (and shimmer). Tap the ear the moment you notice it — three times.', fallback: '' },
+  plates: { title: '🦶 Pressure plate', how: 'Everyone together: HOLD your plate only while the bar glows gold!', fallback: '' },
 };
 
 function makeCanvas(root: HTMLElement, height = 320) {
@@ -618,6 +621,155 @@ async function twoFinger(root: HTMLElement, dur: number, multi: boolean): Promis
   return multi ? clamp(held / (dur * 0.6)) : clamp(alternations / ((dur / 1000) * 4));
 }
 
+
+async function search(root: HTMLElement, dur: number): Promise<number> {
+  const { c, ctx, W, H } = makeCanvas(root, 320);
+  const gx = 40 + Math.random() * (W - 80);
+  const gy = 40 + Math.random() * (H - 80);
+  const dust = document.createElement('canvas');
+  dust.width = Math.ceil(W);
+  dust.height = H;
+  const dctx = dust.getContext('2d')!;
+  dctx.fillStyle = '#b89c6c';
+  dctx.fillRect(0, 0, W, H);
+  for (let i = 0; i < 400; i++) {
+    dctx.fillStyle = `rgba(${90 + Math.random() * 60},${70 + Math.random() * 40},40,0.35)`;
+    dctx.fillRect(Math.random() * W, Math.random() * H, 3, 3);
+  }
+  let rubbing = false;
+  let erased = 0;
+  let foundAt = -1;
+  const t0 = performance.now();
+  const rub = (e: PointerEvent) => {
+    const r = c.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    dctx.globalCompositeOperation = 'destination-out';
+    dctx.beginPath();
+    dctx.arc(x, y, 18, 0, Math.PI * 2);
+    dctx.fill();
+    erased += 1;
+    if (foundAt < 0 && Math.hypot(x - gx, y - gy) < 20) {
+      // check how uncovered the gem is
+      const px = dctx.getImageData(Math.max(0, gx - 12), Math.max(0, gy - 12), 24, 24).data;
+      let clear = 0;
+      for (let i = 3; i < px.length; i += 4) if (px[i]! < 40) clear++;
+      if (clear / (px.length / 4) > 0.5) {
+        foundAt = performance.now() - t0;
+        haptic([30, 30, 90]);
+      }
+    }
+  };
+  c.addEventListener('pointerdown', (e) => {
+    rubbing = true;
+    c.setPointerCapture(e.pointerId);
+    rub(e);
+  });
+  c.addEventListener('pointermove', (e) => rubbing && rub(e));
+  c.addEventListener('pointerup', () => (rubbing = false));
+  const tb = timerBar(root);
+  await loop(dur, (_t, f) => {
+    tb(f);
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '34px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('💎', gx, gy);
+    ctx.drawImage(dust, 0, 0, W, H);
+    return foundAt >= 0 && performance.now() - t0 > foundAt + 400;
+  });
+  if (foundAt < 0) return 0.1;
+  const messy = Math.min(0.35, erased / 1200);
+  return clamp(1.15 - foundAt / dur - messy);
+}
+
+async function listen(root: HTMLElement, dur: number): Promise<number> {
+  const ear = h('button', { class: 'mgpad', style: 'transition: box-shadow .4s' }, '👂');
+  root.appendChild(ear);
+  const tb = timerBar(root);
+  const cues = [0.2, 0.5, 0.78].map((f) => (f + (Math.random() - 0.5) * 0.12) * dur);
+  const taps: number[] = [];
+  let actx: AudioContext | undefined;
+  try {
+    actx = new AudioContext();
+  } catch {
+    /* silent fallback: shimmer only */
+  }
+  const played = new Set<number>();
+  const t0 = performance.now();
+  ear.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    taps.push(performance.now() - t0);
+  });
+  await loop(dur, (t, f) => {
+    tb(f);
+    cues.forEach((ct, i) => {
+      if (!played.has(i) && t >= ct) {
+        played.add(i);
+        if (actx) {
+          const o = actx.createOscillator();
+          const g = actx.createGain();
+          o.frequency.value = 900 + Math.random() * 900;
+          g.gain.setValueAtTime(0.0001, actx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.05, actx.currentTime + 0.05);
+          g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.35);
+          o.connect(g).connect(actx.destination);
+          o.start();
+          o.stop(actx.currentTime + 0.4);
+        }
+        ear.style.boxShadow = '0 0 0 6px rgba(184,134,11,0.25)';
+        setTimeout(() => (ear.style.boxShadow = 'none'), 350);
+      }
+    });
+  });
+  void actx?.close();
+  let score = 0;
+  for (const ct of cues) {
+    const hit = taps.find((x) => x >= ct && x - ct < 1300);
+    if (hit !== undefined) score += clamp(1 - (hit - ct) / 1300);
+  }
+  const falseTaps = taps.filter((x) => !cues.some((ct) => x >= ct && x - ct < 1300)).length;
+  return clamp(score / cues.length - falseTaps * 0.15);
+}
+
+async function plates(root: HTMLElement, dur: number): Promise<number> {
+  const plate = h('button', { class: 'mgpad', style: 'border-radius:18px' }, '🦶');
+  const tl = h('div', { class: 'bar', style: 'height:26px;position:relative' }, h('i', { style: 'width:0%;background:#7a1f1f' }));
+  const win = h('div', { style: 'position:absolute;top:0;bottom:0;left:35%;width:40%;background:rgba(212,160,23,0.35)' });
+  tl.appendChild(win);
+  root.append(tl, plate);
+  let down = false;
+  plate.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    down = true;
+    plate.classList.add('hit');
+  });
+  const up = () => {
+    down = false;
+    plate.classList.remove('hit');
+  };
+  plate.addEventListener('pointerup', up);
+  plate.addEventListener('pointercancel', up);
+  plate.addEventListener('pointerleave', up);
+  let inWin = 0;
+  let winFrames = 0;
+  let outside = 0;
+  let outFrames = 0;
+  await loop(dur, (_t, f) => {
+    (tl.firstChild as HTMLElement).style.width = `${f * 100}%`;
+    const inside = f >= 0.35 && f <= 0.75;
+    win.style.background = inside ? 'rgba(212,160,23,0.85)' : 'rgba(212,160,23,0.35)';
+    if (inside) {
+      winFrames++;
+      if (down) inWin++;
+    } else {
+      outFrames++;
+      if (down) outside++;
+    }
+  });
+  return clamp(inWin / Math.max(1, winFrames) - (outside / Math.max(1, outFrames)) * 0.6);
+}
+
 // ---------------------------------------------------------------- entry
 
 export async function playMinigame(root: HTMLElement, p: MiniPrompt): Promise<MiniResult> {
@@ -692,6 +844,15 @@ export async function playMinigame(root: HTMLElement, p: MiniPrompt): Promise<Mi
       break;
     case 'twofinger':
       score = await twoFinger(arena, dur, caps.multitouch);
+      break;
+    case 'search':
+      score = await search(arena, dur);
+      break;
+    case 'listen':
+      score = await listen(arena, dur);
+      break;
+    case 'plates':
+      score = await plates(arena, dur);
       break;
     default:
       score = await tapMash(arena, dur);

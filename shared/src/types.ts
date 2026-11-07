@@ -91,6 +91,9 @@ export const MINIGAMES = [
   'twofinger', // two-finger disarm
   'quiet', // stay silent
   'tap', // rapid tapping
+  'search', // rub/scratch the screen to uncover a hidden object
+  'listen', // tap the moment you hear a faint sound
+  'plates', // cooperative: everyone holds their plate during the glowing window
 ] as const;
 export type MinigameKind = (typeof MINIGAMES)[number];
 

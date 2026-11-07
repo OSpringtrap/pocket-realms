@@ -551,6 +551,9 @@ export class Game {
     twofinger: 4000,
     quiet: 4000,
     tap: 3000,
+    search: 9000,
+    listen: 9000,
+    plates: 7000,
   };
 
   async minigame(playerId: string, game: MinigameKind, title: string, param?: string): Promise<number> {
