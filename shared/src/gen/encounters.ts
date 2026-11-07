@@ -89,7 +89,9 @@ export function buildEncounter(rng: Rng, spec: EncounterSpec): BuiltEncounter {
     const k = spec.encounter === 'easy' ? 0.7 : spec.encounter === 'medium' ? 0.9 : 1.15;
     const nMin = Math.max(1, Math.round(size * k * 0.6));
     const cap = size === 1 ? 2 : size === 2 ? 3 : 7;
-    const nMax = Math.max(nMin, Math.min(cap, Math.round(size * k * 1.3) + 1));
+    const extra = spec.encounter === 'easy' ? 0 : spec.encounter === 'medium' ? 1 : 2;
+    const lowLevel = avg <= 2 ? 1 : 0;
+    const nMax = Math.max(nMin, Math.min(cap, size + extra - lowLevel, Math.round(size * k * 1.3) + 1));
     let best: MonsterDef[] = [];
     let bestScore = Infinity;
     for (let attempt = 0; attempt < 60; attempt++) {

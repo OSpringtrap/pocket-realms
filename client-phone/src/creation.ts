@@ -197,7 +197,7 @@ export function renderCreation(app: App) {
       break;
     }
     case 'portrait':
-      out.push(h('h2', null, '🎨 Draw your portrait'), h('div', { class: 'muted' }, 'Sketch your hero (or skip). It appears on the main screen.'), drawPad(draft.portrait, (url) => (draft.portrait = url)), nav(app, true, draft.portrait ? 'Next →' : 'Skip →'));
+      out.push(h('h2', null, '🎨 Draw your portrait'), h('div', { class: 'muted' }, 'Sketch your hero (or skip). It appears on the main screen.'), drawPad(draft.portrait, (url) => (draft.portrait = url)), nav(app, true, 'Next →'));
       break;
     case 'review': {
       const sp = draft.species ? C.species[draft.species] : undefined;

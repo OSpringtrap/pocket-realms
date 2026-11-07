@@ -1403,7 +1403,7 @@ function pickTarget(ctx: CombatCtx, m: Monster): Unit | undefined {
   if (!pool.length) return undefined;
   switch (m.behavior) {
     case 'skirmisher':
-      return ctx.rng.chance(0.65) ? pool.reduce((a, b) => (b.hp < a.hp ? b : a)) : ctx.rng.pick(pool);
+      return ctx.rng.chance(0.45) ? pool.reduce((a, b) => (b.hp < a.hp ? b : a)) : ctx.rng.pick(pool);
     case 'brute':
       return ctx.rng.chance(0.5) ? pool.reduce((a, b) => (acOf(b) < acOf(a) ? b : a)) : ctx.rng.pick(pool);
     default:

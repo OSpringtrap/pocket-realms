@@ -292,7 +292,7 @@ export function renderContext(app: App) {
       const foes = cb.monsters.filter((m) => m.side === 'enemy' && !m.dead && !m.fled);
       const mine = cb.current === c.id;
       return [
-        c.dead ? waitCard('👻', 'Your spirit lingers', 'You will get to nudge the battle on your turn.') : c.down ? waitCard('☠️', 'You are dying!', `Death saves: ${c.death.successes}✔ ${c.death.failures}✖ — roll on your turn.`) : waitCard(mine ? '⚔️' : '⏳', mine ? 'Your turn!' : `Round ${cb.round} — wait for your turn`, cb.current ? `Now acting: ${v.chars[cb.current]?.name ?? cb.monsters.find((m) => m.id === cb.current)?.name ?? ''}` : undefined),
+        c.dead ? waitCard('👻', 'Your spirit lingers', 'You will get to nudge the battle on your turn.') : c.down ? waitCard('☠️', 'You are dying!', `Death saves: ${c.death.successes}✔ ${c.death.failures}✖ — roll on your turn.`) : waitCard(mine ? '⚔️' : '⏳', mine ? 'Your turn!' : cb.round === 0 ? 'Rolling initiative...' : `Round ${cb.round} — wait for your turn`, cb.current ? `Now acting: ${v.chars[cb.current]?.name ?? cb.monsters.find((m) => m.id === cb.current)?.name ?? ''}` : undefined),
         h('div', { class: 'card col small' }, h('b', null, 'Enemies'), ...foes.map((m) => h('div', { class: 'row' }, h('span', null, m.emoji), h('span', { class: 'grow' }, `${m.name}${m.telegraph ? ' ⚠️' : ''}`), h('span', null, `${m.hp}/${m.maxHp}`)))),
         c.conditions.length ? h('div', { class: 'card small' }, `Conditions: ${c.conditions.map((x) => x.id).join(', ')}`) : null,
         footer,

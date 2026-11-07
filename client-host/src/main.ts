@@ -371,7 +371,7 @@ function renderCombat(cb: { title: string; round: number; order: string[]; curre
   const initbar = h(
     'div',
     { class: 'initbar' },
-    h('b', null, `Round ${cb.round}`),
+    h('b', null, cb.round ? `Round ${cb.round}` : 'Initiative!'),
     ...cb.order.map((id) => {
       const m = cb.monsters.find((x) => x.id === id);
       return h('span', { class: `ini${id === cb.current ? ' cur' : ''}${m && m.side === 'enemy' ? ' foe' : ''}${isGone(id) ? ' gone' : ''}` }, `${m ? m.emoji : v.chars[id] ? C.classes[v.chars[id]!.cls].emoji : ''} ${unitName(id)}`);
