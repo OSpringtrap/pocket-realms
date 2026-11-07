@@ -73,5 +73,5 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .debugtoggle { position: fixed; right: 8px; bottom: 120px; z-index: 9001; padding: 6px 10px; }
 .conn { position: fixed; top: 0; left: 0; right: 0; background: var(--red); color: #fff; text-align: center; padding: 4px; z-index: 999; font-size: 0.85em; }
 .tip { font-size: 0.85em; color: var(--ink-2); }
-.badge { font-size: 0.72em; border: 1px solid var(--ink-2); border-radius: 999px; padding: 1px 6px; background: rgba(255,255,255,0.6); }
+.badge { display: inline-block; vertical-align: 0.1em; font-size: 0.72em; border: 1px solid var(--ink-2); border-radius: 999px; padding: 1px 6px; margin-left: 6px; white-space: nowrap; font-weight: normal; background: rgba(255,255,255,0.6); }
 .modal .dicebox { background: linear-gradient(180deg, #fbf3dc, #efdfb4); }

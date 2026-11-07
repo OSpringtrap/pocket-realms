@@ -259,7 +259,7 @@ function handleFx(f: Fx) {
       if (f.target === v.me.id) sfx.play('heal');
       break;
     case 'banner':
-      toast(f.text, f.style === 'bad' ? 'error' : f.style === 'good' ? 'good' : 'info', 2500);
+      toast(f.text, f.style === 'bad' ? 'error' : f.style === 'good' ? 'good' : 'info', Math.min(7000, Math.max(3000, 1200 + f.text.length * 55)));
       break;
     case 'sound':
       if (['levelup', 'victory', 'coin', 'loot'].includes(f.name)) sfx.play(f.name);

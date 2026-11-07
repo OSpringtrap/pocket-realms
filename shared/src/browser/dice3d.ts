@@ -97,9 +97,38 @@ function facesByNormals(verts: V3[], normals: V3[], k: number): Face[] {
   });
 }
 
+/** Scale a shape so its circumradius is r (keeps every die the same visual size). */
+function normalize(sh: Shape, r: number): Shape {
+  const R = Math.max(...sh.verts.map((v) => Math.hypot(v[0], v[1], v[2])));
+  const k = r / R;
+  return { verts: sh.verts.map((v) => mul(v, k)), faces: sh.faces.map((f) => ({ ...f, center: mul(f.center, k) })) };
+}
+
+/**
+ * Re-order faces so index i shows value i+1 and opposite faces add up to n+1,
+ * like real dice. Shapes without opposite faces (d4) keep their order.
+ */
+function pairOpposites(faces: Face[]): Face[] {
+  const n = faces.length;
+  const out: (Face | undefined)[] = new Array(n);
+  const used = new Set<number>();
+  let lo = 0;
+  for (let i = 0; i < n; i++) {
+    if (used.has(i)) continue;
+    let j = -1;
+    for (let k = 0; k < n; k++) if (k !== i && !used.has(k) && dot(faces[i]!.normal, faces[k]!.normal) < -0.999) j = k;
+    if (j < 0) return faces;
+    used.add(i).add(j);
+    out[lo] = faces[i];
+    out[n - 1 - lo] = faces[j];
+    lo++;
+  }
+  return out as Face[];
+}
+
 function buildShapes(): Record<string, Shape> {
   const s: Record<string, Shape> = {};
-  // d4
+  // d4 (tetrahedra read small, so give it a slightly larger radius)
   {
     const v: V3[] = [
       [1, 1, 1],
@@ -107,29 +136,33 @@ function buildShapes(): Record<string, Shape> {
       [-1, 1, -1],
       [-1, -1, 1],
     ];
-    const verts = v.map((x) => mul(x, 0.95));
-    s[4] = { verts, faces: facesByNormals(verts, v.map((x) => mul(x, -1)), 3) };
+    s[4] = normalize({ verts: v, faces: facesByNormals(v, v.map((x) => mul(x, -1)), 3) }, 1.12);
   }
   // d6
   {
     const verts: V3[] = [];
-    for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) verts.push([x * 0.72, y * 0.72, z * 0.72]);
-    s[6] = { verts, faces: facesByNormals(verts, [[0, 0, 1], [0, 0, -1], [0, 1, 0], [0, -1, 0], [1, 0, 0], [-1, 0, 0]], 4) };
+    for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) verts.push([x, y, z]);
+    const normals: V3[] = [[0, 0, 1], [0, 0, -1], [0, 1, 0], [0, -1, 0], [1, 0, 0], [-1, 0, 0]];
+    // label "up" points at an edge midpoint, not a corner, so a settled cube reads square-on
+    const faces = facesByNormals(verts, normals, 4).map((f) => ({ ...f, up: norm(sub(mul(add(verts[f.idx[0]!]!, verts[f.idx[1]!]!), 0.5), f.center)) }));
+    s[6] = normalize({ verts, faces: pairOpposites(faces) }, 0.98);
   }
   // d8
   {
     const verts: V3[] = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
     const normals: V3[] = [];
     for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) normals.push([x, y, z]);
-    s[8] = { verts, faces: facesByNormals(verts, normals, 3) };
+    s[8] = normalize({ verts, faces: pairOpposites(facesByNormals(verts, normals, 3)) }, 1);
   }
-  // d10 (pentagonal trapezohedron)
+  // d10 (pentagonal trapezohedron); ring height chosen so every kite is planar
   {
-    const verts: V3[] = [[0, 0, 1.05], [0, 0, -1.05]];
-    const z0 = 0.11;
+    const h = 1;
+    const c36 = Math.cos(Math.PI / 5);
+    const z0 = (h * (1 - c36)) / (1 + c36);
+    const verts: V3[] = [[0, 0, h], [0, 0, -h]];
     for (let k = 0; k < 10; k++) {
       const a = (k * Math.PI) / 5;
-      verts.push([Math.cos(a) * 0.95, Math.sin(a) * 0.95, k % 2 === 0 ? z0 : -z0]);
+      verts.push([Math.cos(a) * 0.9, Math.sin(a) * 0.9, k % 2 === 0 ? z0 : -z0]);
     }
     const R = (k: number) => 2 + (((k % 10) + 10) % 10);
     const faces: Face[] = [];
@@ -144,9 +177,9 @@ function buildShapes(): Record<string, Shape> {
         faces.push({ idx, normal: n, center, up: norm(sub(pts[0]!, center)) });
       }
     }
-    s[10] = { verts, faces };
+    s[10] = normalize({ verts, faces: pairOpposites(faces) }, 1);
   }
-  // d12
+  // d12: vertices are the cube corners plus cyclic (0, ±1/φ, ±φ); face normals are cyclic (0, ±φ, ±1)
   {
     const verts: V3[] = [];
     for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) verts.push([x, y, z]);
@@ -154,32 +187,41 @@ function buildShapes(): Record<string, Shape> {
       for (const b of [-1, 1]) {
         verts.push([0, a / PHI, b * PHI]);
         verts.push([a / PHI, b * PHI, 0]);
-        verts.push([a * PHI, 0, b / PHI]);
+        verts.push([b * PHI, 0, a / PHI]);
       }
-    const sc = verts.map((v) => mul(v, 0.6));
     const normals: V3[] = [];
-    for (const a of [-1, 1]) for (const b of [-1, 1]) normals.push([0, a, b * PHI], [a, b * PHI, 0], [a * PHI, 0, b]);
-    s[12] = { verts: sc, faces: facesByNormals(sc, normals, 5) };
+    for (const a of [-1, 1]) for (const b of [-1, 1]) normals.push([0, a * PHI, b], [a * PHI, b, 0], [b, 0, a * PHI]);
+    s[12] = normalize({ verts, faces: pairOpposites(facesByNormals(verts, normals, 5)) }, 1);
   }
-  // d20
+  // d20: vertices are cyclic (0, ±1, ±φ); face normals are the cube corners plus cyclic (0, ±φ, ±1/φ)
   {
     const verts: V3[] = [];
-    for (const a of [-1, 1]) for (const b of [-1, 1]) verts.push([0, a, b * PHI], [a, b * PHI, 0], [a * PHI, 0, b]);
-    const sc = verts.map((v) => mul(v, 0.58));
+    for (const a of [-1, 1]) for (const b of [-1, 1]) verts.push([0, a, b * PHI], [a, b * PHI, 0], [b * PHI, 0, a]);
     const normals: V3[] = [];
     for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) normals.push([x, y, z]);
     for (const a of [-1, 1])
       for (const b of [-1, 1]) {
-        normals.push([0, a / PHI, b * PHI]);
-        normals.push([a / PHI, b * PHI, 0]);
-        normals.push([a * PHI, 0, b / PHI]);
+        normals.push([0, a * PHI, b / PHI]);
+        normals.push([a * PHI, b / PHI, 0]);
+        normals.push([b / PHI, 0, a * PHI]);
       }
-    s[20] = { verts: sc, faces: facesByNormals(sc, normals, 3) };
+    s[20] = normalize({ verts, faces: pairOpposites(facesByNormals(verts, normals, 3)) }, 1);
   }
   return s;
 }
 
 const SHAPES = buildShapes();
+
+/** Final resting tilt: top leans away from the viewer, slight turn to the side. */
+const SETTLE_TILT = qmul(qaxis([0, 1, 0], -0.22), qaxis([1, 0, 0], -0.3));
+/** Camera distance (in die radii) for the perspective projection. */
+const CAM = 5;
+/** Max projected radius of a die (circumradius ≤ 1.12 under perspective). */
+const DIE_EXTENT = (1.12 * CAM) / (CAM - 1.12);
+/** Radius of the crit/kept highlight ring. */
+const RING = DIE_EXTENT + 0.12;
+/** Half-size of a die's layout cell, in die sizes: ring + stroke + a bounce/shadow margin. */
+const CELL_EXTENT = RING + 0.2;
 
 export type DieKind = 4 | 6 | 8 | 10 | 12 | 20 | 100 | 1000; // 1000 = percentile tens die
 
@@ -228,6 +270,8 @@ export class DiceTray {
   private dice: DieAnim[] = [];
   private raf = 0;
   private t0 = 0;
+  private lastT = 0;
+  private size = 40;
   private settleResolve?: () => void;
   ink = '#2b1d0e';
   reduceMotion = false;
@@ -260,25 +304,28 @@ export class DiceTray {
     const W = this.canvas.width;
     const H = this.canvas.height;
     const n = expanded.length;
-    const size = this.dieSize(n);
-    const cols = Math.min(n, Math.max(1, Math.floor(W / (size * 2.4))));
-    const rows = Math.ceil(n / cols);
+    const { size, cols, rows } = this.layout(n);
+    this.size = size;
     const intensity = Math.max(0.4, Math.min(2, opts.intensity ?? 1));
+    const cellW = W / cols;
+    const cellH = H / rows;
     this.dice = expanded.map((kind, i) => {
       const col = i % cols;
       const row = Math.floor(i / cols);
-      const targetX = (W / (cols + 1)) * (col + 1);
-      const targetY = (H / (rows + 1)) * (row + 1);
+      // centre a partially filled last row
+      const inRow = row === rows - 1 ? n - row * cols : cols;
+      const targetX = W / 2 + (col - (inRow - 1) / 2) * cellW;
+      const targetY = cellH * (row + 0.5) - size * 0.1;
       return {
         kind,
         shape: SHAPES[kind === 1000 || kind === 100 ? 10 : kind]!,
         q: qnorm([Math.random(), Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5]),
         axis: norm([Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5]),
         spin: (10 + Math.random() * 8) * intensity,
-        x: targetX + (Math.random() - 0.5) * W * 0.6,
-        y: -size * 2 - Math.random() * size * 2,
-        vx: (Math.random() - 0.5) * 400,
-        vy: 300 + Math.random() * 300,
+        x: targetX + (Math.random() - 0.5) * cellW * 0.4,
+        y: -size * DIE_EXTENT - Math.random() * size,
+        vx: (Math.random() - 0.5) * cellW * 0.8,
+        vy: 200 + Math.random() * 200,
         targetX,
         targetY,
         done: false,
@@ -286,6 +333,7 @@ export class DiceTray {
       };
     });
     this.t0 = performance.now();
+    this.lastT = 0;
     cancelAnimationFrame(this.raf);
     const loop = (t: number) => {
       this.step(t);
@@ -294,11 +342,23 @@ export class DiceTray {
     this.raf = requestAnimationFrame(loop);
   }
 
-  private dieSize(n: number) {
+  /**
+   * Pick a grid and die size so every die (including its highlight ring and
+   * bounce) stays inside its own cell: no clipping at the canvas edge and no
+   * dice drawn over each other once they land.
+   */
+  private layout(n: number) {
     const W = this.canvas.width;
     const H = this.canvas.height;
     const base = this.opts.size ?? Math.min(W, H) * 0.3;
-    return Math.max(18, Math.min(base, (W / Math.max(1, n)) * 0.38));
+    let best = { size: 0, cols: 1, rows: 1 };
+    for (let cols = 1; cols <= Math.max(1, n); cols++) {
+      const rows = Math.ceil(n / cols);
+      const size = Math.min(base, W / cols / (2 * CELL_EXTENT), H / rows / (2 * CELL_EXTENT));
+      if (size > best.size) best = { size, cols, rows };
+    }
+    best.size = Math.max(10, best.size);
+    return best;
   }
 
   /** Settle on server values. Returns a promise resolving when the dice land. */
@@ -332,7 +392,8 @@ export class DiceTray {
       const up1 = qrot(q1, face.up);
       const ang = Math.atan2(up1[0], -up1[1]);
       const q2 = qaxis([0, 0, 1], -ang);
-      d.settleTo = qmul(q2, q1);
+      // tip the die back a little so neighbouring faces show and it reads as a solid
+      d.settleTo = qmul(SETTLE_TILT, qmul(q2, q1));
       d.settleStart = startAt;
     });
     return new Promise((res) => {
@@ -356,9 +417,12 @@ export class DiceTray {
     const W = this.canvas.width;
     const H = this.canvas.height;
     ctx.clearRect(0, 0, W, H);
-    const dt = 1 / 60;
+    // real frame time (clamped) so dice move at the same speed on 60/120 Hz screens
+    const dt = this.lastT ? Math.min(1 / 30, Math.max(1 / 240, (t - this.lastT) / 1000)) : 1 / 60;
+    this.lastT = t;
+    const f60 = dt * 60;
     let allDone = this.dice.length > 0;
-    const size = this.dieSize(this.dice.length);
+    const size = this.size;
     for (const d of this.dice) {
       if (d.settleTo && d.settleStart !== undefined && t >= d.settleStart) {
         const dur = this.reduceMotion ? 120 : 520;
@@ -366,13 +430,14 @@ export class DiceTray {
         const k = Math.min(1, (t - d.settleStart) / dur);
         const e = 1 - (1 - k) ** 3;
         d.q = qslerp(d.settleFrom, d.settleTo, e);
-        d.x += (d.targetX - d.x) * 0.2;
-        d.y += (d.targetY - d.y) * 0.2;
+        const pull = 1 - 0.8 ** f60;
+        d.x += (d.targetX - d.x) * pull;
+        d.y += (d.targetY - d.y) * pull;
         if (k >= 1) d.done = true;
       } else {
         // free tumble with bounces inside the tray
         d.q = qnorm(qmul(qaxis(d.axis, d.spin * dt), d.q));
-        d.spin = Math.max(6, d.spin * 0.992);
+        d.spin = Math.max(6, d.spin * 0.992 ** f60);
         d.vy += 1600 * dt;
         d.x += d.vx * dt;
         d.y += d.vy * dt;
@@ -383,13 +448,15 @@ export class DiceTray {
           d.vx *= 0.8;
           d.axis = norm(add(d.axis, [Math.random() - 0.5, Math.random() - 0.5, 0]));
         }
-        if (d.x < size) (d.x = size), (d.vx = Math.abs(d.vx));
-        if (d.x > W - size) (d.x = W - size), (d.vx = -Math.abs(d.vx));
-        d.x += (d.targetX - d.x) * 0.02;
+        const m = size * DIE_EXTENT;
+        if (d.x < m) (d.x = m), (d.vx = Math.abs(d.vx));
+        if (d.x > W - m) (d.x = W - m), (d.vx = -Math.abs(d.vx));
+        d.x += (d.targetX - d.x) * (1 - 0.98 ** f60);
       }
       if (!d.done) allDone = false;
-      this.drawDie(d, size);
     }
+    // far-back rows first so nearer dice overlap them cleanly mid-tumble
+    for (const d of [...this.dice].sort((a, b) => a.y - b.y)) this.drawDie(d, size);
     if (allDone && this.settleResolve) {
       const r = this.settleResolve;
       this.settleResolve = undefined;
@@ -399,22 +466,24 @@ export class DiceTray {
 
   private drawDie(d: DieAnim, size: number) {
     const ctx = this.ctx;
-    const light = norm([-0.4, -0.6, 1]);
+    const light = norm([-0.3, -0.2, 1]);
     const proj = (v: V3): [number, number] => {
-      const persp = 4 / (4 - v[2]);
+      const persp = CAM / (CAM - v[2]);
       return [d.x + v[0] * size * persp, d.y + v[1] * size * persp];
     };
     const rv = d.shape.verts.map((v) => qrot(d.q, v));
+    // Perspective back-face test: a face is visible when it faces the camera
+    // point, not merely +z (that test dropped faces near the silhouette).
     const faces = d.shape.faces
       .map((f, fi) => ({ f, fi, n: qrot(d.q, f.normal), c: qrot(d.q, f.center), u: qrot(d.q, f.up) }))
-      .filter((x) => x.n[2] > 0.01)
+      .filter((x) => dot(x.n, sub([0, 0, CAM], x.c)) > 1e-4)
       .sort((a, b) => a.c[2] - b.c[2]);
     // shadow
     ctx.save();
     ctx.globalAlpha = 0.18;
     ctx.fillStyle = this.ink;
     ctx.beginPath();
-    ctx.ellipse(d.x + size * 0.15, d.targetY + size * 1.05, size * 0.85, size * 0.22, 0, 0, Math.PI * 2);
+    ctx.ellipse(d.x + size * 0.12, d.targetY + size * 1.02, size * 0.8, size * 0.18, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
     for (const { f, fi, n, c, u } of faces) {
@@ -456,7 +525,7 @@ export class DiceTray {
       ctx.lineWidth = size * 0.08;
       ctx.strokeStyle = d.highlight === 'crit' ? '#d4a017' : d.highlight === 'fumble' ? '#a93226' : d.highlight === 'dropped' ? 'rgba(80,60,40,0.35)' : '#2e7d32';
       ctx.beginPath();
-      ctx.arc(d.x, d.y, size * 1.25, 0, Math.PI * 2);
+      ctx.arc(d.x, d.y, size * RING, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
     }

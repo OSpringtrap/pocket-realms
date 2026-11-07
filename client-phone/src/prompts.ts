@@ -53,7 +53,7 @@ export function onRollFx(f: Extract<Fx, { kind: 'roll' }>) {
     setTimeout(() => {
       roll.el.remove();
       if (activeRoll === roll) activeRoll = undefined;
-    }, 1700);
+    }, 2600);
   });
 }
 

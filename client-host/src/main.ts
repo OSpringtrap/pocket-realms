@@ -6,7 +6,7 @@ import { Slot, clear, h, hash, toast } from '../../shared/src/browser/dom.js';
 import { renderHexMap } from '../../shared/src/browser/hexmap.js';
 import { Net } from '../../shared/src/browser/net.js';
 import { content } from '../../shared/src/content/index.js';
-import type { Fx, HostCommand, PublicView, SceneView, Settings } from '../../shared/src/protocol.js';
+import type { Fx, HostCommand, NarrationLine, PublicView, SceneView, Settings } from '../../shared/src/protocol.js';
 import type { Character, Monster } from '../../shared/src/types.js';
 
 const params = new URLSearchParams(location.search);
@@ -456,31 +456,77 @@ const narrLine = h('div', { class: 'line' });
 const narrWait = h('div', { class: 'waiting' });
 narr.append(narrOld, narrLine, narrWait);
 void narrSlot;
+/** How long a line of text should stay up so people can read it (scaled by the text-speed setting). */
+function readMs(text: string, min = 1600) {
+  const speed = view?.settings.textSpeed || 1;
+  return Math.min(7000, Math.max(min, 900 + text.length * 55)) / speed;
+}
+
+type NarrLine = NarrationLine;
+/** Lines waiting their turn: each is typed, then held for its reading time before the next. */
+const narrQueue: NarrLine[] = [];
+let narrShown: NarrLine[] = [];
+let narrBusy = false;
+
 function renderNarration() {
   const v = view!;
   const lines = v.narration;
-  const last = lines[lines.length - 1];
   clear(narrWait);
   for (const w of v.waiting) narrWait.appendChild(h('span', { class: 'chip' }, `⏳ ${w.label}${w.deadline ? ` (${Math.max(0, Math.round((w.deadline - Date.now()) / 1000))}s)` : ''}`));
+  const last = lines[lines.length - 1];
   if (!last || last.id === typedId) return;
-  typedId = last.id;
-  clear(narrOld);
-  for (const l of lines.slice(-3, -1)) narrOld.appendChild(h('div', null, l.text));
-  narrLine.className = `line ${last.style ?? ''}`;
-  clearInterval(typeTimer);
-  const text = last.text;
-  if (v.settings.reduceMotion) {
-    narrLine.textContent = text;
-    return;
+  if (last.id < typedId) {
+    // ids restarted (new or loaded game): drop the old backlog
+    narrQueue.length = 0;
+    narrShown = [];
+    typedId = -1;
   }
-  let i = 0;
-  const speed = Math.max(8, 26 / (v.settings.textSpeed || 1));
-  narrLine.textContent = '';
-  typeTimer = window.setInterval(() => {
-    i += 2;
-    narrLine.textContent = text.slice(0, i);
-    if (i >= text.length) clearInterval(typeTimer);
-  }, speed);
+  let fresh = lines.filter((l) => l.id > typedId);
+  if (typedId === -1) {
+    // first view after (re)connecting: show the latest line, keep the rest as history
+    narrShown = fresh.slice(0, -1);
+    fresh = fresh.slice(-1);
+  }
+  typedId = last.id;
+  narrQueue.push(...fresh);
+  if (!narrBusy) void runNarration();
+}
+
+async function runNarration() {
+  narrBusy = true;
+  while (narrQueue.length) {
+    // a long backlog (e.g. a whole combat round at once) catches up instead of lagging forever
+    while (narrQueue.length > 6) narrShown.push(narrQueue.shift()!);
+    const line = narrQueue.shift()!;
+    clear(narrOld);
+    for (const l of narrShown.slice(-2)) narrOld.appendChild(h('div', null, l.text));
+    narrShown = [...narrShown.slice(-4), line];
+    narrLine.className = `line ${line.style ?? ''}`;
+    const text = line.text;
+    const settings = view?.settings;
+    const hurry = narrQueue.length >= 3 ? 0.6 : 1;
+    if (!settings || settings.reduceMotion) {
+      narrLine.textContent = text;
+    } else {
+      const speed = Math.max(8, 26 / (settings.textSpeed || 1)) * hurry;
+      narrLine.textContent = '';
+      await new Promise<void>((done) => {
+        let i = 0;
+        clearInterval(typeTimer);
+        typeTimer = window.setInterval(() => {
+          i += 2;
+          narrLine.textContent = text.slice(0, i);
+          if (i >= text.length) {
+            clearInterval(typeTimer);
+            done();
+          }
+        }, speed);
+      });
+    }
+    // only wait when there is something to move on to; the newest line just stays up
+    if (narrQueue.length) await new Promise((r) => setTimeout(r, readMs(text) * hurry));
+  }
+  narrBusy = false;
 }
 
 // ------------------------------------------------------------ modals
@@ -576,7 +622,8 @@ async function runDice() {
     res.className = `res ${f.crit ? 'crit' : f.dc !== undefined ? (f.success ? 'ok' : 'no') : ''}`;
     if (f.crit) sfx.play('crit');
     if (f.fumble) sfx.play('fumble');
-    await new Promise((r) => setTimeout(r, diceQueue.length ? 600 : 1300));
+    // leave the result up long enough to read it
+    await new Promise((r) => setTimeout(r, diceQueue.length ? 1500 : 2200));
   }
   diceHideTimer = window.setTimeout(() => diceBox.remove(), 400);
   diceBusy = false;
@@ -613,11 +660,33 @@ function floaty(id: string, text: string, cls: string) {
   atUnit(id, h('div', null, h('div', { class: `floaty ${cls}` }, text)), 1500);
 }
 
+/** Banners play one at a time so they never draw over each other. */
+const bannerQueue: { text: string; style: string }[] = [];
+let bannerBusy = false;
 function banner(text: string, style = 'title') {
-  const b = h('div', { class: `banner ${style}` }, text);
-  overlay.appendChild(b);
-  setTimeout(() => b.remove(), 2400);
+  // the same banner twice in a row adds nothing
+  const last = bannerQueue[bannerQueue.length - 1];
+  if (last && last.text === text) return;
+  bannerQueue.push({ text, style });
+  if (!bannerBusy) void runBanners();
 }
+async function runBanners() {
+  bannerBusy = true;
+  while (bannerQueue.length) {
+    const { text, style } = bannerQueue.shift()!;
+    const b = h('div', { class: `banner ${style}` }, text);
+    overlay.appendChild(b);
+    // hold long enough to read; hurry a little when more are waiting
+    const hold = readMs(text, 1800) * (bannerQueue.length ? 0.75 : 1);
+    await new Promise((r) => setTimeout(r, hold));
+    b.classList.add('out');
+    await new Promise((r) => setTimeout(r, 300));
+    b.remove();
+  }
+  bannerBusy = false;
+}
+
+const miniStack = h('div', { class: 'ministack' });
 
 function handleFx(f: Fx) {
   switch (f.kind) {
@@ -656,8 +725,9 @@ function handleFx(f: Fx) {
     case 'minigame': {
       const pct = Math.round(f.score * 100);
       const t = h('div', { class: 'card minifx' }, `${pct >= 80 ? '🌟' : pct >= 45 ? '👍' : '😅'} ${f.name}'s ${f.game}: ${pct}%`);
-      overlay.appendChild(t);
-      setTimeout(() => t.remove(), 2200);
+      if (!miniStack.isConnected) overlay.appendChild(miniStack);
+      miniStack.appendChild(t);
+      setTimeout(() => t.remove(), 3500);
       if (pct >= 80) sfx.play('good');
       break;
     }

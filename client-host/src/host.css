@@ -97,8 +97,10 @@ body { overflow: hidden; font-size: calc(19px * var(--scale)); }
 .diceov .res { font-family: var(--font-title); font-size: 2.2em; font-weight: bold; min-height: 1.2em; }
 .diceov .res.ok { color: var(--green); } .diceov .res.no { color: var(--red); } .diceov .res.crit { color: #d4a017; text-shadow: 0 0 10px rgba(212,160,23,0.6); }
 .banner { position: absolute; left: 0; right: 0; top: 38%; text-align: center; z-index: 60; pointer-events: none; font-family: var(--font-title); font-size: 4em; font-weight: bold; animation: pop 0.5s; text-shadow: 3px 3px 0 #f3e6c4, -2px -2px 0 #f3e6c4, 4px 6px 12px rgba(0,0,0,0.35); }
+.banner { transition: opacity 0.3s; } .banner.out { opacity: 0; }
 .banner.good { color: var(--green); } .banner.bad { color: var(--red); } .banner.title { color: var(--ink); }
-.minifx { position: absolute; right: 20px; top: 20px; z-index: 55; padding: 8px 14px; animation: pop 0.3s; }
+.ministack { position: absolute; right: 20px; top: 20px; z-index: 55; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: none; }
+.minifx { padding: 8px 14px; animation: pop 0.3s; }
 /* modals */
 .modal { position: fixed; inset: 0; background: rgba(43,29,14,0.45); display: flex; align-items: center; justify-content: center; z-index: 100; }
 .modal .card { width: min(820px, 92vw); max-height: 86vh; overflow-y: auto; }

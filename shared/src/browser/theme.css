@@ -88,7 +88,7 @@ input:focus, textarea:focus { outline: 3px solid rgba(184, 134, 11, 0.5); }
 .bar.sp > i { background: linear-gradient(90deg, #23527c, #5d8fc9); }
 .bar.xp > i { background: linear-gradient(90deg, #8a6d10, #d4a017); }
 .bar.doom > i { background: linear-gradient(90deg, #3b0a45, #8b1e1e); }
-.tag { display: inline-block; font-size: 0.75em; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--ink-2); background: rgba(255, 255, 255, 0.5); margin-left: 4px; white-space: nowrap; }
+.tag { display: inline-block; font-size: 0.75em; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--ink-2); background: rgba(255, 255, 255, 0.5); margin-left: 6px; white-space: nowrap; }
 .rarity-common { color: #5a4326; } .rarity-uncommon { color: #2e7d32; } .rarity-rare { color: #1565c0; } .rarity-epic { color: #7b1fa2; } .rarity-legendary { color: #e65100; font-weight: bold; }
 .toasts { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; width: min(92vw, 520px); }
 .toast { background: #2b1d0e; color: #f3e6c4; padding: 10px 14px; border-radius: 10px; box-shadow: var(--shadow); transition: opacity 0.4s, transform 0.4s; font-size: 0.95em; }
