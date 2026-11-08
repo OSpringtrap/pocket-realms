@@ -1,4 +1,4 @@
-import { buildBossEncounter, content, longRest, type EndingStats } from '@pr/shared';
+import { buildBossEncounter, content, heroEpithet, heroTitle, longRest, type EndingStats } from '@pr/shared';
 import type { Game } from '../Game.js';
 import { partyLevels } from '../effects.js';
 import { combatScene, currentBiome } from './combat.js';
@@ -81,7 +81,7 @@ export async function ending(g: Game, victory: boolean) {
   if (victory) {
     if (doomRatio < 0.45) {
       title = 'A Golden Age';
-      text = `${w.antagonist.name} falls, and ${w.kingdomName} rejoices. Bells ring for a week. ${w.mascot ? `${w.mascot} is given a tiny medal.` : ''}`;
+      text = `${w.antagonist.name} falls, and ${w.kingdomName} rejoices. Bells ring for a week, and someone gives the town goose a tiny medal.`;
     } else if (doomRatio < 0.85) {
       title = 'A Hard-Won Peace';
       text = `${w.antagonist.name} is defeated, though the scars on ${w.kingdomName} will take years to heal. The songs about you are only slightly exaggerated.`;
@@ -94,6 +94,11 @@ export async function ending(g: Game, victory: boolean) {
   } else {
     title = 'Darkness Falls';
     text = `The heroes have fallen, and ${w.antagonist.name} ${w.antagonist.title} claims ${w.kingdomName}. Perhaps another band of fools will rise... someday.`;
+  }
+  const titled = g.partyChars().filter((c) => heroEpithet(c));
+  if (titled.length) {
+    const names = titled.map((c) => heroTitle(c.name, heroEpithet(c)));
+    text += ` ${victory ? 'The bards will sing of' : 'Few will remember'} ${names.length > 1 ? `${names.slice(0, -1).join(names.some((n) => n.includes(',')) ? '; ' : ', ')} and ${names[names.length - 1]}` : names[0]}.`;
   }
   if (s.party.motto) text += ` Their motto echoes on: "${s.party.motto}".`;
   const stats: EndingStats = {

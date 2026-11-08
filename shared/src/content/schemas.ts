@@ -487,7 +487,7 @@ export const zQuestTemplate = z.object({
 export const zJackboxPrompt = z.object({
   id: z.string(),
   text: z.string(),
-  use: z.enum(['kingdom', 'mascot', 'rumor', 'npc', 'place', 'deed', 'lore', 'tavern', 'motto', 'title']),
+  use: z.enum(['kingdom', 'rumor', 'place', 'deed', 'lore', 'tavern', 'motto', 'title']),
   examples: z.array(z.string()).default([]),
 });
 

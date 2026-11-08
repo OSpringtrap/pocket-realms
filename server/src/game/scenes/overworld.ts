@@ -145,7 +145,7 @@ async function wildEncounter(g: Game, tile: HexTile): Promise<CombatOutcome | un
   if (!g.rng.chance(chance)) {
     g.narrate(g.rng.pick([
       `The ${tile.biome} is quiet. Too quiet? No — just quiet.`,
-      `You pass through ${tile.name ?? `the ${tile.biome}`} without incident. ${w.mascot ? `Someone tells a joke about ${w.mascot}.` : ''}`,
+      `You pass through ${tile.name ?? `the ${tile.biome}`} without incident.`,
       'A peaceful stretch of road. Birds, wind, the creak of boots.',
       'You find an old milestone with a rude carving on it. Classic.',
     ]));
@@ -244,7 +244,7 @@ export async function overworldLoop(g: Game) {
     const every = s.settings.length === 'oneshot' ? 4 : 5;
     if (humans >= 2 && w.turn > 1 && w.turnsSincePrompt >= every) {
       w.turnsSincePrompt = 0;
-      await jackboxRound(g, g.rng.pick(['deed', 'lore', 'motto', 'npc', 'title'] as const));
+      await jackboxRound(g, g.rng.pick(['deed', 'lore', 'motto', 'title'] as const));
     }
     w.turnsSincePrompt++;
     botUpkeep(g);

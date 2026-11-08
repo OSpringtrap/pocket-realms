@@ -1,6 +1,7 @@
 import { sfx } from '../../shared/src/browser/audio.js';
 import { h } from '../../shared/src/browser/dom.js';
 import { content } from '../../shared/src/content/index.js';
+import { heroEpithet, heroTitle } from '../../shared/src/gen/names.js';
 import { itemStatLine } from '../../shared/src/rules/items.js';
 import { getAc, initiativeBonus, mod, profBonus, saveBonus, signed, skillBonus, spellDC, stat, weaponProfile, XP_TABLE } from '../../shared/src/rules/stats.js';
 import { ABILITIES, SKILLS, type Character, type ItemInstance } from '../../shared/src/types.js';
@@ -36,7 +37,7 @@ function sheet(c: Character) {
     h(
       'div',
       { class: 'card col' },
-      h('div', { class: 'row' }, c.portrait ? h('img', { src: c.portrait, style: 'width:64px;height:64px;border-radius:50%;border:2px solid var(--ink-2)' }) : h('span', { style: 'font-size:2.6em' }, cls.emoji), h('div', null, h('h2', null, `${c.name} ${c.titles.length ? c.titles[c.titles.length - 1] : ''}`), h('div', null, `Level ${c.level} ${sp.name} ${cls.name}${c.ancestry ? ` (${c.ancestry})` : ''}`))),
+      h('div', { class: 'row' }, c.portrait ? h('img', { src: c.portrait, style: 'width:64px;height:64px;border-radius:50%;border:2px solid var(--ink-2)' }) : h('span', { style: 'font-size:2.6em' }, cls.emoji), h('div', null, h('h2', null, heroTitle(c.name, heroEpithet(c))), h('div', null, `Level ${c.level} ${sp.name} ${cls.name}${c.ancestry ? ` (${c.ancestry})` : ''}`))),
       h('div', { class: 'muted' }, `“${c.personality}”`),
       h('div', { class: 'bar xp', title: 'XP' }, h('i', { style: `width:${Math.min(100, ((c.xp - (XP_TABLE[c.level - 1] ?? 0)) / Math.max(1, nextXp - (XP_TABLE[c.level - 1] ?? 0))) * 100)}%` })),
       h('div', { class: 'small muted' }, `${c.xp} XP — next level at ${nextXp}`),

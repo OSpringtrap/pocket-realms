@@ -108,11 +108,10 @@ async function lobbyThenPlay(g: Game, resumed: boolean) {
     g.narrate(`Your quest: ${w.objective.text} You will need ${w.objective.keysNeeded} ${w.objective.keyName}${w.objective.keysNeeded > 1 ? 's' : ''} to break its seal — the dungeons (🕳️) hold them.`);
     await g.beat(2600);
     g.journal('quest', w.objective.text);
-    // World-building: name the kingdom, then (with friends) a mascot and a banner
+    // World-building: name the kingdom, then draw its banner
     const humans = g.partyIds().filter((id) => !g.players.get(id)?.isBot);
     if (humans.length) {
       await jackboxRound(g, 'kingdom');
-      if (humans.length >= 2) await jackboxRound(g, 'mascot');
       const artist = g.rng.pick(humans);
       const banner = await g.ask<string | null>(
         artist,

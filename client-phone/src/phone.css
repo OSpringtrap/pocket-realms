@@ -39,7 +39,8 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .grouptabs button.on { background: linear-gradient(180deg, #b0563a, #86361f); color: var(--bone); border-color: #4e1d10; }
 .prompt-head { font-family: var(--font-title); font-size: 1.35em; font-weight: 400; }
 .prompt-text { white-space: pre-line; color: var(--ink-2); }
-.deadline { font-size: 0.8em; color: var(--red); }
+.deadline { align-self: flex-start; font-size: 0.9em; font-weight: 700; font-variant-numeric: tabular-nums; padding: 3px 10px; border-radius: 999px; background: #f3e7c9; color: #2a2119; border: 1px solid #8a7552; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+.deadline.low { background: #e0442a; color: #fff; border-color: #fff3; animation: glowPulse 1s infinite; }
 .urgent { animation: glowPulse 1.5s infinite; }
 
 /* character creation */

@@ -142,7 +142,7 @@ export async function applyEffects(g: Game, effects: EventEffect[], actorId: str
       case 'inspiration': {
         const targets = e.who === 'party' ? chars : actor ? [actor] : [];
         for (const c of targets) c.inspiration++;
-        g.narrate(`✨ Inspiration for ${targets.map((c) => c.name).join(', ')}! (A free reroll.)`, 'good');
+        g.narrate(`✨ Inspiration for ${targets.map((c) => c.name).join(', ')}! (Advantage on your next hard check.)`, 'good');
         break;
       }
       case 'sp': {

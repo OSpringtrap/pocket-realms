@@ -17,6 +17,24 @@ function newGame(seed: string, bots: number, settings = {}) {
 }
 
 describe('server game flow', () => {
+  it('the narrator calls titled heroes by their title, now and then', () => {
+    const g = newGame('EPI', 0);
+    g.state.chars.h1 = { id: 'h1', name: 'Doob', titles: ['the Bold'] } as never;
+    g.state.chars.h2 = { id: 'h2', name: 'Mira', titles: ['Monster Slayer'] } as never;
+    const said: string[] = [];
+    for (const t of ['Doob swings and Mira strikes the goblin.', 'Doob misses.', 'Doob misses.', "Doob's shield cracks.", 'Doob misses.', 'Doob misses.', 'Mira falls!']) {
+      g.narrate(t);
+      said.push(g.state.narration[g.state.narration.length - 1]!.text);
+    }
+    expect(said[0]).toBe('Doob the Bold swings and Mira, Monster Slayer, strikes the goblin.');
+    expect(said[1]).toBe('Doob misses.'); // not every line
+    expect(said[3]).toBe("Doob's shield cracks."); // possessives stay plain
+    expect(said[4]).toBe('Doob the Bold misses.');
+    expect(said[6]).toBe('Mira, Monster Slayer, falls!');
+    g.narrate('From now on, the bards call them Doob the Bold!');
+    expect(g.state.narration[g.state.narration.length - 1]!.text).toBe('From now on, the bards call them Doob the Bold!');
+  });
+
   it('refuses to start without ready heroes', () => {
     const g = new Game({ clock: instantClock(), code: 'TEST', lanUrl: '', instantBots: true });
     installHandlers(g);

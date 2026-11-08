@@ -14,7 +14,8 @@ export class Sfx {
 
   unlock() {
     if (this.ctx) {
-      if (this.ctx.state === 'suspended') void this.ctx.resume();
+      // iOS can also report 'interrupted' (after a call or Siri); resume from anything but running
+      if (this.ctx.state !== 'running') void this.ctx.resume().catch(() => {});
       return;
     }
     const AC = (window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext) as typeof AudioContext | undefined;
@@ -100,6 +101,108 @@ export class Sfx {
     if (v > 0.35) this.tone(260 + Math.random() * 160, 0.05, { type: 'triangle', gain: g * 0.35 });
   }
   private lastClack = 0;
+
+  // ------------------------------------------------------------ minigame feedback
+  // Short, quiet sounds for the phone speaker. They matter most on iPhone, where there is no
+  // vibration: the hot/cold search and the lockpick must be playable by ear.
+
+  /** One hot/cold sonar blip; `heat` 0 (cold) .. 1 (on target). The caller repeats it faster as
+   * it gets hotter, like a geiger counter; the pitch rises too, so either cue alone works. */
+  sonar(heat: number) {
+    if (!this.ctx) return;
+    const h = Math.max(0, Math.min(1, heat));
+    const f = 260 * 2 ** (h * 2.3); // ~260 Hz cold .. ~1290 Hz hot
+    this.tone(f, 0.05 + (1 - h) * 0.05, { type: h > 0.9 ? 'square' : 'triangle', gain: 0.05 + h * 0.07 });
+    if (h > 0.9) this.tone(f * 1.5, 0.04, { at: 0.03, gain: 0.04 });
+  }
+
+  /** A blade cutting the air; `v` 0..1 is how hard (louder, longer and brighter). */
+  swish(v: number) {
+    if (!this.ctx) return;
+    const s = Math.max(0.05, Math.min(1, v));
+    this.noise(0.12 + s * 0.22, { freq: 400 + s * 300, sweep: 1500 + s * 4500, q: 1.2 + s * 2, gain: 0.08 + s * 0.3 });
+    if (s > 0.75) this.tone(1900 + s * 900, 0.18, { type: 'sine', gain: 0.03, slide: 3200, at: 0.05 }); // edge ring on a great swing
+  }
+
+  /** Bones/dice rattling in a pouch, for the shake game; throttled. */
+  rattle(v: number) {
+    if (!this.ctx || v < 0.05) return;
+    const now = performance.now();
+    if (now - this.lastRattle < 70) return;
+    this.lastRattle = now;
+    const n = 1 + Math.round(v * 3);
+    for (let i = 0; i < n; i++) this.noise(0.025, { at: i * 0.018 + Math.random() * 0.01, freq: 1400 + Math.random() * 2200, q: 6, gain: 0.05 + v * 0.18 });
+  }
+  private lastRattle = 0;
+
+  /** A woody knock; `pitch` 0..1 lets fast tapping climb in pitch. */
+  knock(pitch = 0) {
+    if (!this.ctx) return;
+    const p = Math.max(0, Math.min(1, pitch));
+    this.tone(300 + p * 500, 0.06, { type: 'triangle', gain: 0.12, slide: 180 + p * 300 });
+    this.noise(0.02, { freq: 2000 + p * 1500, q: 3, gain: 0.08 });
+  }
+
+  /** One of four pad notes (memory sequence, rhythm drum when `i` is -1). */
+  pad(i: number) {
+    if (!this.ctx) return;
+    if (i < 0) {
+      this.tone(110, 0.16, { slide: 55, gain: 0.35 });
+      this.noise(0.05, { freq: 300, gain: 0.15 });
+      return;
+    }
+    const notes = [392, 494, 587, 784]; // G B D G: any order sounds fine
+    this.tone(notes[i % 4]!, 0.28, { type: 'triangle', gain: 0.13 });
+  }
+
+  /** Steel on steel; `v` 0..1 is how clean the parry was. Inharmonic partials read as metal. */
+  clang(v: number) {
+    if (!this.ctx) return;
+    const g = 0.05 + Math.max(0, Math.min(1, v)) * 0.08;
+    [1, 2.76, 5.4, 8.93].forEach((m, i) => this.tone(520 * m, 0.5 - i * 0.08, { type: 'sine', gain: g / (i + 1) }));
+    this.noise(0.04, { freq: 5000, q: 1, gain: 0.2 * v + 0.05 });
+  }
+
+  /** Lockpick: a faint detent tick as the dial turns; `near` 0..1 makes it louder and brighter
+   * as you approach the sweet spot, like feeling the pins through the pick. */
+  detent(near: number) {
+    if (!this.ctx) return;
+    const n = Math.max(0, Math.min(1, near));
+    this.noise(0.015, { freq: 2600 + n * 2400, q: 8, gain: 0.03 + n * 0.16 });
+  }
+
+  /** A held, continuously adjustable tone (charge bars, tightrope wobble, the hum fallback).
+   * Returns a handle; call `stop()` when the game ends. */
+  drone(type: OscillatorType = 'sine'): { set: (freq: number, gain: number) => void; stop: () => void } {
+    const c = this.ctx;
+    if (!c || !this.master) return { set: () => {}, stop: () => {} };
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type;
+    g.gain.value = 0;
+    o.connect(g).connect(this.master);
+    o.start();
+    let stopped = false;
+    return {
+      set: (freq, gain) => {
+        if (stopped) return;
+        o.frequency.setTargetAtTime(Math.max(20, freq), c.currentTime, 0.02);
+        g.gain.setTargetAtTime(Math.max(0, gain), c.currentTime, 0.03);
+      },
+      stop: () => {
+        if (stopped) return;
+        stopped = true;
+        g.gain.setTargetAtTime(0, c.currentTime, 0.03);
+        o.stop(c.currentTime + 0.2);
+      },
+    };
+  }
+
+  /** A faint shimmer for the "listen" game (deliberately quiet). */
+  shimmer(freq: number) {
+    if (!this.ctx) return;
+    this.tone(freq, 0.35, { gain: 0.05, attack: 0.05 });
+  }
 
   play(name: string) {
     if (!this.ctx) return;
@@ -230,6 +333,28 @@ export class Sfx {
         break;
       case 'bad':
         n(200, 0.3, { type: 'square', gain: 0.06, slide: 120 });
+        break;
+      case 'perfect':
+        // minigame aced: quick sparkle up an arpeggio
+        [784, 988, 1175, 1568, 1976].forEach((f, i) => n(f, 0.25, { at: i * 0.05, type: 'triangle', gain: 0.08 }));
+        break;
+      case 'countdown':
+        // last seconds of a minigame timer
+        n(1400, 0.05, { gain: 0.06, type: 'square' });
+        break;
+      case 'unlock':
+        // the lock gives: a heavy click and a little rattle of the bolt
+        this.noise(0.03, { freq: 1800, q: 4, gain: 0.35 });
+        n(140, 0.12, { at: 0.01, type: 'triangle', gain: 0.25, slide: 90 });
+        this.noise(0.08, { at: 0.12, freq: 900, q: 2, gain: 0.12 });
+        break;
+      case 'pin':
+        // one tumbler set
+        this.noise(0.02, { freq: 3200, q: 6, gain: 0.3 });
+        n(620, 0.08, { type: 'triangle', gain: 0.12 });
+        break;
+      case 'gust':
+        this.noise(0.7, { type: 'bandpass', freq: 300, sweep: 900, q: 0.7, gain: 0.12 });
         break;
       default:
         n(600, 0.1, { gain: 0.05 });

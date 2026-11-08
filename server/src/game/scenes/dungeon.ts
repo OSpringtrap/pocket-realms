@@ -112,14 +112,16 @@ async function trapRoom(g: Game): Promise<void> {
 
 async function puzzleRoom(g: Game): Promise<void> {
   const chars = g.partyChars().filter((c) => !c.dead && !c.down);
-  const kinds: MinigameKind[] = ['sequence', 'rune', 'plates', 'plates'];
+  const kinds: MinigameKind[] = ['sequence', 'rune', 'plates', 'plates', 'lockpick'];
   const kind = g.rng.pick(kinds);
   const desc =
     kind === 'sequence'
       ? 'Glowing tiles flash in a pattern. Everyone must repeat it — together!'
       : kind === 'rune'
         ? 'A great rune is carved into the door. Everyone traces their part of it.'
-        : 'Pressure plates! Everyone must hold their plate down at the same time — together!';
+        : kind === 'lockpick'
+          ? 'A vault door with a dial lock for each of you. Listen for the tumblers!'
+          : 'Pressure plates! Everyone must hold their plate down at the same time — together!';
   g.narrate(`🧩 ${desc}`);
   const param = kind === 'rune' ? g.rng.pick(['circle', 'triangle', 'star', 'spiral', 'zigzag']) : undefined;
   const scores = await Promise.all(chars.map((c) => g.minigame(c.id, kind, `Puzzle: ${desc}`, param)));

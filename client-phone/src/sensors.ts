@@ -33,14 +33,35 @@ const debugVals = { accel: 0, beta: 0, gamma: 0, alpha: 0, vol: 0, pitch: 0, bur
 let motionListening = false;
 let lastMotion = 0;
 
+/**
+ * Sign of the motion vectors. The spec has accelerationIncludingGravity point away from the ground
+ * at rest (+9.81 on y with the phone upright), but some engines (iOS Safari among them) report the
+ * opposite sign, which made the dice box fall *up*. The tilt angles agree everywhere, so the sign is
+ * learned by comparing the two whenever the phone is clearly tipped (votes, so one bad sample does
+ * not flip it). Starts from a platform guess until the first votes are in.
+ */
+const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let signVotes = IOS ? -3 : 3;
+let motionSign = IOS ? -1 : 1;
+/** low-passed gravity, for devices that report only accelerationIncludingGravity */
+const gLow = [0, 0, 0];
+
 function onMotion(e: DeviceMotionEvent) {
   if (DEBUG) return;
   const a = e.acceleration;
   const g = e.accelerationIncludingGravity;
   if (g && g.x !== null) {
-    S.gx = g.x ?? 0;
-    S.gy = g.y ?? 0;
-    S.gz = g.z ?? 0;
+    if (caps.orientation && g.y !== null) {
+      const sb = Math.sin((S.beta * Math.PI) / 180);
+      if (Math.abs(sb) > 0.45 && Math.abs(g.y) > 4) {
+        signVotes = Math.max(-12, Math.min(12, signVotes + Math.sign(g.y) * Math.sign(sb)));
+        if (signVotes >= 3) motionSign = 1;
+        else if (signVotes <= -3) motionSign = -1;
+      }
+    }
+    S.gx = (g.x ?? 0) * motionSign;
+    S.gy = (g.y ?? 0) * motionSign;
+    S.gz = (g.z ?? 0) * motionSign;
     S.hasGravity = true;
   }
   const rr = e.rotationRate;
@@ -52,11 +73,17 @@ function onMotion(e: DeviceMotionEvent) {
   let x = a?.x ?? null;
   let y = a?.y ?? null;
   let z = a?.z ?? null;
-  if (x === null && g) {
-    // devices without linear acceleration: subtract gravity estimate
-    x = (g.x ?? 0) * 0.3;
-    y = (g.y ?? 0) * 0.3;
-    z = ((g.z ?? 0) - 9.81) * 0.3;
+  if (x !== null) {
+    x *= motionSign;
+    y = (y ?? 0) * motionSign;
+    z = (z ?? 0) * motionSign;
+  } else if (g && g.x !== null) {
+    // devices without linear acceleration: subtract a slow gravity estimate (a constant tilt is not motion)
+    const raw = [S.gx, S.gy, S.gz];
+    for (let i = 0; i < 3; i++) gLow[i]! += (raw[i]! - gLow[i]!) * 0.08;
+    x = raw[0]! - gLow[0]!;
+    y = raw[1]! - gLow[1]!;
+    z = raw[2]! - gLow[2]!;
   }
   if (x === null) return;
   S.accelX = x;

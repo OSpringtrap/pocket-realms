@@ -157,6 +157,27 @@ export function monsterName(rng: Rng, culture: Culture, g: Gender = rng.chance(0
   }
 }
 
+/** Names that already end in an epithet ("Florian the Hollow", "Sabine Mouth of the Dark", "Brass
+ * Sentinel IV", "Tom Ninefingers"): adding "the Cultist" to these would read as a doubled title. */
+const EPITHET_END = new RegExp(`(?:\\bthe \\S+|Mouth of the Dark|\\b[IVX]+|${MON.bandit.tail.filter((t) => !t.startsWith('the')).join('|')})$`);
+
+/** A named member of a monster kind: "Snikrot the Goblin", or the name alone when it carries its own epithet. */
+export function namedMonster(name: string, kind: string): string {
+  return EPITHET_END.test(name) ? name : `${name} the ${kind}`;
+}
+
+/** A hero's latest title, if any: the one the bards use. */
+export function heroEpithet(c: { titles: string[] }): string | undefined {
+  return c.titles[c.titles.length - 1];
+}
+
+/** A hero with a title as it is said aloud: "Doob the Bold", "Doob of the Silver Tongue", or with a
+ * comma for a noun title, "Doob, Monster Slayer" (the caller adds the closing comma mid-sentence). */
+export function heroTitle(name: string, title: string | undefined): string {
+  if (!title) return name;
+  return /^(the|of|who) /i.test(title) ? `${name} ${title.replace(/^(The|Of|Who) /, (m) => m.toLowerCase())}` : `${name}, ${title}`;
+}
+
 /** Monster families whose members can carry a personal name, and the culture it comes from. */
 export const FAMILY_CULTURE: Record<string, Culture> = {
   goblin: 'goblin', kobold: 'kobold', bandit: 'bandit', cult: 'cult', giant: 'brute', troll: 'brute', hag: 'witch',

@@ -1,4 +1,4 @@
-import { applyLevelUp, content, levelUpOptions, sanitizeText, type LevelChoice } from '@pr/shared';
+import { applyLevelUp, content, heroTitle, levelUpOptions, sanitizeText, type LevelChoice } from '@pr/shared';
 import type { Game } from '../Game.js';
 
 /** Every hero with pending levels picks one of three upgrades on their phone (in parallel). */
@@ -43,8 +43,8 @@ async function epithet(g: Game, heroId: string) {
     { kind: 'text', title: `Give ${hero.name} an epithet!`, text: `Based on their deeds so far. e.g. "${sample}"`, maxLen: 32, placeholder: 'the Unflinching', suggestions: [sample, g.rng.pick(content().names.epithets)] },
     { timeoutMs: 45000, fallback: () => sample, bot: () => sample, validate: (v) => sanitizeText(v, 32) || undefined },
   );
-  const t = text.startsWith('the ') || text.startsWith('of ') ? text : text;
+  const t = text;
   if (!hero.titles.includes(t)) hero.titles.push(t);
-  g.narrate(`From now on, the bards call them ${hero.name} ${t}!`, 'title');
+  g.narrate(`From now on, the bards call them ${heroTitle(hero.name, t)}!`, 'title');
   g.journal('deed', `${hero.name} earned the epithet "${t}".`, g.displayName(writer));
 }

@@ -1,7 +1,7 @@
 import { content, sanitizeText, shortRest, type ChoiceOption } from '@pr/shared';
 import type { Game } from '../Game.js';
 
-type Use = 'kingdom' | 'mascot' | 'rumor' | 'npc' | 'place' | 'deed' | 'lore' | 'tavern' | 'motto' | 'title';
+type Use = 'kingdom' | 'rumor' | 'place' | 'deed' | 'lore' | 'tavern' | 'motto' | 'title';
 
 /**
  * Jackbox-style round: everyone writes privately on their phone, answers appear
@@ -86,11 +86,6 @@ export async function jackboxRound(g: Game, use: Use, promptId?: string): Promis
         g.narrate(`So it is decided: you hail from the kingdom of ${text}!`, 'title');
         g.journal('world', `The heroes hail from the kingdom of ${text}.`, author);
         break;
-      case 'mascot':
-        w.mascot = text;
-        g.narrate(`The beloved mascot of ${w.home?.name ?? 'home'}: ${text}.`, 'good');
-        g.journal('world', `The village mascot is ${text}.`, author);
-        break;
       case 'tavern':
         w.lore.tavern = text;
         g.narrate(`You step into "${text}".`, 'good');
@@ -100,10 +95,6 @@ export async function jackboxRound(g: Game, use: Use, promptId?: string): Promis
         w.lore.rumor = text;
         g.narrate(`The rumor everyone's whispering: "${text}"`, 'whisper');
         g.journal('lore', `Rumor: ${text}`, author);
-        break;
-      case 'npc':
-        w.lore.legend = text;
-        g.journal('lore', `Locals fear ${text}.`, author);
         break;
       case 'place': {
         const t = w.tiles.find((x) => x.q === w.party.q && x.r === w.party.r);

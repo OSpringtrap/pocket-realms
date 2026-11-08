@@ -9,3 +9,4 @@ voice/.venv/
 voice/config.json
 __pycache__/
 voice/.tmp/
+voice/auditions/

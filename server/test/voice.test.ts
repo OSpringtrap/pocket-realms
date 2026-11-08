@@ -100,10 +100,26 @@ describe('speech queue', () => {
     const { w, jobs } = fakeWorker();
     let now = 0;
     const q = new SpeechQueue(w, { hosts: () => 1, json: () => {}, binary: () => {} }, () => now);
-    q.narrate('First line is long enough. Second line is long enough. Third line is stale by then.');
+    q.narrate('First line is long enough. Second line is long enough.');
+    q.narrate('This later line is stale by then.');
     now = 60000;
     const first = [...jobs.values()][0]!;
     first.h.end('error', {});
-    expect(jobs.size).toBe(2); // the third sentence was dropped, not sent
+    expect(jobs.size).toBe(2); // the later narration was dropped, not sent
+  });
+
+  it('reads a narration that has started to its last sentence (the ending and its motto)', () => {
+    const { w, jobs } = fakeWorker();
+    let now = 0;
+    const sent: { t: string; sid?: number }[] = [];
+    const q = new SpeechQueue(w, { hosts: () => 1, json: (m) => sent.push(m as { t: string }), binary: () => {} }, () => now);
+    q.narrate('One sentence is long enough. Two sentence is long enough. Three is long enough. Their motto echoes on, never give up.');
+    for (let i = 0; i < 4; i++) {
+      now += 10000; // each sentence takes a while to play
+      const job = [...jobs.values()][i]!;
+      job.h.end('done', { samples: 24000, sampleRate: 24000 });
+      q.played(sent.filter((m) => m.t === 'speech')[i]!.sid!);
+    }
+    expect(jobs.size).toBe(4);
   });
 });

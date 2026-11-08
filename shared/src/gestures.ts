@@ -167,12 +167,126 @@ const NORMALIZED_REV: Record<string, Pt[]> = Object.fromEntries(Object.entries(R
 
 export const RUNE_NAMES = Object.keys(RUNE_SHAPES);
 
+// ---------------------------------------------------------------- strict trace scoring
+
+/** Bounding box of a template in its own (shape) units: the phone draws the guide from this box. */
+export function runeBox(name: string): { minX: number; minY: number; maxX: number; maxY: number; size: number } {
+  const pts = (RUNE_SHAPES[name] ?? RUNE_SHAPES.circle!).points;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const [x, y] of pts) {
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+  return { minX, minY, maxX, maxY, size: Math.max(maxX - minX, maxY - minY, 0.01) };
+}
+
+function segDist(p: Pt, a: Pt, b: Pt): number {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const l2 = dx * dx + dy * dy;
+  const t = l2 > 0 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / l2)) : 0;
+  return Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dy);
+}
+
+/** Distance from a point to a polyline. */
+export function polyDist(p: Pt, line: Pt[]): number {
+  if (line.length === 1) return Math.hypot(p[0] - line[0]![0], p[1] - line[0]![1]);
+  let d = Infinity;
+  for (let i = 1; i < line.length; i++) d = Math.min(d, segDist(p, line[i - 1]!, line[i]!));
+  return d;
+}
+
+/** Distance (in units of the rune's size) from a shape-space point to the target rune; the phone
+ * uses it to colour the ink live. */
+export function runeInkDistance(p: Pt, target: string): number {
+  const shape = RUNE_SHAPES[target] ?? RUNE_SHAPES.circle!;
+  return polyDist(p, shape.points) / runeBox(target).size;
+}
+
+const ramp = (d: number, ok: number, zero: number) => (d <= ok ? 1 : d >= zero ? 0 : 1 - (d - ok) / (zero - ok));
+
+export interface TraceScore {
+  score: number;
+  /** mean closeness of the ink to the rune (0..1): penalises ink far from the rune */
+  precision: number;
+  /** share of the rune that has ink on it (0..1) */
+  coverage: number;
+  /** stroke order/direction agreement (0..1), either direction, any start point on closed runes */
+  order: number;
+  /** share of the ink that is clearly off the rune */
+  stray: number;
+}
+
+const TRACE_N = 64;
+
 /**
- * Score a drawn stroke against a target rune. Returns 0..1 where ~0.8+ is a clean drawing.
- * `tolerance` (0.5 strict .. 1.5 lenient) adjusts how forgiving the curve is.
+ * Strict scoring of a trace drawn over the guide. `pts` are in the rune's own shape units (the
+ * phone converts screen pixels with the same transform it used to draw the guide), so position
+ * and size matter: a tiny or shifted copy of the right shape is not an honest trace.
+ *
+ * The old $1-only scoring was translation/scale/rotation invariant and only rewarded similarity
+ * to the closest template, so a lopsided blob drawn anywhere passed as a circle. Here three
+ * things must all hold (they are multiplied, so one bad metric sinks the score):
+ * - precision: every bit of ink must lie near the rune (ink far away is penalised, not ignored);
+ * - coverage: the whole rune must be inked (half a star is half a star);
+ * - order: the stroke must follow the rune's path (scribbling over it back and forth fails).
+ * Distances are in units of the rune's bounding-box size; `tolerance` scales them.
  */
-export function scoreRune(points: unknown, target: string, tolerance = 1): { score: number; best: string } {
-  if (!Array.isArray(points) || points.length < 6 || points.length > 2000) return { score: 0, best: '' };
+export function scoreTrace(pts: Pt[], target: string, tolerance = 1): TraceScore {
+  const zero: TraceScore = { score: 0, precision: 0, coverage: 0, order: 0, stray: 1 };
+  const shape = RUNE_SHAPES[target];
+  if (!shape || pts.length < 2) return zero;
+  const L = runeBox(target).size;
+  const tol = Math.max(0.3, tolerance);
+  const tpl = shape.points;
+  if (pathLength(pts) < L * 0.2) return zero;
+  const P = resample(pts, TRACE_N);
+  const T = resample(tpl, TRACE_N);
+
+  // precision: ink within ~5% of the rune size is perfect, beyond ~16% earns nothing
+  let prec = 0;
+  let stray = 0;
+  for (const p of P) {
+    const d = polyDist(p, tpl) / L;
+    prec += ramp(d, 0.05 * tol, 0.16 * tol);
+    if (d > 0.22 * tol) stray++;
+  }
+  prec /= P.length;
+  stray /= P.length;
+
+  // coverage: every part of the rune needs ink close by
+  let cov = 0;
+  for (const q of T) cov += ramp(polyDist(q, pts) / L, 0.06 * tol, 0.15 * tol);
+  cov /= T.length;
+
+  // order: point-by-point along the path (forward or reversed; cyclic shifts for closed runes)
+  const closed = Math.hypot(tpl[0]![0] - tpl[tpl.length - 1]![0], tpl[0]![1] - tpl[tpl.length - 1]![1]) < L * 0.05;
+  let best = Infinity;
+  for (const cand of [T, [...T].reverse()]) {
+    const base = closed ? cand.slice(0, -1) : cand; // drop the duplicated closing point for shifting
+    const shifts = closed ? base.length : 1;
+    for (let s = 0; s < shifts; s += closed ? 2 : 1) {
+      const seq = closed ? [...base.slice(s), ...base.slice(0, s)] : base;
+      const tgt = closed ? resample([...seq, seq[0]!], TRACE_N) : seq;
+      best = Math.min(best, pathDistance(P, tgt));
+    }
+  }
+  const order = ramp(best / L, 0.06 * tol, 0.2 * tol);
+
+  // strays are punished twice on purpose: a scribble that also crosses the rune must not pass
+  const raw = prec ** 1.5 * cov ** 2 * (0.35 + 0.65 * order) * (1 - Math.min(1, stray * 1.5));
+  const score = Math.max(0, Math.min(1, raw * 1.15)); // small headroom so a careful honest trace can reach 1
+  const r2 = (x: number) => Math.round(x * 100) / 100;
+  return { score: r2(score), precision: r2(prec), coverage: r2(cov), order: r2(order), stray: r2(stray) };
+}
+
+function cleanPoints(points: unknown): Pt[] | null {
+  if (!Array.isArray(points) || points.length < 6 || points.length > 2000) return null;
   const pts: Pt[] = [];
   for (const p of points) {
     if (!Array.isArray(p) || p.length < 2) continue;
@@ -180,25 +294,33 @@ export function scoreRune(points: unknown, target: string, tolerance = 1): { sco
     const y = Number(p[1]);
     if (Number.isFinite(x) && Number.isFinite(y) && Math.abs(x) < 1e5 && Math.abs(y) < 1e5) pts.push([x, y]);
   }
-  if (pts.length < 6 || pathLength(pts) < 20) return { score: 0, best: '' };
+  return pts.length < 6 ? null : pts;
+}
+
+/** Which template a stroke most resembles ($1 recognizer: position/size/rotation invariant). */
+export function recognizeRune(pts: Pt[]): string {
+  if (pts.length < 6 || pathLength(pts) <= 0) return '';
   const cand = normalize(pts);
   let best = '';
   let bestD = Infinity;
-  let targetD = Infinity;
   for (const name of RUNE_NAMES) {
     const d = Math.min(distanceAtBestAngle(cand, NORMALIZED[name]!), distanceAtBestAngle(cand, NORMALIZED_REV[name]!));
     if (d < bestD) {
       bestD = d;
       best = name;
     }
-    if (name === target) targetD = d;
   }
-  if (!NORMALIZED[target]) return { score: 0, best };
-  const raw = 1 - targetD / HALF_DIAG;
-  // map raw similarity (typically 0.6 .. 0.95) onto 0..1 with tolerance
-  const lo = 0.62 - 0.08 * (tolerance - 1);
-  const hi = 0.9 - 0.05 * (tolerance - 1);
-  let score = Math.max(0, Math.min(1, (raw - lo) / (hi - lo)));
-  if (best !== target) score *= 0.75;
-  return { score: Math.round(score * 100) / 100, best };
+  return best;
+}
+
+/**
+ * Score a drawn stroke against a target rune. `points` are in the rune's shape units (see
+ * `scoreTrace`); untrusted input is sanitised here. Returns 0..1 where 0.8+ is a clean trace,
+ * plus the template the stroke looks most like (for feedback).
+ * `tolerance` (0.5 strict .. 1.5 lenient) scales the distance thresholds.
+ */
+export function scoreRune(points: unknown, target: string, tolerance = 1): { score: number; best: string } {
+  const pts = cleanPoints(points);
+  if (!pts || !RUNE_SHAPES[target]) return { score: 0, best: '' };
+  return { score: scoreTrace(pts, target, tolerance).score, best: recognizeRune(pts) };
 }

@@ -24,6 +24,8 @@ interface Item {
   text: string;
   at: number;
   kind: 'narr' | 'say';
+  /** sentences of one narrate() call share a block: once it starts playing it is read to the end */
+  block: number;
 }
 
 const STALE_MS = { narr: 14000, say: 7000 };
@@ -36,6 +38,9 @@ export class SpeechQueue implements VoiceHooks {
   private live = new Map<number, { job: number; synthDone: boolean; timer?: NodeJS.Timeout }>();
   private sid = 0;
   private job = 0;
+  private block = 0;
+  /** block of the sentence most recently sent to the worker */
+  private playing = 0;
   private idleWaiters: (() => void)[] = [];
 
   constructor(
@@ -49,12 +54,13 @@ export class SpeechQueue implements VoiceHooks {
   }
 
   narrate(text: string) {
-    for (const s of splitSentences(cleanForSpeech(text))) this.push({ who: 'Narrator', voice: 'narrator', text: s, kind: 'narr' });
+    const block = ++this.block;
+    for (const s of splitSentences(cleanForSpeech(text))) this.push({ who: 'Narrator', voice: 'narrator', text: s, kind: 'narr', block });
   }
 
   say(speaker: Speaker, text: string) {
     const clean = cleanForSpeech(text);
-    if (clean) this.push({ who: speaker.name, voice: this.worker.voices.has(speaker.voice) ? speaker.voice : 'narrator', text: clean, kind: 'say' });
+    if (clean) this.push({ who: speaker.name, voice: this.worker.voices.has(speaker.voice) ? speaker.voice : 'narrator', text: clean, kind: 'say', block: ++this.block });
   }
 
   busy(): boolean {
@@ -102,7 +108,7 @@ export class SpeechQueue implements VoiceHooks {
     this.pending.push({ ...it, sid: ++this.sid, at: this.now() });
     // Too much backlog: drop the oldest narration first, characters last.
     while (this.pending.length > MAX_PENDING) {
-      const i = this.pending.findIndex((p) => p.kind === 'narr');
+      const i = this.pending.findIndex((p) => p.kind === 'narr' && p.block !== this.playing);
       this.pending.splice(i >= 0 ? i : 0, 1);
     }
     this.pump();
@@ -115,6 +121,10 @@ export class SpeechQueue implements VoiceHooks {
     this.pending = this.pending.filter((p) => now - p.at < STALE_MS[p.kind] * slack);
     while (this.live.size < IN_FLIGHT && this.pending.length) {
       const it = this.pending.shift()!;
+      // The rest of a block that has started is not stale: a long narration (the ending) is read
+      // to its last sentence instead of being cut when its tail waited behind the first ones.
+      this.playing = it.block;
+      for (const p of this.pending) if (p.block === it.block) p.at = now;
       const job = ++this.job;
       const entry: { job: number; synthDone: boolean; timer?: NodeJS.Timeout } = { job, synthDone: false };
       const ok = this.worker.synth(job, it.text, it.voice, {

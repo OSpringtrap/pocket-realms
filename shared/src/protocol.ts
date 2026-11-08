@@ -103,7 +103,6 @@ export interface WorldView {
   quests: Quest[];
   kingdomName: string;
   banner?: string;
-  mascot?: string;
   lore: Record<string, string>;
   home?: { name: string; inn: number; shop: number; shrine: number };
   turn: number;

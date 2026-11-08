@@ -196,11 +196,14 @@ body { overflow: hidden; font-size: calc(17px * var(--scale)); }
 /* dice thrown from the phones roll over the whole screen; no tray, no card */
 .dicelayer { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 58; }
 /* their totals show in the log strip under the board for a few seconds */
-.rolllog { display: flex; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 4px; }
+.narration .hist { height: 2.5em; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+.rolllog { display: flex; flex-wrap: nowrap; gap: 10px; overflow: hidden; }
 .rolllog:empty { display: none; }
-.rollline { display: inline-flex; align-items: baseline; gap: 10px; padding: 3px 14px; border: 1px solid var(--edge-soft); background: rgba(0, 0, 0, 0.3); animation: pop 0.25s; transition: opacity 0.45s; }
+.rolllog:not(:empty) + .old { display: none; }
+.rollline { display: inline-flex; align-items: baseline; gap: 10px; padding: 2px 14px; min-width: 0; flex-shrink: 1; white-space: nowrap; border: 1px solid var(--edge-soft); background: rgba(0, 0, 0, 0.3); animation: pop 0.25s; transition: opacity 0.45s; }
 .rollline .who { font-family: var(--font-title); }
-.rollline .lbl { color: var(--ink-2); font-size: 0.85em; }
-.rollline .sum { font-family: var(--font-title); font-size: 1.35em; color: var(--bone); }
+.rollline .lbl { color: var(--ink-2); font-size: 0.85em; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 32em; }
+.rollline .sum { font-family: var(--font-title); font-size: 1.35em; line-height: 1.2; flex-shrink: 0; color: var(--bone); }
 .rollline.ok .sum { color: #a9c98f; } .rollline.no .sum { color: #e08a6a; } .rollline.crit .sum { color: #e3b75a; text-shadow: 0 0 10px rgba(201, 160, 80, 0.55); } .rollline.fumble .sum { color: #e08a6a; }
 .rollline.out { opacity: 0; }
+.member .sub .epi { color: var(--gold, #c9a227); font-style: italic; }

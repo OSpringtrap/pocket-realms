@@ -70,8 +70,15 @@ Each entry: **decision** — why.
   bonus die (+2/+3 to hit), crit range (−1/−2), damage/potency (+1/+2 dice or +turns), or SP refund. Quirks such as
   "Calligrapher" add to specific minigame scores. The d20 is never replaced.
 - **Telegraphed attacks:** many big monsters wind up for a turn; targeted players immediately get a short BRACE
-  minigame (shake/steady). Great = advantage on the save / disadvantage on the attack, good = +2. Counter abilities
-  (Counterspell, Shield Bash, Cutting Words, Disarm) or stunning the monster cancel the wind-up.
+  minigame: *parry* for weapon blows (no save), *shake* for DEX saves, *steady* for other saves. Great = advantage
+  on the save / disadvantage on the attack, good = +2. Counter abilities (Counterspell, Shield Bash, Cutting Words,
+  Disarm) or stunning the monster cancel the wind-up.
+- **New minigames: lockpick, parry, balance.** Lockpick (three hidden tumblers on a dial, found by ear and by the
+  pick trembling; you must *rest* on one to set it, so sweeping slowly does not work) replaces the two-finger game
+  for picking locks and disarming traps, and is a dungeon puzzle option. Parry (tap as five ever-faster rings meet
+  your shield; a tap long before impact is a flinch that wastes that parry, so mashing fails) is the brace for
+  weapon blows and Riposte's minigame. Balance (an unstable tightrope with gusts; falling ends the walk) is used for
+  rope bridges and climbs. Lockpick and balance are tilt games with drag/hold-a-side touch fallbacks.
 
 ## Phones, dice and sensors
 
@@ -80,17 +87,34 @@ Each entry: **decision** — why.
 - **3D dice are drawn on a 2D canvas** (convex polyhedra with back-face culling, numbers mapped onto faces) instead of
   three.js: smaller, no dependency, and the ink-on-parchment style fits the theme. The tumble settles on the
   server's values. d% is shown as a tens die plus a units die.
-- **Rune drawing is scored on the server** with a $1 unistroke recognizer over the raw points (10 rune shapes,
-  either stroke direction). Other minigames report a 0..1 score that the server clamps; a cheating phone could claim
-  perfect scores, but minigames only ever give a bounded bonus. Accepted risk for a living-room game.
+- **Rune drawing is scored on the server as a trace of the guide**, not by shape recognition. The phone sends the
+  stroke in the rune's own shape units (same transform it drew the guide with), and `scoreTrace` multiplies three
+  checks: *precision* (all ink near the rune; ink far off costs points, and clearly stray ink is penalised again),
+  *coverage* (the whole rune inked) and *order* (follows the path, either direction, any start on closed runes).
+  The old $1 recognizer was position/size/rotation invariant and only compared shapes, so a small lopsided blob
+  anywhere passed as a perfect circle; it is kept only to say what a failed stroke looked like. The phone colours
+  the ink live (violet on the line, gold drifting, red off). Other minigames report a 0..1 score that the server
+  clamps; a cheating phone could claim perfect scores, but minigames only ever give a bounded bonus. Accepted risk
+  for a living-room game.
 - **Every sensor game has a touch fallback** (timing bar, tap-mash, drag-to-aim, finger-steady, slider pitch match,
   drag dial). Fallback is used automatically if a sensor is missing or permission is denied, or on request.
 - **iOS:** motion permission is requested inside the Join tap and again inside the minigame Start tap; there is no
-  vibration on iOS, so a gold screen-edge flash is used instead.
+  vibration on iOS, so a gold screen-edge flash is used instead, and minigames have synthesized sound cues (the
+  hot/cold search beeps faster and higher as you get close, the lockpick's ticks get louder near a tumbler). Audio
+  is unlocked in the Start tap, and the page asks iOS for a *playback* audio session during a minigame so the cues
+  play even with the silent switch on. Mic games (shout, blow, quiet, hum, listen) get no timer ticks, so the
+  phone does not hear itself.
 - **"Listen with the mic for hidden sounds"** was implemented as the *quiet* (stay silent) and *listen* (react to a
   faint sound/shimmer) minigames; a true "hear the TV's sound through the phone mic" game proved too dependent on
   room acoustics. **Pressure plates** are cooperative: every player holds their plate during a shared timed window
   and the result uses the *lowest* score.
+- **Dice box: the hold angle is level.** Absolute gravity pinned the dice to one edge (nobody holds a phone flat,
+  and static friction gives way at about 11 degrees). The box learns the angle the phone is held at (re-learned
+  over about 2.5 s) and only tilting away from it rolls the dice; small accelerations and rotation rates are a dead
+  zone, so a steady hand does not drag or swirl them.
+- **Motion sign is learned, not assumed.** iOS Safari reports `accelerationIncludingGravity` (and `acceleration`)
+  with the opposite sign to the spec, which made the dice fall up. The sign is voted from the tilt angle (beta),
+  which agrees on every engine, starting from a platform guess.
 - **Disconnects:** a player's pending prompts get a 60 s grace period, then resolve with their fallback (combat turns
   become *Defend*; rolls auto-roll). Reconnecting restores the original deadlines.
 - **Turn timer** (default 75 s, configurable 0–180 s, 0 = off): when it runs out, the character acts on autopilot
@@ -106,6 +130,13 @@ Each entry: **decision** — why.
   offered at level-up.
 - **Bosses scale to the party's level** (`scaleMonsterToLevel`), so any antagonist can be the final boss of a
   one-shot at level 4 or a campaign at level 10.
+- **Written answers must come back.** A vote result is kept only if the game uses it again (kingdom, party
+  name, motto, place names on the map, tavern, rumor). The mascot and "local legend" rounds were removed
+  because their winners were never mentioned again.
+- **Titles are said aloud.** The narrator calls a hero by their latest title ("Doob the Bold", "Mira,
+  Monster Slayer,") at their first mention in a line, at most once every 4 narration lines per hero
+  (`Game.withEpithets`); possessives and the line announcing the title are left alone. The ending names
+  every titled hero. Named monsters whose name already ends in an epithet don't also get "the Cultist".
 
 ## Secrets & social
 
@@ -150,7 +181,9 @@ Each entry: **decision** — why.
   synthesized and the next one is synthesized while it plays.
 - **One global speech queue, never two voices at once** (as in solo-dm). Narration is split into
   sentences. Stale lines are dropped (narration after 14 s, character lines after 7 s), and the oldest
-  narration goes first when more than 8 lines wait. A sentence counts as heard when the main screen
+  narration goes first when more than 8 lines wait. A narration that has started is read to its end:
+  its remaining sentences are not stale (the ending's last sentence, the party motto, used to expire
+  while the first ones played). A sentence counts as heard when the main screen
   reports it played, or after its length plus 4 s if no report comes.
 - **Pacing follows speech, with caps.** `beat()` waits for queued speech to finish (at most the beat
   plus 9 s), and a monster's turn waits up to 4 s for its line. With voices off nothing changes.

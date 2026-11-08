@@ -287,7 +287,7 @@
     "minigame": { "kind": "twofinger", "bonus": "adv" }, "desc": "Knock their weapon away: -4 to their attacks and cancels a wind-up.", "flavor": "A twist of the wrist and their sword goes spinning.", "anim": "slash", "sound": "coin", "tags": ["counter"] },
   { "id": "riposte", "name": "Riposte", "classes": ["warrior"], "level": 3, "kind": "ability", "action": "bonus", "emoji": "🤺", "cost": { "resource": "grit", "amount": 1 }, "range": "self", "target": "self", "resolve": "auto",
     "effects": [ { "type": "buff", "buff": { "id": "thorns", "turns": 2, "dice": "1d8+3", "dmg": "piercing", "name": "Riposte" } } ],
-    "minigame": { "kind": "swing", "bonus": "potency" }, "desc": "Any foe that attacks you takes a counter-strike. Bonus action.", "flavor": "Parry. Thrust.", "anim": "slash", "sound": "slash" },
+    "minigame": { "kind": "parry", "bonus": "potency" }, "desc": "Any foe that attacks you takes a counter-strike. Bonus action.", "flavor": "Parry. Thrust.", "anim": "slash", "sound": "slash" },
   { "id": "trip_attack", "name": "Trip Attack", "classes": ["warrior"], "level": 3, "kind": "ability", "emoji": "🦵", "cost": { "resource": "grit", "amount": 1 }, "range": "melee", "target": "enemy", "resolve": "weapon", "save": { "ability": "STR" },
     "effects": [ { "type": "damage", "dice": "1d8", "dmg": "bludgeoning", "weapon": true }, { "type": "condition", "id": "prone", "turns": 1 } ],
     "minigame": { "kind": "swing", "bonus": "adv" }, "desc": "Sweep their legs: damage and knock prone.", "flavor": "Down you go.", "anim": "slash", "sound": "thud" },

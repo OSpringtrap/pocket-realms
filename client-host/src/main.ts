@@ -9,6 +9,7 @@ import { Slot, clear, h, hash, toast } from '../../shared/src/browser/dom.js';
 import { renderHexMap } from '../../shared/src/browser/hexmap.js';
 import { Net } from '../../shared/src/browser/net.js';
 import { content } from '../../shared/src/content/index.js';
+import { heroEpithet, heroTitle } from '../../shared/src/gen/names.js';
 import type { Fx, HostCommand, NarrationLine, PublicView, SceneView, Settings } from '../../shared/src/protocol.js';
 import type { Character, Monster } from '../../shared/src/types.js';
 
@@ -378,7 +379,7 @@ function renderSide() {
           ...condChips(c.conditions),
         ),
         h('div', { class: 'lv' }, h('small', null, 'LV.'), h('b', null, String(c.level).padStart(2, '0'))),
-        h('div', { class: 'sub' }, `${C.species[c.species]?.name ?? ''} ${C.classes[c.cls].name}`),
+        h('div', { class: 'sub' }, heroEpithet(c) ? h('span', { class: 'epi' }, `${heroEpithet(c)} · `) : null, `${C.species[c.species]?.name ?? ''} ${C.classes[c.cls].name}`),
         h('div', { class: 'bars' }, statLine(heartIcon(), 'hp', c.hp, c.maxHp), c.maxSp ? statLine(sparkIcon(), 'sp', c.sp, c.maxSp) : null),
       ),
     );
@@ -530,7 +531,7 @@ function renderEnding(sc: Extract<SceneView, { kind: 'ending' }>) {
       'table',
       null,
       h('tr', null, ...['Hero', 'Level', 'Defeated', 'Crits', 'Damage', 'Healed', ''].map((t) => h('th', null, t))),
-      ...sc.stats.heroes.map((x) => h('tr', null, h('td', null, `${x.name} ${x.title}`), h('td', null, x.level), h('td', null, x.kills), h('td', null, x.crits), h('td', null, x.damage), h('td', null, x.healed), h('td', null, x.dead ? '💀' : ''))),
+      ...sc.stats.heroes.map((x) => h('tr', null, h('td', null, heroTitle(x.name, x.title || undefined)), h('td', null, x.level), h('td', null, x.kills), h('td', null, x.crits), h('td', null, x.damage), h('td', null, x.healed), h('td', null, x.dead ? '💀' : ''))),
     ),
     h('div', { class: 'muted' }, `${sc.stats.days} days — ${sc.stats.turns} turns — Doom ${sc.stats.doom}`),
     role === 'host' ? h('div', { class: 'row center' }, h('button', { class: 'primary', onclick: () => cmd({ cmd: 'title' }) }, '🏰 Back to the title screen')) : null,
@@ -545,7 +546,8 @@ const rollLog = h('div', { class: 'rolllog' });
 const narrOld = h('div', { class: 'old' });
 const narrLine = h('div', { class: 'line' });
 const narrWait = h('div', { class: 'waiting' });
-narr.append(rollLog, narrOld, narrLine, narrWait);
+// the roll total takes the place of the recent-history lines for a few seconds (same box, same height)
+narr.append(h('div', { class: 'hist' }, rollLog, narrOld), narrLine, narrWait);
 void narrSlot;
 /** How long a line of text should stay up so people can read it (scaled by the text-speed setting). */
 function readMs(text: string, min = 1600) {
@@ -644,7 +646,6 @@ function renderModal() {
           { class: 'card journal' },
           h('div', { class: 'row' }, h('h2', null, `The Chronicle of ${w?.kingdomName ?? 'the Realm'}`), h('span', { class: 'grow' }), h('button', { onclick: close }, '✖')),
           w ? h('div', { class: 'small' }, `${w.antagonist.emoji} ${w.antagonist.name} ${w.antagonist.title} — ${w.antagonist.desc}`) : null,
-          w?.mascot ? h('div', { class: 'small' }, `Mascot: ${w.mascot}`) : null,
           view!.party.motto ? h('div', { class: 'small' }, `Motto: “${view!.party.motto}”`) : null,
           w ? h('div', { class: 'small' }, ...w.factions.map((f) => h('span', { class: 'tag' }, `${f.emoji} ${f.name} ${f.rep >= 0 ? '+' : ''}${f.rep}`))) : null,
           h('hr'),
@@ -703,7 +704,7 @@ function voiceStatusText(v: PublicView['voice']): string {
 // ------------------------------------------------------------ fx
 
 // Dice cross over from the phones onto the whole screen (no tray, no card) and roll to a stop;
-// the total goes up in the log under the board for a few seconds.
+// the total replaces the recent-history lines of the narration strip for a few seconds.
 const diceLayer = h('canvas', { class: 'dicelayer' }) as HTMLCanvasElement;
 document.body.appendChild(diceLayer);
 const dice = new DiceWorld(diceLayer);
@@ -761,17 +762,18 @@ function throwDice(f: Extract<Fx, { kind: 'roll' }>) {
 
 function showRollInLog(f: Extract<Fx, { kind: 'roll' }>) {
   const bonus = f.bonus ? ` ${f.bonus > 0 ? '+' : '−'} ${Math.abs(f.bonus)}` : '';
-  const base = f.kept ?? f.values.reduce((a, b) => a + b, 0);
+  // the dice as rolled (advantage: the kept one), then the modifier, then the total
+  const base = f.kept ?? f.values.join(' + ');
   const verdict = f.dc !== undefined ? (f.success ? ' ✔' : ' ✖') : '';
   const el = h(
     'div',
     { class: `rollline ${f.crit ? 'crit' : f.fumble ? 'fumble' : f.dc !== undefined ? (f.success ? 'ok' : 'no') : ''}` },
     h('span', { class: 'who', style: `color:${playerColor(f.playerId)}` }, `🎲 ${f.name}`),
     h('span', { class: 'lbl' }, `${f.label}${f.physical ? ' (real dice)' : ''}`),
-    h('span', { class: 'sum' }, `${f.crit ? 'NAT 20! ' : f.fumble ? 'Nat 1… ' : ''}${base}${bonus} = ${f.total}${verdict}`),
+    h('span', { class: 'sum' }, `${f.crit ? 'NAT 20! ' : f.fumble ? 'Nat 1… ' : ''}${bonus || (f.kept === undefined && f.values.length > 1) ? `${base}${bonus} = ` : ''}${f.total}${verdict}`),
   );
   rollLog.appendChild(el);
-  while (rollLog.children.length > 3) rollLog.firstElementChild?.remove();
+  while (rollLog.children.length > 2) rollLog.firstElementChild?.remove();
   setTimeout(() => {
     el.classList.add('out');
     setTimeout(() => el.remove(), 500);

@@ -159,20 +159,33 @@ function diceBox(app: App, p: Extract<Prompt, { kind: 'roll' }>, wrap: HTMLEleme
     if (Math.hypot(vx, vy) > short * 1.5) fling(vx * 1.4, vy * 1.4);
   });
 
-  // sensors -> forces, every frame
+  // sensors -> forces, every frame.
+  // Nobody holds a phone flat: whatever angle it is held at counts as level (re-learned over a few
+  // seconds), and tilting away from that rolls the dice. Absolute gravity pinned them to one edge.
+  let level: [number, number] | undefined;
+  let lastTick = performance.now();
+  const dead = (v: number, d: number) => (Math.abs(v) <= d ? 0 : v - Math.sign(v) * d);
   const tick = () => {
     if (sent) return;
     if (!wrap.isConnected) return close();
+    const now = performance.now();
+    const dt = Math.min(0.1, (now - lastTick) / 1000);
+    lastTick = now;
     const [gx, gy] = screenGravity();
-    world.gravity = [gx * pxPerM, gy * pxPerM];
-    // the phone accelerating one way pushes the dice the other way (capped: sensors spike)
+    if (!level) level = [gx, gy];
+    const k = 1 - Math.exp(-dt / 2.5);
+    level = [level[0] + (gx - level[0]) * k, level[1] + (gy - level[1]) * k];
+    const TILT_GAIN = 1.6;
+    world.gravity = [(gx - level[0]) * TILT_GAIN * pxPerM, (gy - level[1]) * TILT_GAIN * pxPerM];
+    // the phone accelerating one way pushes the dice the other way (capped: sensors spike; a dead
+    // zone: a steady hand is not a shake)
     const [lx, ly] = toScreen(S.accelX, S.accelY);
     const cap = (v: number) => Math.max(-45, Math.min(45, v));
-    world.push = [-cap(lx) * pxPerM, -cap(ly) * pxPerM];
+    world.push = [-cap(dead(lx, 1.2)) * pxPerM, -cap(dead(ly, 1.2)) * pxPerM];
     // dropping the phone fast lifts the dice off the table; tipping it sharply tosses them
-    const tip = (Math.abs(S.rotB) + Math.abs(S.rotG)) * (Math.PI / 180);
-    world.lift = Math.max(0, -cap(S.accelZ)) * pxPerM + tip * world.dieSize * 60;
-    world.frameSpin = (S.rotA * Math.PI) / 180;
+    const tip = (dead(Math.abs(S.rotB), 40) + dead(Math.abs(S.rotG), 40)) * (Math.PI / 180);
+    world.lift = Math.max(0, -cap(dead(S.accelZ, 1.5))) * pxPerM + tip * world.dieSize * 60;
+    world.frameSpin = (dead(S.rotA, 25) * Math.PI) / 180;
     // a throw needs a deliberate flick, and not in the first instant
     if (!exit && world.escapeSpeed !== short * 1.2) world.escapeSpeed = performance.now() - opened < 500 ? Infinity : 2.2 * pxPerM;
     requestAnimationFrame(tick);
@@ -297,6 +310,7 @@ function deadlineEl(deadline?: number) {
     if (!el.isConnected) return clearInterval(t);
     const s = Math.max(0, Math.round((deadline - Date.now()) / 1000));
     el.textContent = `⏳ ${s}s`;
+    el.classList.toggle('low', s <= 10);
   };
   const t = window.setInterval(upd, 1000);
   setTimeout(upd, 0);

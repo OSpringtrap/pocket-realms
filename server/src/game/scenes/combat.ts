@@ -4,6 +4,7 @@ import {
   Rng,
   humanName,
   monsterName,
+  namedMonster,
   type Monster,
   addXp,
   botAction,
@@ -19,6 +20,7 @@ import {
   needsTargetChoice,
   partyChars,
   rollInitiative,
+  heroInitiativeBonus,
   rollLoot,
   runCombat,
   spawnMonster,
@@ -154,6 +156,9 @@ function minigameTag(kind: string): string {
     quiet: '🤫 quiet',
     twofinger: '✌️ 2-finger',
     tap: '👆 tap',
+    parry: '🛡️ parry',
+    lockpick: '🔓 pick',
+    balance: '🪢 balance',
   };
   return map[kind] ?? kind;
 }
@@ -297,7 +302,7 @@ export async function combatScene(g: Game, opts: CombatOptions): Promise<CombatO
   // Initiative: everyone rolls at once on their phones
   const rollers = ids.filter((id) => !s.chars[id]!.dead);
   const initRolls = await Promise.all(
-    rollers.map((id) => g.rollDice(id, { kind: 'initiative', label: 'Roll initiative!', faces: [20], bonus: 0 } satisfies RollRequest, { quiet: true, timeoutMs: 20000 })),
+    rollers.map((id) => g.rollDice(id, { kind: 'initiative', label: 'Roll initiative!', faces: [20], bonus: heroInitiativeBonus(s.chars[id]!, opts.ambush) } satisfies RollRequest, { quiet: true, timeoutMs: 20000 })),
   );
   rollInitiative(ctx, Object.fromEntries(rollers.map((id, i) => [id, initRolls[i]![0]!])), opts.ambush);
   await g.beat(1200);
@@ -444,6 +449,6 @@ function nameMonsters(g: Game, monsters: Monster[]) {
     const culture = FAMILY_CULTURE[m.family];
     if (!culture || m.side !== 'enemy' || !(m.elite || rng.chance(0.3))) continue;
     const base = m.name.replace(/ [A-Z]$/, ''); // "Goblin B" -> "Goblin"
-    m.name = `${book.take(() => monsterName(rng, culture))} the ${base}`;
+    m.name = namedMonster(book.take(() => monsterName(rng, culture)), base);
   }
 }

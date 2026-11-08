@@ -7,6 +7,8 @@ import {
   Rng,
   clone,
   content,
+  heroEpithet,
+  heroTitle,
   hexKey,
   randomSeedName,
   reachable,
@@ -137,6 +139,8 @@ export const DEFAULT_SETTINGS: Settings = {
 
 export const DISCONNECT_GRACE_MS = 60_000;
 const ROLL_TIMEOUT_MS = 30_000;
+/** narration lines between two times the narrator gives one hero their title */
+const EPITHET_GAP = 4;
 
 export interface GameOptions {
   clock: Clock;
@@ -284,7 +288,7 @@ export class Game {
 
   /** A line on the main screen, read aloud by the narrator unless `quiet` (bookkeeping lines). */
   narrate(text: string, style: NarrationLine['style'] = 'normal', opts: { quiet?: boolean } = {}) {
-    const line = this.pushLine({ id: ++this.narrSeq, text: this.fillTemplate(text), style });
+    const line = this.pushLine({ id: ++this.narrSeq, text: this.withEpithets(this.fillTemplate(text)), style });
     if (!opts.quiet && this.state.settings.voice) this.voice?.narrate(line.text);
   }
 
@@ -295,6 +299,30 @@ export class Game {
     this.pushLine({ id: ++this.narrSeq, text: clean, style: 'say', who: speaker.name });
     this.fx({ kind: 'say', who: speaker.name, text: clean, source: speaker.source });
     if (this.state.settings.voice) this.voice?.say(speaker, clean);
+  }
+
+  /** narration line at which each hero was last called by their title */
+  private epithetAt = new Map<string, number>();
+
+  /** The narrator calls a hero who has earned a title by it ("Doob the Bold falls!"): on the first
+   * mention in a line, at most once every few lines per hero so it stays a flourish, not a refrain.
+   * Lines that already say the title (the one announcing it) are left alone. */
+  withEpithets(text: string): string {
+    for (const c of Object.values(this.state.chars)) {
+      const title = heroEpithet(c);
+      if (!title || !c.name || text.includes(title)) continue;
+      if (this.narrSeq - (this.epithetAt.get(c.id) ?? -EPITHET_GAP) < EPITHET_GAP) continue;
+      const esc = c.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      // a whole-word mention, not a possessive ("Doob's" stays as it is)
+      const m = new RegExp(`(?<![\\p{L}\\p{N}'’-])${esc}(?![\\p{L}\\p{N}'’-])`, 'u').exec(text);
+      if (!m) continue;
+      let named = heroTitle(c.name, title);
+      const rest = text.slice(m.index + c.name.length);
+      if (named.includes(', ') && rest && !/^[\s]*([.!?,:;)…—–-]|$)/.test(rest)) named += ',';
+      text = text.slice(0, m.index) + named + rest;
+      this.epithetAt.set(c.id, this.narrSeq);
+    }
+    return text;
   }
 
   private pushLine(line: NarrationLine): NarrationLine {
@@ -322,7 +350,6 @@ export class Game {
     const vars: Record<string, string> = {
       party: this.state.party.name ?? 'the party',
       kingdom: w?.kingdomName ?? 'the Realm',
-      mascot: w?.mascot ?? 'the town goose',
       antagonist: w ? `${w.antagonist.name} ${w.antagonist.title}` : 'the enemy',
       fortress: w?.lore.fortress ?? 'the fortress',
       town: w?.home?.name ?? 'town',
@@ -612,6 +639,9 @@ export class Game {
     search: 9000,
     listen: 9000,
     plates: 7000,
+    lockpick: 14000,
+    parry: 7000,
+    balance: 7000,
   };
 
   async minigame(playerId: string, game: MinigameKind, title: string, param?: string): Promise<number> {
@@ -728,7 +758,6 @@ export class Game {
       quests: w.quests.filter((q) => !q.privateFor),
       kingdomName: w.kingdomName,
       banner: w.banner,
-      mascot: w.mascot,
       lore: w.lore,
       home: w.home,
       turn: w.turn,

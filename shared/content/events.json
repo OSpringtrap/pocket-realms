@@ -1046,7 +1046,7 @@
     "skill": "acrobatics",
     "dc": 12,
     "group": true,
-    "minigame": "tilt",
+    "minigame": "balance",
     "outcomes": {
      "success": {
       "text": [
@@ -4887,7 +4887,7 @@
      ],
      "species": []
     },
-    "minigame": "steady"
+    "minigame": "balance"
    },
    {
     "label": "Befriend the griffon",
@@ -5095,7 +5095,7 @@
       "dwarf"
      ]
     },
-    "minigame": "twofinger"
+    "minigame": "lockpick"
    },
    {
     "label": "Charge through",
@@ -6354,7 +6354,7 @@
      ],
      "species": []
     },
-    "minigame": "twofinger"
+    "minigame": "lockpick"
    }
   ],
   "weight": 0.6,
@@ -8440,7 +8440,7 @@
     "outcomes": {
      "success": {
       "text": [
-       "It's from a local {mascot} enthusiast. They left you a gift too."
+       "It's from a local goose enthusiast. They left you a gift too."
       ],
       "effects": [
        {

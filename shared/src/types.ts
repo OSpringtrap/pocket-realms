@@ -94,6 +94,9 @@ export const MINIGAMES = [
   'search', // rub/scratch the screen to uncover a hidden object
   'listen', // tap the moment you hear a faint sound
   'plates', // cooperative: everyone holds their plate during the glowing window
+  'lockpick', // turn the dial (tilt or drag) and listen for each tumbler's click
+  'parry', // tap as each closing ring meets your shield
+  'balance', // tightrope: tilt (or hold a side) to stay upright through the gusts
 ] as const;
 export type MinigameKind = (typeof MINIGAMES)[number];
 
@@ -247,7 +250,7 @@ export interface Character {
   inventory: ItemInstance[];
   conditions: ActiveCondition[];
   buffs: Buff[];
-  inspiration: number; // party-vote awarded rerolls
+  inspiration: number; // spent automatically for advantage on a hard skill check (see DECISIONS.md)
   death: { successes: number; failures: number; stable: boolean };
   down: boolean;
   dead: boolean;
@@ -437,7 +440,6 @@ export interface WorldState {
   quests: Quest[];
   kingdomName: string;
   banner?: string;
-  mascot?: string;
   lore: Record<string, string>; // world-building facts woven into narration
   home?: { name: string; inn: number; shop: number; shrine: number; q: number; r: number };
   recentEvents: string[]; // last event card ids (anti-repeat)

@@ -5,7 +5,8 @@
 Writes voice/voices/<name>.wav and <name>.txt. The clips are committed, so players never need the
 VoiceDesign model: the Base model clones these clips on every backend. Each clip reads an
 in-character line, because a clone keeps the delivery of its reference as well as the timbre.
-narrator, villain and gruff come from solo-dm and are not listed here.
+villain and gruff come from solo-dm and are not listed here. The narrator uses solo-dm's narrator
+description, redesigned here with a longer (~12 s) reference, which solo-dm found clones more steadily.
 """
 
 import sys
@@ -18,13 +19,15 @@ from pr_voice.voices import VOICE_DIR  # noqa: E402
 
 # Seeds of the takes that were kept (picked from several by pitch, roughness and how well the Base
 # model's clone of them is understood); rerun with --force to roll new ones.
-SEEDS = {"crone": 1012, "hag": 1024, "goblin_king": 1039, "undead": 1034, "goblin": 1041}
+SEEDS = {"narrator": 2104, "crone": 1012, "hag": 1024, "goblin_king": 1039, "undead": 1034, "goblin": 1041}
 # goblin: the designed clip is too clean for a goblin at that pitch, so it gets some grit before use
 # (38 Hz growl flutter, tanh drive 8, +6 dB at 1.4 kHz, -6 dB at 250 Hz); the clone keeps it.
 
 DESIGN_MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-6bit"
 
 VOICES = {
+    "narrator": ("A warm, deep, unhurried storyteller in his fifties, slightly husky, like a veteran tabletop game master reading by candlelight. Clear English.",
+                 "The lantern gutters, and the old road bends into the dark between the pines. Somewhere ahead a bell is ringing, slow and patient, as if it has waited a hundred years for you."),
     "goblin": ("A nasty little goblin with a raspy, hoarse, gravelly voice pitched high and squeezed through the nose, like a rusty hinge: harsh, crackling and croaky, spitting and hissing, fast and twitchy, giggling wickedly. A creature, not a human; very rough and scratchy, never smooth or clear.",
              "Hee hee! Shiny boots, shiny buckles, all mine soon! You lot look tasty, and slow, and very, very stupid. Stab 'em! Stab 'em!"),
     "goblin_king": ("A goblin warlord king: a fat, cruel old goblin with a thick, guttural, gravelly and wet croaking voice, nasal and throaty, greedy and pompous, snarling and slurping his words, growling laughter. Clearly a monster, not a normal human man.",
@@ -78,7 +81,7 @@ def main():
         if name in SEEDS and not force:
             mx.random.seed(SEEDS[name])
         chunks = [np.asarray(r.audio, dtype=np.float32) for r in
-                  model.generate_voice_design(text=text, instruct=instruct, language="English", max_tokens=400)]
+                  model.generate_voice_design(text=text, instruct=instruct, language="English", max_tokens=420)]
         audio = np.concatenate(chunks)
         peak = float(np.max(np.abs(audio))) or 1.0
         sf.write(str(wav), audio * (0.9 / peak), model.sample_rate, subtype="PCM_16")

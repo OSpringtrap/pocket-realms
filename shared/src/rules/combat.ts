@@ -265,12 +265,17 @@ export function createCombat(rng: Rng, opts: { title: string; biome: CombatState
   };
 }
 
+/** What a hero adds to their initiative d20 (shown on the dice as the modifier, so the total adds up). */
+export function heroInitiativeBonus(c: Character, ambush = false): number {
+  return initiativeBonus(c) + (ambush ? -5 : 0) + (hasCond(c, 'slowed') ? -10 : 0);
+}
+
 /** Sets initiative order. `playerRolls` are the d20 faces players rolled (or the server rolled for them). */
 export function rollInitiative(ctx: CombatCtx, playerRolls: Record<string, number>, ambush = false) {
   const init: Record<string, number> = {};
   for (const c of partyChars(ctx)) {
     const r = playerRolls[c.id] ?? ctx.rng.die(20);
-    init[c.id] = r + initiativeBonus(c) + (ambush ? -5 : 0) + (hasCond(c, 'slowed') ? -10 : 0);
+    init[c.id] = r + heroInitiativeBonus(c, ambush);
   }
   for (const m of ctx.combat.monsters) {
     init[m.id] = ctx.rng.die(20) + mod(m.abilities.DEX) + (ambush && m.side === 'enemy' ? 5 : 0) + (m.boss ? 2 : 0);
@@ -1568,7 +1573,8 @@ export async function monsterTurn(ctx: CombatCtx, io: CombatIO, m: Monster): Pro
       // The threatened players brace on their phones
       const ids = (targetId === 'all' ? opponentsOf(ctx, m) : [target!]).filter((u) => isChar(u)).map((u) => u.id);
       if (ids.length && io.braceMany) {
-        const kind: MinigameKind = atk.save?.ability === 'DEX' || !atk.save ? 'shake' : 'steady';
+        // weapon blows are parried, DEX saves dodged (shake), anything else is endured (steady)
+        const kind: MinigameKind = !atk.save ? 'parry' : atk.save.ability === 'DEX' ? 'shake' : 'steady';
         const scores = await io.braceMany(ids, kind, `BRACE! ${m.name}'s ${atk.name} is coming!`);
         m.telegraph.braced = scores;
       }
