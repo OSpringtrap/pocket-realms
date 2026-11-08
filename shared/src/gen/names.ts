@@ -284,7 +284,7 @@ const ANIMALS = ['a cat', 'a goat', 'a raven', 'a goose', 'a badger', 'a toad', 
 const ANIMAL_NAMES = ['Sir Whiskers', 'Barnaby', 'Mister Pickles', 'Duchess', 'Captain Fluff', 'Lord Snoot', 'Madam Feathers', 'Biscuit', 'Professor Hops', 'Old Grumble'];
 
 /** Which of the reference voices are women's and men's, for matching a generated name to a voice. */
-export const VOICE_GENDER: Record<string, Gender | undefined> = { woman: 'f', lady: 'f', crone: 'f', witch: 'f', man: 'm', elder: 'm', gruff: 'm', sly: 'm', zealot: 'm', youth: 'm' };
+export const VOICE_GENDER: Record<string, Gender | undefined> = { woman: 'f', lady: 'f', crone: 'f', hag: 'f', man: 'm', elder: 'm', gruff: 'm', sly: 'm', zealot: 'm', youth: 'm' };
 
 /** A fresh name for an NPC of an archetype, as a woman or a man. */
 export function npcName(rng: Rng, archetypeId: string, g: Gender): string {

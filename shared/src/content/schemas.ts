@@ -423,7 +423,7 @@ export type EventCard = z.infer<typeof zEventCard>;
 // ---------------------------------------------------------------- voices and barks
 
 /** Reference voices in voice/voices/ (cloned by the TTS worker). */
-export const VOICE_IDS = ['narrator', 'villain', 'gruff', 'goblin', 'brute', 'undead', 'crone', 'zealot', 'man', 'woman', 'lady', 'elder', 'youth', 'sly'] as const;
+export const VOICE_IDS = ['narrator', 'villain', 'gruff', 'goblin', 'goblin_king', 'brute', 'undead', 'crone', 'hag', 'zealot', 'man', 'woman', 'lady', 'elder', 'youth', 'sly'] as const;
 export type VoiceId = (typeof VOICE_IDS)[number];
 
 /** Short scripted lines a monster says in combat. `id` is a monster id or a family (monster id wins). */

@@ -16,21 +16,28 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pr_voice.voices import VOICE_DIR  # noqa: E402
 
+# Seeds of the takes that were kept (picked from several by pitch, roughness and how well the Base
+# model's clone of them is understood); rerun with --force to roll new ones.
+SEEDS = {"crone": 1012, "hag": 1024, "goblin_king": 1039, "undead": 1034, "goblin": 1041}
+# goblin: the designed clip is too clean for a goblin at that pitch, so it gets some grit before use
+# (38 Hz growl flutter, tanh drive 8, +6 dB at 1.4 kHz, -6 dB at 250 Hz); the clone keeps it.
+
 DESIGN_MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-6bit"
 
 VOICES = {
-    "goblin": ("A small goblin with a high, shrill, nasal and scratchy voice, fast and gleeful, cackling and "
-               "mischievous, sneering.",
-               "Hee hee! Shiny boots, shiny buckles, all mine soon! You lot look tasty, and slow, and very, very stupid."),
+    "goblin": ("A nasty little goblin with a raspy, hoarse, gravelly voice pitched high and squeezed through the nose, like a rusty hinge: harsh, crackling and croaky, spitting and hissing, fast and twitchy, giggling wickedly. A creature, not a human; very rough and scratchy, never smooth or clear.",
+             "Hee hee! Shiny boots, shiny buckles, all mine soon! You lot look tasty, and slow, and very, very stupid. Stab 'em! Stab 'em!"),
+    "goblin_king": ("A goblin warlord king: a fat, cruel old goblin with a thick, guttural, gravelly and wet croaking voice, nasal and throaty, greedy and pompous, snarling and slurping his words, growling laughter. Clearly a monster, not a normal human man.",
+             "Bow before your king, you soggy little worms! The king wants gold, the king wants blood, and the king always gets what he wants. Ha! Ha!"),
+    "crone": ("A very old woman of about eighty, a cackling witch. Her voice is thin, cracked and croaking, dry and hoarse, with a constant tremble and wobble in it, breathy and wheezing between phrases, a nasal sing-song delivery that keeps breaking into a crackly cackle. Unmistakably elderly: never a young woman or a girl.",
+             "Oh ho ho, look what the bog dragged in! Sit down, dearies, the kettle's on, and the frogs are fresh this morning. Heh heh."),
+    "hag": ("An ancient, evil swamp hag. A low, guttural, gravelly old woman's voice that crackles like dry leaves, wet and phlegmy, slow and venomous, half-whispered threats that break into a rasping, wheezing cackle. Very old and very hoarse; menacing, not kindly.",
+             "Little lambs, lost in my bog. Mother will boil your bones and grind your teeth, and sing you to sleep in the black water. Heh heh heh."),
+    "undead": ("An ancient undead creature speaking in a hollow, dry, rasping whisper, almost no voice at all, only breath and rattle, slow and cold, each word dragged out of a dead throat, with an eerie, airy hiss of the grave.",
+             "Cold. So cold, for so very long. Come closer, living ones. Lie down with us in the dark, and rest forever."),
     "brute": ("A huge ogre with a very deep, booming, slow and gravelly voice, dim-witted but menacing, chest "
               "resonance, heavy breathing.",
               "You small. You weak. Me hungry. Me smash you flat, then me eat you all up for supper."),
-    "undead": ("An ancient undead creature with a hollow, dry, rasping whisper, slow and cold, airy and breathy, "
-               "with an eerie echo of the grave.",
-               "Cold. So cold, for so very long. Come closer, living ones. Lie down with us in the dark, and rest forever."),
-    "crone": ("An old witch with a cracked, wavering, high old woman's voice, cackling, sly and amused, slightly "
-              "hoarse.",
-              "Oh ho ho, look what the bog dragged in! Sit down, dearies, the kettle's on, and the frogs are fresh this morning."),
     "zealot": ("A fanatical cult priest, a middle-aged man with an intense, fervent, trembling voice, preaching "
                "with feverish conviction, hissing on his consonants.",
                "The darkness is coming, and it is beautiful! Kneel, unbelievers, kneel, and the shadow may yet spare your souls."),
@@ -68,6 +75,8 @@ def main():
             print(f"skip {name} (exists)")
             continue
         instruct, text = VOICES[name]
+        if name in SEEDS and not force:
+            mx.random.seed(SEEDS[name])
         chunks = [np.asarray(r.audio, dtype=np.float32) for r in
                   model.generate_voice_design(text=text, instruct=instruct, language="English", max_tokens=400)]
         audio = np.concatenate(chunks)
