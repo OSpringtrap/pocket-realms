@@ -1,4 +1,10 @@
 import {
+  FAMILY_CULTURE,
+  NameBook,
+  Rng,
+  humanName,
+  monsterName,
+  type Monster,
   addXp,
   botAction,
   botBonus,
@@ -267,8 +273,9 @@ export async function combatScene(g: Game, opts: CombatOptions): Promise<CombatO
     scaleMonsterToLevel(comp, s.chars[alive[0]!]!.level);
     monsters.push(comp);
   }
+  nameMonsters(g, monsters);
   const combat = createCombat(g.rng, {
-    title: opts.title ?? opts.encounter.title,
+    title: g.renameAntagonist(opts.title ?? opts.encounter.title),
     biome: currentBiome(g),
     monsters,
     bossFight: opts.bossFight || opts.noFlee,
@@ -414,4 +421,29 @@ export async function handleDeaths(g: Game) {
     }),
   );
   g.dirty();
+}
+
+/** Leaders and some of the rank and file get a personal name ("Snikrot the Goblin"), the boss gets
+ * this run's antagonist name, a solo hero's squire gets a name of their own. Flavour only: drawn from
+ * Math.random so the seeded game RNG plays out the same. */
+const nameBooks = new WeakMap<Game, NameBook>();
+function nameMonsters(g: Game, monsters: Monster[]) {
+  let book = nameBooks.get(g);
+  if (!book) {
+    const w = g.state.world;
+    nameBooks.set(g, (book = new NameBook([...(w?.npcs.map((n) => n.name) ?? []), ...Object.values(g.state.chars).map((c) => c.name)])));
+  }
+  const rng = new Rng((Math.random() * 2 ** 32) >>> 0);
+  for (const m of monsters) {
+    m.name = g.renameAntagonist(m.name);
+    if (m.boss || m.dead) continue;
+    if (m.family === 'companion') {
+      m.name = `${book.take(() => humanName(rng, rng.chance(0.5) ? 'f' : 'm', { surname: false }))} the ${m.name.replace(/^the /i, '')}`;
+      continue;
+    }
+    const culture = FAMILY_CULTURE[m.family];
+    if (!culture || m.side !== 'enemy' || !(m.elite || rng.chance(0.3))) continue;
+    const base = m.name.replace(/ [A-Z]$/, ''); // "Goblin B" -> "Goblin"
+    m.name = `${book.take(() => monsterName(rng, culture))} the ${base}`;
+  }
 }

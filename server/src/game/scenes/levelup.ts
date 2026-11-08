@@ -46,5 +46,5 @@ async function epithet(g: Game, heroId: string) {
   const t = text.startsWith('the ') || text.startsWith('of ') ? text : text;
   if (!hero.titles.includes(t)) hero.titles.push(t);
   g.narrate(`From now on, the bards call them ${hero.name} ${t}!`, 'title');
-  g.journal('deed', `${hero.name} earned the epithet "${t}".`, g.players.get(writer)?.name);
+  g.journal('deed', `${hero.name} earned the epithet "${t}".`, g.displayName(writer));
 }

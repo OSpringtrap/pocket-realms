@@ -76,7 +76,7 @@ export async function partyVote(g: Game, title: string, options: ChoiceOption[],
   if (tied.length === 1) return options.indexOf(tied[0]!);
   // Tie-breaker: the leader rolls a d20
   const leader = g.leaderId() ?? voters[0]!;
-  g.narrate(`A tie! ${g.players.get(leader)?.name ?? 'The leader'} rolls to decide...`);
+  g.narrate(`A tie! ${g.displayName(leader)} rolls to decide...`);
   const [v] = await g.rollDice(leader, { kind: 'check', label: `Tie-breaker: ${tied.map((t, i) => `${i + 1}=${t.label}`).join(', ')}`, faces: [20], bonus: 0 });
   const pick = tied[((v ?? 1) - 1) % tied.length]!;
   g.narrate(`The dice choose: ${pick.label}!`);

@@ -173,7 +173,7 @@ export async function townScene(g: Game, poi: Poi) {
             const [taken] = board.splice(Number(q), 1);
             if (taken) {
               w.quests.push(taken);
-              g.narrate(`📜 ${g.players.get(pid)?.name} takes the quest "${taken.title}". The target is marked on the map.`, 'good');
+              g.narrate(`📜 ${g.displayName(pid)} takes the quest "${taken.title}". The target is marked on the map.`, 'good');
               g.journal('quest', `Took the quest "${taken.title}".`);
             }
           }

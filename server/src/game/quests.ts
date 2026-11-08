@@ -1,7 +1,6 @@
-import { content, hexDist, type Quest, type QuestType } from '@pr/shared';
+import { VOICE_GENDER, content, hexDist, npcName, trinketName, type Quest, type QuestType } from '@pr/shared';
 import type { Game } from './Game.js';
 
-const ITEMS = ['Moonpetal', 'Silver Locket', 'Old Ledger', 'Star-Iron Ingot', 'Crown Jewel', 'Sealed Letter', 'Golden Idol', 'Lost Map'];
 
 /** Build a quest from a template, targeting a real place on the map. */
 export function makeQuest(g: Game, type?: QuestType, opts: { privateFor?: string } = {}): Quest | undefined {
@@ -19,10 +18,10 @@ export function makeQuest(g: Game, type?: QuestType, opts: { privateFor?: string
   const monster = g.rng.pick(monsters);
   const place = tile.poi?.name ?? tile.name ?? `the ${tile.biome} to the ${dirName(w.party, tile)}`;
   const vars: Record<string, string> = {
-    npc: g.rng.pick(npc.names),
+    npc: questNpcName(g, npc),
     giver: giver ? `${giver.name} the ${giver.title}` : 'A worried villager',
     place,
-    item: g.rng.pick(ITEMS),
+    item: trinketName(g.rng),
     monster: monster.name,
     biome: tile.biome,
   };
@@ -53,6 +52,12 @@ export function makeQuest(g: Game, type?: QuestType, opts: { privateFor?: string
   (q as Quest & { monsterId?: string }).monsterId = monster.id;
   tile.revealed = true;
   return q;
+}
+
+/** The person a quest is about: a fresh name for the archetype (the hand-written ones are for NPCs met in the world). */
+function questNpcName(g: Game, arche: ReturnType<typeof content>['npcs'][number]): string {
+  const voice = arche.voices?.[g.rng.int(0, arche.voices.length - 1)];
+  return npcName(g.rng, arche.id, VOICE_GENDER[voice ?? ''] ?? (g.rng.chance(0.5) ? 'f' : 'm'));
 }
 
 function dirName(from: { q: number; r: number }, to: { q: number; r: number }): string {

@@ -1,6 +1,7 @@
 import {
   CLASSES,
   SPECIES,
+  speciesName,
   allowedQuirks,
   content,
   createCharacter,
@@ -120,7 +121,7 @@ async function lobbyThenPlay(g: Game, resumed: boolean) {
       );
       if (banner) {
         w.banner = banner;
-        g.journal('world', `${g.players.get(artist)?.name} painted the banner of ${w.kingdomName}.`, g.players.get(artist)?.name);
+        g.journal('world', `${g.displayName(artist)} painted the banner of ${w.kingdomName}.`, g.displayName(artist));
         g.narrate(`The banner of ${w.kingdomName} is raised!`, 'good');
       }
     }
@@ -194,13 +195,12 @@ export function hostCommand(g: Game, cmd: HostCommand): string | null {
     }
     case 'addBot': {
       if (g.state.phase !== 'lobby') return 'Bots can only join in the lobby.';
-      const names = ['Bramble', 'Pip', 'Mags', 'Thorn', 'Wren', 'Ox'];
-      const p = g.addPlayer(`🤖 ${names[g.players.size % names.length]}`, { bot: true, botSkill: 0.6 });
+      const species = g.rng.pick(SPECIES);
+      const p = g.addPlayer(`🤖 ${speciesName(g.rng, species).split(' ')[0]}`, { bot: true, botSkill: 0.6 });
       if (typeof p === 'string') return p;
       const taken = new Set(Object.values(g.state.chars).map((c) => c.cls));
       const free = CLASSES.filter((c) => !taken.has(c));
       const cls = free.length ? g.rng.pick(free) : g.rng.pick(CLASSES);
-      const species = g.rng.pick(SPECIES);
       const draft: CharacterDraft = { name: p.name.replace('🤖 ', ''), species, cls, quirks: [g.rng.pick(allowedQuirks(species, cls))], personality: g.rng.pick(content().names.personalities) };
       finishCreation(g, p, draft);
       return null;

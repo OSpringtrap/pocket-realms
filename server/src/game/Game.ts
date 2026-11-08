@@ -308,6 +308,13 @@ export class Game {
     this.dirty();
   }
 
+  /** How the game refers to a player: their character's name once they have one (never the name typed
+   * into the lobby, which is the person, not the hero). */
+  displayName(playerId: string | undefined): string {
+    if (!playerId) return '?';
+    return this.state.chars[playerId]?.name ?? this.players.get(playerId)?.name?.replace('🤖 ', '') ?? '?';
+  }
+
   fillTemplate(text: string, extra: Record<string, string> = {}): string {
     const w = this.state.world;
     const vars: Record<string, string> = {
@@ -319,7 +326,15 @@ export class Game {
       town: w?.home?.name ?? 'town',
       ...extra,
     };
-    return text.replace(/\{(\w+)\}/g, (m, k: string) => vars[k] ?? m);
+    const out = text.replace(/\{(\w+)\}/g, (m, k: string) => vars[k] ?? m);
+    return this.renameAntagonist(out);
+  }
+
+  /** Content (barks, doom narration, the boss's stat block) names the antagonist by its canonical
+   * name; this run's antagonist may have a generated one. */
+  renameAntagonist(text: string): string {
+    const a = this.state.world?.antagonist;
+    return a?.baseName && a.baseName !== a.name ? text.split(a.baseName).join(a.name) : text;
   }
 
   /** Delay scaled by the text-speed setting (narration pacing). */
@@ -539,7 +554,7 @@ export class Game {
       kind: 'roll',
       id: p.id,
       playerId: p.playerId,
-      name: player?.name ?? '?',
+      name: this.displayName(p.playerId),
       label: req.label,
       faces: req.faces,
       values,
@@ -610,7 +625,7 @@ export class Game {
         validate: (v) => scoreMinigame(game, param, v),
       },
     );
-    const name = this.players.get(playerId)?.name ?? '?';
+    const name = this.displayName(playerId);
     this.fx({ kind: 'minigame', playerId, name, game, score });
     return score;
   }
@@ -736,7 +751,7 @@ export class Game {
       const pl = this.players.get(p.playerId);
       if (!pl || pl.isBot) continue;
       const verb = p.prompt.kind === 'roll' ? 'to roll' : p.prompt.kind === 'minigame' ? 'to play' : p.prompt.kind === 'text' ? 'to write' : p.prompt.kind === 'draw' ? 'to draw' : 'to choose';
-      out.push({ playerId: p.playerId, label: `${pl.name} ${verb}${pl.connected ? '' : ' (reconnecting…)'}`, deadline: p.prompt.deadline });
+      out.push({ playerId: p.playerId, label: `${this.displayName(p.playerId)} ${verb}${pl.connected ? '' : ' (reconnecting…)'}`, deadline: p.prompt.deadline });
     }
     return out;
   }

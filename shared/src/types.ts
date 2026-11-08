@@ -388,6 +388,8 @@ export interface Npc {
   factionId?: string;
   attitude: number; // -3..3
   met?: boolean;
+  /** reference voice (VOICE_IDS); older saves look it up from the archetype by name */
+  voice?: string;
 }
 
 export type QuestType = 'rescue' | 'fetch' | 'escort' | 'investigate' | 'hunt' | 'negotiate' | 'heist';
@@ -427,7 +429,8 @@ export interface WorldState {
   doom: number;
   doomMax: number;
   doomEvents: number[]; // thresholds already triggered
-  antagonist: { id: string; name: string; title: string; emoji: string; bossId: string; desc: string };
+  /** `name` may be generated per run; `baseName` is the content's name, which text in content still uses */
+  antagonist: { id: string; name: string; baseName?: string; title: string; emoji: string; bossId: string; desc: string };
   objective: { text: string; fortress: { q: number; r: number }; keysNeeded: number; keys: number; keyName: string };
   factions: Faction[];
   npcs: Npc[];

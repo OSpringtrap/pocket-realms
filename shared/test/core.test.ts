@@ -128,3 +128,24 @@ describe('rune recognizer', () => {
     expect(scoreRune([[NaN, 1], [2, 'x']], 'circle').score).toBe(0);
   });
 });
+
+describe('name generators', () => {
+  it('give a world distinct place names and rename the antagonist in its own text', async () => {
+    const { generateWorld } = await import('../src/gen/world.js');
+    for (const seed of ['A', 'B', 'C', 'D', 'E', 'F']) {
+      const w = generateWorld({ seed, length: 'campaign', partySize: 4 });
+      const names = w.tiles.map((t) => t.poi?.name).filter((n): n is string => !!n && n !== 'Hidden Cache');
+      expect(new Set(names).size).toBe(names.length);
+      expect(new Set(w.npcs.map((n) => n.name)).size).toBe(w.npcs.length);
+      if (w.antagonist.baseName && w.antagonist.baseName !== w.antagonist.name) expect(w.objective.text).not.toContain(w.antagonist.baseName);
+    }
+  });
+  it('NameBook avoids repeats', async () => {
+    const { NameBook, monsterName } = await import('../src/gen/names.js');
+    const { Rng } = await import('../src/rng.js');
+    const r = new Rng(1);
+    const book = new NameBook();
+    const got = Array.from({ length: 40 }, () => book.take(() => monsterName(r, 'goblin')));
+    expect(new Set(got).size).toBe(40);
+  });
+});

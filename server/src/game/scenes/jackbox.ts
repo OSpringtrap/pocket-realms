@@ -5,7 +5,8 @@ type Use = 'kingdom' | 'mascot' | 'rumor' | 'npc' | 'place' | 'deed' | 'lore' | 
 
 /**
  * Jackbox-style round: everyone writes privately on their phone, answers appear
- * anonymously on the TV, everyone votes (not for their own), and the winner is woven into the world.
+ * anonymously on the TV, everyone votes (their own answer included: it's friends on a couch, arguing
+ * out loud anyway), and the winner is woven into the world.
  */
 export async function jackboxRound(g: Game, use: Use, promptId?: string): Promise<string | undefined> {
   const w = g.state.world;
@@ -34,7 +35,7 @@ export async function jackboxRound(g: Game, use: Use, promptId?: string): Promis
   // shuffle for anonymity
   g.rng.shuffle(list);
   let winner = list[0]!;
-  if (humans.length >= 2 && list.length >= 2) {
+  if (humans.length >= 1 && list.length >= 2) {
     g.state.scene = { kind: 'jackbox', prompt: g.fillTemplate(p.text), stage: 'voting', answers: list.map((a) => ({ id: a.id, text: a.text })) };
     g.dirty();
     await g.beat(1500);
@@ -45,13 +46,13 @@ export async function jackboxRound(g: Game, use: Use, promptId?: string): Promis
         title: '🗳️ Vote for your favorite!',
         text: g.fillTemplate(p.text),
         style: 'vote',
-        options: list.map((a): ChoiceOption => ({ id: a.id, label: a.text, emoji: '📝', disabled: a.pid === pid ? "That's yours!" : undefined })),
+        options: list.map((a): ChoiceOption => ({ id: a.id, label: a.text, emoji: a.pid === pid ? '✍️' : '📝' })),
       }),
       {
         timeoutMs: 40000,
         fallback: () => '__none',
-        bot: (pid) => g.rng.pick(list.filter((a) => a.pid !== pid)).id,
-        validate: (v, pid) => (typeof v === 'string' && list.some((a) => a.id === v && a.pid !== pid) ? v : undefined),
+        bot: () => g.rng.pick(list).id,
+        validate: (v) => (typeof v === 'string' && list.some((a) => a.id === v) ? v : undefined),
       },
     );
     const tally: Record<string, number> = {};
@@ -63,21 +64,21 @@ export async function jackboxRound(g: Game, use: Use, promptId?: string): Promis
       kind: 'jackbox',
       prompt: g.fillTemplate(p.text),
       stage: 'result',
-      answers: list.map((a) => ({ id: a.id, text: a.text, votes: tally[a.id] ?? 0, author: g.players.get(a.pid)?.name })),
+      answers: list.map((a) => ({ id: a.id, text: a.text, votes: tally[a.id] ?? 0, author: g.displayName(a.pid) })),
       winner: winner.id,
     };
     const wc = g.state.chars[winner.pid];
     if (wc) wc.inspiration++;
-    g.fx({ kind: 'banner', text: `🏆 "${winner.text}" — ${g.players.get(winner.pid)?.name ?? ''}`, style: 'good' }, { kind: 'sound', name: 'victory' });
+    g.fx({ kind: 'banner', text: `🏆 "${winner.text}" — ${g.displayName(winner.pid)}`, style: 'good' }, { kind: 'sound', name: 'victory' });
     g.dirty();
     await g.beat(3500);
   } else {
-    g.state.scene = { kind: 'jackbox', prompt: g.fillTemplate(p.text), stage: 'result', answers: list.map((a) => ({ id: a.id, text: a.text, author: g.players.get(a.pid)?.name })), winner: winner.id };
+    g.state.scene = { kind: 'jackbox', prompt: g.fillTemplate(p.text), stage: 'result', answers: list.map((a) => ({ id: a.id, text: a.text, author: g.displayName(a.pid) })), winner: winner.id };
     g.dirty();
     await g.beat(2000);
   }
   const text = winner.text;
-  const author = g.players.get(winner.pid)?.name;
+  const author = g.displayName(winner.pid);
   if (w) {
     switch (p.use) {
       case 'kingdom':

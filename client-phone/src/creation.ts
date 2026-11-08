@@ -2,6 +2,8 @@ import { h } from '../../shared/src/browser/dom.js';
 import { content } from '../../shared/src/content/index.js';
 import { allowedQuirks, baseScores } from '../../shared/src/rules/character.js';
 import { mod } from '../../shared/src/rules/stats.js';
+import { speciesName } from '../../shared/src/gen/names.js';
+import { Rng } from '../../shared/src/rng.js';
 import { ABILITIES, CLASSES, SKILLS, SPECIES, type ClassId, type Skill, type SpeciesId } from '../../shared/src/types.js';
 import type { CreationView } from '../../shared/src/protocol.js';
 import type { App } from './main.js';
@@ -21,12 +23,15 @@ interface Draft {
 
 export const creationFlags = { skipClaim: false };
 let step = 0;
-let draft: Draft = { name: '', quirks: [], personality: '' };
-try {
-  draft.name = localStorage.getItem('pr_name') ?? '';
-} catch {
-  /* ignore */
-}
+// The hero starts with a generated name fitting their folk (never the player's own name, which is how
+// the game would end up calling the person instead of the hero); typing one keeps it.
+const nameRng = new Rng((Math.random() * 2 ** 32) >>> 0);
+let nameAuto = true;
+const rollName = (species?: SpeciesId) => {
+  const n = speciesName(nameRng, species ?? 'human');
+  return n.length <= 24 ? n : n.split(' ')[0]!;
+};
+let draft: Draft = { name: rollName(), quirks: [], personality: '' };
 
 const STEPS = ['species', 'ancestry', 'class', 'quirks', 'personality', 'fate', 'portrait', 'review'] as const;
 
@@ -63,7 +68,17 @@ export function renderCreation(app: App) {
     case 'species':
       out.push(
         h('h2', null, 'Choose your folk'),
-        h('div', { class: 'col' }, h('b', null, 'Hero name'), h('input', { value: draft.name, maxlength: 24, placeholder: 'Name your hero', oninput: (e: Event) => (draft.name = (e.target as HTMLInputElement).value) })),
+        h(
+          'div',
+          { class: 'col' },
+          h('b', null, 'Hero name'),
+          h(
+            'div',
+            { class: 'row' },
+            h('input', { class: 'grow', value: draft.name, maxlength: 24, placeholder: 'Name your hero', oninput: (e: Event) => ((draft.name = (e.target as HTMLInputElement).value), (nameAuto = false)) }),
+            h('button', { title: 'Another name', onclick: () => ((draft.name = rollName(draft.species)), (nameAuto = true), app.rerender()) }, '🎲'),
+          ),
+        ),
         h(
           'div',
           { class: 'pickgrid' },
@@ -75,6 +90,7 @@ export function renderCreation(app: App) {
                 class: `pick${draft.species === id ? ' on' : ''}`,
                 onclick: () => {
                   draft.species = id;
+                  if (nameAuto) draft.name = rollName(id);
                   draft.quirks = draft.quirks.filter((q) => draft.cls && allowedQuirks(id, draft.cls).includes(q));
                   app.send({ t: 'creation:draft', species: id, cls: draft.cls, step: s });
                   app.rerender();

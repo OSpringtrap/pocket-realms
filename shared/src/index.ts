@@ -13,5 +13,6 @@ export * from './rules/ai.js';
 export * from './rules/bots.js';
 export * from './gen/encounters.js';
 export * from './gen/world.js';
+export * from './gen/names.js';
 export * from './gestures.js';
 export * from './protocol.js';

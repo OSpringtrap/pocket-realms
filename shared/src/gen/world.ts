@@ -1,5 +1,6 @@
 import { content } from '../content/index.js';
 import { Rng, hashString } from '../rng.js';
+import { NameBook, VOICE_GENDER, antagonistName, dungeonName, npcName, poiName, regionName, townName, type Gender } from './names.js';
 import type { Biome, HexTile, Npc, Poi, PoiKind, RunLength, WorldState } from '../types.js';
 
 // ---------------------------------------------------------------- hex math (axial)
@@ -82,15 +83,6 @@ export interface WorldGenOptions {
   partySize: number;
 }
 
-export function townName(rng: Rng): string {
-  const n = content().names;
-  return `${rng.pick(n.townPre)}${rng.pick(n.townSuf)}`;
-}
-export function dungeonName(rng: Rng): string {
-  const n = content().names;
-  return `The ${rng.pick(n.dungeon)} ${rng.pick(n.dungeonSuf)}`;
-}
-
 export function generateWorld(opts: WorldGenOptions): WorldState {
   const rng = Rng.derive(opts.seed, 'world');
   const campaign = opts.length === 'campaign';
@@ -123,8 +115,14 @@ export function generateWorld(opts: WorldGenOptions): WorldState {
   const tileAt = (q: number, r: number) => tiles.find((t) => t.q === q && t.r === r);
   const land = () => tiles.filter((t) => t.biome !== 'water' && !t.poi);
 
+  // Names come from their own stream, so growing the name tables never moves the map a seed draws.
+  const nrng = Rng.derive(opts.seed, 'names');
+  const book = new NameBook();
+
   // Antagonist and fortress
   const ant = rng.pick(content().antagonists);
+  const antName = antagonistName(nrng, ant.id) ?? ant.name;
+  const renamed = (s: string) => (antName === ant.name ? s : s.split(ant.name).join(antName));
   const outer = land().filter((t) => hexDist(t, { q: 0, r: 0 }) >= R - 1);
   const start = rng.pick(outer.length ? outer : land());
   const prefer = ANTAGONIST_BIOME[ant.id] ?? [];
@@ -144,7 +142,7 @@ export function generateWorld(opts: WorldGenOptions): WorldState {
     t.poi = { id: `poi${poiN++}`, kind, name, emoji: POI_EMOJI[kind], data };
     return t.poi;
   };
-  const startTown = townName(rng);
+  const startTown = book.take(() => townName(nrng));
   if (start.biome === 'swamp' || start.biome === 'mountains') start.biome = 'plains';
   place(start, 'town', startTown, { home: true });
   place(fortressTile, 'fortress', ant.fortress.replace(/^the /, 'The '));
@@ -162,20 +160,12 @@ export function generateWorld(opts: WorldGenOptions): WorldState {
       const t = rng.pick(pool);
       const name =
         kind === 'town'
-          ? townName(rng)
+          ? book.take(() => townName(nrng))
           : kind === 'dungeon'
-            ? dungeonName(rng)
-            : kind === 'camp'
-              ? rng.pick(['Old Campsite', 'Hunters\' Rest', 'Wayfarer\'s Fire', 'Lonely Hearth'])
-              : kind === 'shrine'
-                ? rng.pick(['Shrine of Dawn', 'Mossy Shrine', 'Shrine of the Wanderer', 'Starfall Shrine'])
-                : kind === 'merchant'
-                  ? rng.pick(['Peddler\'s Wagon', 'Trading Post', 'Odd Little Shop'])
-                  : kind === 'lair'
-                    ? rng.pick(['Beast Lair', 'Bone-Strewn Den', 'Monster Nest'])
-                    : kind === 'cache'
-                      ? 'Hidden Cache'
-                      : rng.pick(['Crumbling Ruins', 'Forgotten Monument', 'Old Watchtower']);
+            ? book.take(() => dungeonName(nrng))
+            : kind === 'cache'
+              ? 'Hidden Cache'
+              : book.take(() => poiName(nrng, kind as 'camp' | 'shrine' | 'merchant' | 'lair' | 'ruin'));
       const p = place(t, kind, name);
       if (kind === 'cache') t.hidden = true;
       if (kind === 'dungeon') p.data = { key: true, depth: campaign ? 4 + (i % 2) : 3 };
@@ -191,7 +181,11 @@ export function generateWorld(opts: WorldGenOptions): WorldState {
   placeKind('cache', counts.cache, 1);
 
   // Name some wilderness tiles
-  for (const t of tiles) if (!t.poi && rng.chance(0.15)) t.name = rng.pick(content().names.wild[t.biome] ?? ['the Wilds']);
+  for (const t of tiles)
+    if (!t.poi && rng.chance(0.15)) {
+      const curated = content().names.wild[t.biome];
+      t.name = book.take(() => (curated?.length && nrng.chance(0.35) ? nrng.pick(curated) : regionName(nrng, t.biome)));
+    }
 
   // Connectivity: guarantee a land path from start to every POI by draining water on the way
   ensureConnected(tiles, start);
@@ -206,9 +200,17 @@ export function generateWorld(opts: WorldGenOptions): WorldState {
   const archetypes = rng.shuffle([...content().npcs]);
   for (let i = 0; i < (campaign ? 14 : 8) && i < archetypes.length; i++) {
     const a = archetypes[i]!;
+    rng.pick(a.names); // keeps the world stream where it was before names were generated
+    // Half the time one of the archetype's hand-written names (with its matching voice), otherwise a
+    // fresh one, matched to a voice of the same gender.
+    const vi = nrng.int(0, a.names.length - 1);
+    const voice = a.voices?.[vi];
+    const gender: Gender = VOICE_GENDER[voice ?? ''] ?? (nrng.chance(0.5) ? 'f' : 'm');
+    const name = nrng.chance(0.5) && !book.used.has(a.names[vi]!) ? book.take(() => a.names[vi]!) : book.take(() => npcName(nrng, a.id, gender));
     npcs.push({
       id: `npc${i}`,
-      name: rng.pick(a.names),
+      name,
+      voice,
       archetypeId: a.id,
       emoji: a.emoji,
       title: a.title,
@@ -230,8 +232,8 @@ export function generateWorld(opts: WorldGenOptions): WorldState {
     doom: 0,
     doomMax: campaign ? 36 : 14,
     doomEvents: [],
-    antagonist: { id: ant.id, name: ant.name, title: ant.title, emoji: ant.emoji, bossId: ant.bossId, desc: ant.desc },
-    objective: { text: ant.objective, fortress: { q: fortressTile.q, r: fortressTile.r }, keysNeeded, keys: 0, keyName: ant.keyName },
+    antagonist: { id: ant.id, name: antName, baseName: ant.name, title: ant.title, emoji: ant.emoji, bossId: ant.bossId, desc: renamed(ant.desc) },
+    objective: { text: renamed(ant.objective), fortress: { q: fortressTile.q, r: fortressTile.r }, keysNeeded, keys: 0, keyName: ant.keyName },
     factions,
     npcs,
     quests: [],
