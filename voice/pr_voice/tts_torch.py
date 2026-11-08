@@ -32,6 +32,11 @@ class TorchTts:
         dev, dtype = pick_device()
         self.device = device or dev
         self.dtype = dtype if self.device.startswith("cuda") else torch.float32
+        if self.device.startswith("cuda") and getattr(torch.version, "hip", None):
+            # On ROCm the codec decoder's convolutions go through MIOpen, which falls back to an
+            # untuned GEMM path there (measured on an RX 9070 / gfx1201: 42 s to decode 5 s of
+            # audio, versus 0.06 s with MIOpen off). PyTorch's native kernels are far faster.
+            torch.backends.cudnn.enabled = False
         self.model_id = model or (GPU_MODEL if self.device.startswith("cuda") else CPU_MODEL)
         self.model = None
         self.sample_rate = 24000
