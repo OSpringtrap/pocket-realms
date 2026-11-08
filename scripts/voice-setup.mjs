@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// One-time install of the optional voice worker (Qwen3-TTS): `npm run voice:setup`.
+// One-time install of the optional voice worker (Qwen3-TTS): `bun run voice:setup`.
 // Picks a backend for this machine, creates voice/.venv, installs it and downloads the model.
 //
 //   Apple Silicon         -> mlx    (Metal)
@@ -108,4 +108,4 @@ if (backend !== 'fake') {
 }
 fs.writeFileSync(path.join(VOICE, 'config.json'), JSON.stringify({ backend, model: backend === 'fake' ? undefined : model, flavor, gpu: card }, null, 2) + '\n');
 fs.rmSync(TMP, { recursive: true, force: true });
-console.log('\n✅ Voice ready. `npm start` now starts the voice worker by itself (set VOICE=0 to play without voices).');
+console.log('\n✅ Voice ready. `bun start` now starts the voice worker by itself (set VOICE=0 to play without voices).');

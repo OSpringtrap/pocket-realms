@@ -17,14 +17,14 @@ your sword and your dice. No app install and no internet needed. Everything runs
 
 ## Quick start
 
-Requirements: **Node.js 20+** on the host computer (Windows, macOS or Linux).
+Requirements: **[Bun](https://bun.sh) 1.2+** on the host computer (macOS, Linux or Windows); `curl -fsSL https://bun.sh/install | bash` installs it.
 
 ```bash
-npm install
-npm start
+bun install
+bun start
 ```
 
-`npm start` builds everything, starts the server, prints the address and opens the main screen in
+`bun start` builds everything, starts the server, prints the address and opens the main screen in
 your browser. The terminal shows something like:
 
 ```
@@ -53,14 +53,14 @@ Tip: typing `http://<ip>:8080` on a phone redirects to the HTTPS address.
 ### Network troubleshooting
 
 - **Same Wi-Fi:** phones must be on the same network as the host (not mobile data, not a guest network).
-- **Firewall:** allow Node.js on private networks when your OS asks. On Windows: *Windows Security →
+- **Firewall:** allow Bun on private networks when your OS asks. On Windows: *Windows Security →
   Firewall → Allow an app*. On macOS: *System Settings → Network → Firewall → Options*. On Linux,
   open TCP ports **8443** and **8080** (e.g. `sudo ufw allow 8443/tcp`).
 - **Router client isolation / AP isolation:** many guest and some home networks block devices from
   talking to each other. If phones can't connect, disable "AP/client isolation" in the router, or
   use a phone hotspot that the host computer also joins.
 - **Wrong IP printed:** if the host has several network adapters (VPN, Docker, VMs), the terminal
-  lists other addresses — try those. You can also set a port: `PORT=9443 HTTP_PORT=9080 npm start`.
+  lists other addresses — try those. You can also set a port: `PORT=9443 HTTP_PORT=9080 bun start`.
 - **iPhone sensors:** iOS asks for motion permission the first time you tap a sensor game. If you
   decline, every minigame falls back to touch.
 
@@ -108,8 +108,8 @@ Install once (needs Python 3.10–3.13, 3.12 recommended, and about 4–6 GB of 
 libraries):
 
 ```bash
-npm run voice:setup
-npm start            # starts the voice worker by itself
+bun run voice:setup
+bun start            # starts the voice worker by itself
 ```
 
 The setup picks a backend for the computer:
@@ -123,9 +123,9 @@ The setup picks a backend for the computer:
 
 On Windows with an AMD card, PyTorch has no official ROCm build, so the setup falls back to the CPU.
 If AMD publishes ROCm PyTorch wheels for your card, point the setup at them:
-`TORCH_INDEX_URL=<index url> npm run voice:setup` (PowerShell: `$env:TORCH_INDEX_URL="<index url>"; npm run voice:setup`).
+`TORCH_INDEX_URL=<index url> bun run voice:setup` (PowerShell: `$env:TORCH_INDEX_URL="<index url>"; bun run voice:setup`).
 
-Other switches: `VOICE=0 npm start` plays without voices; `VOICE_BACKEND=mlx|torch|fake` forces a
+Other switches: `VOICE=0 bun start` plays without voices; `VOICE_BACKEND=mlx|torch|fake` forces a
 backend (`fake` speaks beeps, for testing without models); **Voices** in ⚙️ Settings turns them off for
 a session and shows whether the voice worker is ready. The voices themselves are the clips in
 `voice/voices/` (see [voice/README.md](voice/README.md)).
@@ -150,23 +150,23 @@ The campaign **autosaves** to `saves/*.json` at the end of every scene. On the t
 ## Development
 
 ```bash
-npm run dev          # server with auto-restart (run `npm run build` once first for the clients)
-npm test             # unit tests (rules, RNG, dice, diffs, content validation, generation)
-npm run typecheck
-npm run sim          # balance simulator: full bot runs for 1–6 players
-npm run sim -- --runs 30 --difficulty heroic --length campaign
-npm run ci           # typecheck + tests + simulator with balance gates (fails if out of range)
+bun run dev          # server with auto-restart (run `bun run build` once first for the clients)
+bun test             # unit tests (rules, RNG, dice, diffs, content validation, generation)
+bun run typecheck
+bun run sim          # balance simulator: full bot runs for 1–6 players
+bun run sim -- --runs 30 --difficulty heroic --length campaign
+bun run ci           # typecheck + tests + simulator with balance gates (fails if out of range)
 ```
 
 End-to-end smoke tests against a running server:
 
 ```bash
-npm run build
-HOST_KEY=testkey ROOM_CODE=TEST PORT=9443 HTTP_PORT=9080 node dist/server/index.js --no-open &
-npx tsx scripts/smoke-clients.ts            # 6 phones join, drop, rejoin, auto-play
-npx tsx scripts/smoke-continue.ts start     # then restart the server and:
-npx tsx scripts/smoke-continue.ts resume
-npx tsx scripts/smoke-voice.ts              # with voices installed: narrator + monster lines, audio flows
+bun run build
+HOST_KEY=testkey ROOM_CODE=TEST PORT=9443 HTTP_PORT=9080 bun dist/server/index.js --no-open &
+bun scripts/smoke-clients.ts            # 6 phones join, drop, rejoin, auto-play
+bun scripts/smoke-continue.ts start     # then restart the server and:
+bun scripts/smoke-continue.ts resume
+bun scripts/smoke-voice.ts              # with voices installed: narrator + monster lines, audio flows
 ```
 
 ### Project layout
@@ -193,4 +193,4 @@ See [DECISIONS.md](DECISIONS.md) for design decisions, simplifications and known
 
 ## Credits
 
-Monster art comes from [game-icons.net](https://game-icons.net) (CC BY 3.0); fonts are Young Serif and Merriweather (SIL OFL). See [CREDITS.md](CREDITS.md). To change a monster's icon, edit the map in `scripts/gen-monster-icons.mjs` and run `node scripts/gen-monster-icons.mjs`.
+Monster art comes from [game-icons.net](https://game-icons.net) (CC BY 3.0); fonts are Young Serif and Merriweather (SIL OFL). See [CREDITS.md](CREDITS.md). To change a monster's icon, edit the map in `scripts/gen-monster-icons.mjs` and run `bun scripts/gen-monster-icons.mjs`.

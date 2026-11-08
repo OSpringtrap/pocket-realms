@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import { instantClock } from '../src/clock.js';
 import { Game } from '../src/game/Game.js';
 import { hostCommand, installHandlers, playerIntent, startNewCampaign } from '../src/game/director.js';

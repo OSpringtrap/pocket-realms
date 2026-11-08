@@ -12,9 +12,9 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "allowImportingTsExtensions": false,
-    "types": ["node", "vite/client"],
+    "types": ["bun", "node", "vite/client"],
     "baseUrl": ".",
     "paths": { "@pr/shared": ["shared/src/index.ts"], "@pr/shared/*": ["shared/src/*"] }
   },
-  "include": ["shared/src", "shared/test", "server/src", "client-host/src", "client-phone/src", "scripts", "vitest.config.ts", "client-host/vite.config.ts", "client-phone/vite.config.ts"]
+  "include": ["shared/src", "shared/test", "server/src", "client-host/src", "client-phone/src", "scripts", "client-host/vite.config.ts", "client-phone/vite.config.ts"]
 }

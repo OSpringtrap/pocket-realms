@@ -1,0 +1,3 @@
+[test]
+# the sim-driven server tests play whole games
+timeout = 60000

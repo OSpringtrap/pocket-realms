@@ -1,8 +1,8 @@
 /**
  * Voice smoke test over real WebSockets: a host screen plays a bot game with voices on and checks
  * that narration and character lines arrive as speech with audio, and that the game keeps moving.
- *   HOST_KEY=testkey ROOM_CODE=TEST PORT=9443 node dist/server/index.js --no-open &
- *   npx tsx scripts/smoke-voice.ts
+ *   HOST_KEY=testkey ROOM_CODE=TEST PORT=9443 bun dist/server/index.js --no-open &
+ *   bun scripts/smoke-voice.ts
  */
 import { PROTOCOL_VERSION, type S2C } from '../shared/src/index.js';
 import { Client, assert, sleep } from './lib/wsclient.js';

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import { Rng, hashString } from '../src/rng.js';
 import { parseDice, rollDice, validPhysical, addDice, maxDice } from '../src/dice.js';
 import { diff, applyPatch, clone } from '../src/diff.js';
@@ -81,7 +81,7 @@ describe('diff/patch', () => {
     const a = { x: 1, list: [1, 2, 3], nested: { a: 'hi', gone: true }, arr: [{ k: 1 }, { k: 2 }] };
     const b = { x: 2, list: [1, 5], nested: { a: 'hi', added: [1] }, arr: [{ k: 1 }, { k: 3 }, { k: 4 }], extra: null };
     const ops = diff(a, b);
-    expect(applyPatch(clone(a), ops)).toEqual(b);
+    expect(applyPatch(clone(a), ops)).toEqual(b as never);
     expect(diff(b, b)).toEqual([]);
   });
 });

@@ -6,7 +6,7 @@ import type { VoiceStatus } from '@pr/shared';
 
 /**
  * Client for the TTS worker (voice/pr_voice, Python). It is optional: without it the game plays
- * silently. If `voice/.venv` exists (made by `npm run voice:setup`) the server starts the worker
+ * silently. If `voice/.venv` exists (made by `bun run voice:setup`) the server starts the worker
  * itself and stops it on exit; a worker someone started by hand on the same port is used as is.
  */
 
@@ -47,7 +47,7 @@ export class TtsWorker {
   start() {
     if (process.env.VOICE === '0') return this.set({ state: 'off', detail: 'VOICE=0' });
     const py = this.python();
-    if (!py && process.env.VOICE !== '1') return this.set({ state: 'off', detail: 'not installed (npm run voice:setup)' });
+    if (!py && process.env.VOICE !== '1') return this.set({ state: 'off', detail: 'not installed (bun run voice:setup)' });
     this.set({ state: 'starting' });
     // Try an already running worker first; spawn ours only if nothing answers.
     this.connect(() => {

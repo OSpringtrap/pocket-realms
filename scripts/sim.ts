@@ -3,8 +3,8 @@
  * server game logic (instant clock, bot answers) and reports win rates, run length
  * and combat length. `--ci` fails (exit 1) if balance drifts out of range.
  *
- *   npm run sim                 # default: oneshot, normal, 1-6 players
- *   npm run sim -- --runs 30 --length campaign --difficulty heroic
+ *   bun run sim                 # default: oneshot, normal, 1-6 players
+ *   bun run sim -- --runs 30 --length campaign --difficulty heroic
  */
 import { instantClock } from '../server/src/clock.js';
 import { Game } from '../server/src/game/Game.js';

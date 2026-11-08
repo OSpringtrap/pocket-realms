@@ -5,8 +5,6 @@ Each entry: **decision** — why.
 
 ## Environment & architecture
 
-- **Node 24 LTS was installed user-locally** (`~/.local/opt/node`, symlinked into `~/.local/bin`) because the
-  machine had no Node. The project itself only needs Node ≥ 20.
 - **One room per server process.** The host machine runs one game; a 4-letter room code guards joining.
   A random **host key** in the main-screen URL is required for host commands; other browsers opening `/host/`
   become read-only spectators.
@@ -34,6 +32,12 @@ Each entry: **decision** — why.
 - **Server bundle with esbuild, clients with Vite**; `@pr/shared` is consumed as TypeScript source everywhere.
 - **No frameworks on the clients.** A tiny `h()` DOM helper and keyed `Slot`s that only rebuild a region when its
   data hash changes (so text inputs, drawing pads and running minigames are not destroyed by unrelated updates).
+- **Bun replaces Node, npm, tsx, esbuild and vitest.** `bun install` (text lockfile `bun.lock`), `bun test`
+  (tests import from `bun:test`; timeout in `bunfig.toml`), `bun --watch` for dev, and the server is bundled
+  with `bun build --target bun` into `dist/server/index.js`. Dependencies are bundled in, because Bun's
+  workspace installs keep each package's modules under that package, where a file in `dist/` can't find them.
+  Vite still builds the two clients (run with `bunx --bun`). Express, `ws`, `node:https` and the voice
+  worker's child process all work unchanged on Bun (checked with the client and voice smoke tests).
 
 ## Rules ("5e-lite")
 
@@ -167,7 +171,7 @@ Each entry: **decision** — why.
   as well as the timbre). All 14 clips were checked with Parakeet speech-to-text against their transcripts.
 - **Backends for every GPU vendor** (user: one player is on NVIDIA, another on AMD): MLX on Apple
   Silicon; PyTorch with the official `qwen-tts` package elsewhere. PyTorch's ROCm build exposes AMD
-  GPUs through `torch.cuda`, so CUDA and ROCm share one code path. `npm run voice:setup` detects the
+  GPUs through `torch.cuda`, so CUDA and ROCm share one code path. `bun run voice:setup` detects the
   GPU (`nvidia-smi`, `/dev/kfd`/`rocminfo`, or the Windows video controller name) and installs matching
   wheels. AMD on Windows has no official PyTorch ROCm build, so it falls back to the CPU with the 0.6B
   model unless `TORCH_INDEX_URL` points at one. The PyTorch path was tested here on CPU (Mac, 0.6B):

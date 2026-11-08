@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import { VOICE_IDS, content } from '@pr/shared';
 import { npcSpeaker } from '../src/game/speech.js';
 import { SpeechQueue, cleanForSpeech, splitSentences } from '../src/voice/speech.js';

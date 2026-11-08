@@ -66,7 +66,7 @@ function main() {
   });
   const hostDir = path.join(ROOT, 'dist', 'client-host');
   const phoneDir = path.join(ROOT, 'dist', 'client-phone');
-  if (!fs.existsSync(hostDir) || !fs.existsSync(phoneDir)) console.warn('⚠️  Built clients not found — run `npm run build` (npm start does this for you).');
+  if (!fs.existsSync(hostDir) || !fs.existsSync(phoneDir)) console.warn('⚠️  Built clients not found — run `bun run build` (`bun start` does this for you).');
   app.get('/api/qr.svg', async (_req, res) => {
     const svg = await QRCode.toString(joinUrl, { type: 'svg', margin: 1, color: { dark: '#2b1d0e', light: '#00000000' } });
     res.type('image/svg+xml').send(svg);
@@ -90,7 +90,7 @@ function main() {
   redirect.on('error', (e) => console.warn(`(HTTP redirect on port ${HTTP_PORT} unavailable: ${(e as Error).message})`));
 
   server.on('error', (e: NodeJS.ErrnoException) => {
-    if (e.code === 'EADDRINUSE') console.error(`❌ Port ${PORT} is in use. Close the other program or run with PORT=9443 npm start`);
+    if (e.code === 'EADDRINUSE') console.error(`❌ Port ${PORT} is in use. Close the other program or run with PORT=9443 bun start`);
     else console.error('❌ Server error:', e);
     process.exit(1);
   });

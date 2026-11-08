@@ -1,8 +1,8 @@
 /**
  * End-to-end smoke test over real WebSockets: a host and 6 phones join,
  * create heroes, drop and rejoin with their tokens, then auto-play for a while.
- *   HOST_KEY=testkey ROOM_CODE=TEST PORT=9443 node dist/server/index.js --no-open &
- *   npx tsx scripts/smoke-clients.ts
+ *   HOST_KEY=testkey ROOM_CODE=TEST PORT=9443 bun dist/server/index.js --no-open &
+ *   bun scripts/smoke-clients.ts
  */
 import { PROTOCOL_VERSION } from '../shared/src/index.js';
 import { Client, assert, sleep } from './lib/wsclient.js';

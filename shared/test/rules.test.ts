@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import {
   CLASSES, SPECIES, Rng, allowedQuirks, botController, botIO, buildEncounter, content, createCharacter, createCombat,
   rollInitiative, runCombat, validateDraft, addXp, levelUpOptions, applyLevelUp, getAc, generateWorld, hexDist,
