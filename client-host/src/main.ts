@@ -2,7 +2,8 @@ import '../../shared/src/browser/theme.css';
 import './host.css';
 import { sfx } from '../../shared/src/browser/audio.js';
 import { VoicePlayer } from '../../shared/src/browser/voice.js';
-import { DiceTray } from '../../shared/src/browser/dice3d.js';
+import { expandFaces, expandValues } from '../../shared/src/browser/dice3d.js';
+import { DiceWorld, entryFromThrow } from '../../shared/src/browser/dicephys.js';
 import { heartIcon, monsterArt, sparkIcon } from '../../shared/src/browser/glyphs.js';
 import { Slot, clear, h, hash, toast } from '../../shared/src/browser/dom.js';
 import { renderHexMap } from '../../shared/src/browser/hexmap.js';
@@ -127,7 +128,6 @@ function applySettings(s: Settings) {
   document.body.classList.toggle('reduce-motion', s.reduceMotion);
   sfx.setVolume(s.volume);
   sfx.music = s.music;
-  tray.reduceMotion = s.reduceMotion;
 }
 
 function render() {
@@ -541,10 +541,11 @@ function renderEnding(sc: Extract<SceneView, { kind: 'ending' }>) {
 
 let typedId = -1;
 let typeTimer = 0;
+const rollLog = h('div', { class: 'rolllog' });
 const narrOld = h('div', { class: 'old' });
 const narrLine = h('div', { class: 'line' });
 const narrWait = h('div', { class: 'waiting' });
-narr.append(narrOld, narrLine, narrWait);
+narr.append(rollLog, narrOld, narrLine, narrWait);
 void narrSlot;
 /** How long a line of text should stay up so people can read it (scaled by the text-speed setting). */
 function readMs(text: string, min = 1600) {
@@ -701,41 +702,80 @@ function voiceStatusText(v: PublicView['voice']): string {
 
 // ------------------------------------------------------------ fx
 
-const diceCanvas = h('canvas');
-const tray = new DiceTray(diceCanvas);
-const diceBox = h('div', { class: 'card diceov' }, h('div', { class: 'who' }), diceCanvas, h('div', { class: 'res' }));
-let diceQueue: Extract<Fx, { kind: 'roll' }>[] = [];
-let diceBusy = false;
-let diceHideTimer = 0;
+// Dice cross over from the phones onto the whole screen (no tray, no card) and roll to a stop;
+// the total goes up in the log under the board for a few seconds.
+const diceLayer = h('canvas', { class: 'dicelayer' }) as HTMLCanvasElement;
+document.body.appendChild(diceLayer);
+const dice = new DiceWorld(diceLayer);
+dice.onHit = (_b, v) => sfx.clack(v * 0.8);
+const rollsByGroup = new Map<string, Extract<Fx, { kind: 'roll' }>>();
+dice.onRest = (group) => {
+  const f = rollsByGroup.get(group);
+  rollsByGroup.delete(group);
+  if (!f) return;
+  sfx.play('diceLand');
+  if (f.crit) sfx.play('crit');
+  if (f.fumble) sfx.play('fumble');
+  showRollInLog(f);
+  setTimeout(() => dice.fadeGroup(group), 2600);
+};
 
-async function runDice() {
-  if (diceBusy) return;
-  diceBusy = true;
-  while (diceQueue.length) {
-    const f = diceQueue.shift()!;
-    clearTimeout(diceHideTimer);
-    if (!diceBox.isConnected) overlay.appendChild(diceBox);
-    const who = diceBox.querySelector('.who')!;
-    const res = diceBox.querySelector('.res')!;
-    who.textContent = `${f.name}: ${f.label}${f.physical ? ' 🎲 (real dice)' : ''}`;
-    res.textContent = '';
-    res.className = 'res';
-    sfx.play('dice');
-    const highlights = f.faces.length === 2 && f.faces.every((x) => x === 20) ? f.values.map((v) => (v === f.kept ? 'kept' : 'dropped')) : f.values.map((v, i) => (f.faces[i] === 20 && v === 20 ? 'crit' : f.faces[i] === 20 && v === 1 ? 'fumble' : undefined));
-    tray.throw(f.faces, { color: tintFor(f.playerId) });
-    await tray.settle(f.values, highlights as never);
-    sfx.play('diceLand');
-    const bonus = f.bonus ? ` ${f.bonus > 0 ? '+' : '−'} ${Math.abs(f.bonus)}` : '';
-    const base = f.kept ?? f.values.reduce((a, b) => a + b, 0);
-    res.textContent = `${f.crit ? 'NATURAL 20! ' : f.fumble ? 'Natural 1... ' : ''}${base}${bonus} = ${f.total}${f.dc !== undefined ? (f.success ? ' ✔' : ' ✖') : ''}`;
-    res.className = `res ${f.crit ? 'crit' : f.dc !== undefined ? (f.success ? 'ok' : 'no') : ''}`;
-    if (f.crit) sfx.play('crit');
-    if (f.fumble) sfx.play('fumble');
-    // leave the result up long enough to read it
-    await new Promise((r) => setTimeout(r, diceQueue.length ? 1500 : 2200));
-  }
-  diceHideTimer = window.setTimeout(() => diceBox.remove(), 400);
-  diceBusy = false;
+function throwDice(f: Extract<Fx, { kind: 'roll' }>) {
+  dice.fit();
+  const W = dice.width;
+  const H = dice.height;
+  dice.dieSize = Math.max(22, Math.min(W, H) * 0.045);
+  const r = dice.dieSize * 1.4;
+  const kinds = expandFaces(f.faces);
+  const values = expandValues(f.faces, f.values);
+  const isAdv = f.faces.length === 2 && f.faces.every((x) => x === 20);
+  const highlights = f.faces.flatMap((face, i) => {
+    const v = f.values[i]!;
+    const hl: 'kept' | 'dropped' | 'crit' | 'fumble' | undefined = isAdv ? (v === f.kept ? 'kept' : 'dropped') : face === 20 && v === 20 ? 'crit' : face === 20 && v === 1 ? 'fumble' : undefined;
+    return face === 100 ? [hl, hl] : [hl];
+  });
+  const e = entryFromThrow(f.throw, W, H, r);
+  rollsByGroup.set(f.id, f);
+  sfx.play('dice');
+  const color = tintFor(f.playerId);
+  kinds.forEach((kind, i) => {
+    // a handful of dice comes in as a loose cluster: side by side across the heading, a beat apart
+    const off = (i - (kinds.length - 1) / 2) * r * 1.9;
+    setTimeout(() => {
+      dice.add(kind, {
+        group: f.id,
+        x: e.x - e.dir[1] * off,
+        y: e.y + e.dir[0] * off,
+        vx: e.vx * (0.9 + Math.random() * 0.2) + (Math.random() - 0.5) * 120,
+        vy: e.vy * (0.9 + Math.random() * 0.2) + (Math.random() - 0.5) * 120,
+        z: dice.dieSize * 3,
+        vz: dice.dieSize * 12,
+        color,
+        spin: e.spin,
+        entering: true,
+      });
+      if (i === kinds.length - 1) dice.settle(f.id, values, highlights);
+    }, i * 70);
+  });
+}
+
+function showRollInLog(f: Extract<Fx, { kind: 'roll' }>) {
+  const bonus = f.bonus ? ` ${f.bonus > 0 ? '+' : '−'} ${Math.abs(f.bonus)}` : '';
+  const base = f.kept ?? f.values.reduce((a, b) => a + b, 0);
+  const verdict = f.dc !== undefined ? (f.success ? ' ✔' : ' ✖') : '';
+  const el = h(
+    'div',
+    { class: `rollline ${f.crit ? 'crit' : f.fumble ? 'fumble' : f.dc !== undefined ? (f.success ? 'ok' : 'no') : ''}` },
+    h('span', { class: 'who', style: `color:${playerColor(f.playerId)}` }, `🎲 ${f.name}`),
+    h('span', { class: 'lbl' }, `${f.label}${f.physical ? ' (real dice)' : ''}`),
+    h('span', { class: 'sum' }, `${f.crit ? 'NAT 20! ' : f.fumble ? 'Nat 1… ' : ''}${base}${bonus} = ${f.total}${verdict}`),
+  );
+  rollLog.appendChild(el);
+  while (rollLog.children.length > 3) rollLog.firstElementChild?.remove();
+  setTimeout(() => {
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 500);
+  }, 6500);
 }
 
 function tintFor(pid: string): string {
@@ -800,8 +840,7 @@ const miniStack = h('div', { class: 'ministack' });
 function handleFx(f: Fx) {
   switch (f.kind) {
     case 'roll':
-      diceQueue.push(f);
-      void runDice();
+      throwDice(f);
       break;
     case 'damage': {
       floaty(f.target, `-${f.amount}${f.weak ? '!' : ''}`, f.crit ? 'crit' : 'dmg');

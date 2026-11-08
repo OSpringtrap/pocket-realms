@@ -16,9 +16,17 @@ interface SensorState {
   alpha: number; // compass heading 0..360
   vol: number; // mic RMS 0..1
   pitch: number; // Hz, 0 = none
+  // raw device-frame vectors for the dice box (x right, y toward the top edge, z out of the screen)
+  gx: number; // accelerationIncludingGravity, m/s² (points away from the ground at rest)
+  gy: number;
+  gz: number;
+  hasGravity: boolean;
+  rotA: number; // rotationRate about z (twisting the phone flat), deg/s
+  rotB: number; // about x (tipping top/bottom)
+  rotG: number; // about y (tipping left/right)
 }
 
-export const S: SensorState = { accel: 0, accelX: 0, accelY: 0, accelZ: 0, beta: 0, gamma: 0, alpha: 0, vol: 0, pitch: 0 };
+export const S: SensorState = { accel: 0, accelX: 0, accelY: 0, accelZ: 0, beta: 0, gamma: 0, alpha: 0, vol: 0, pitch: 0, gx: 0, gy: 0, gz: 9.81, hasGravity: false, rotA: 0, rotB: 0, rotG: 0 };
 export const caps = { motion: false, orientation: false, mic: false, vibrate: 'vibrate' in navigator, multitouch: navigator.maxTouchPoints >= 2 };
 const debugVals = { accel: 0, beta: 0, gamma: 0, alpha: 0, vol: 0, pitch: 0, burst: 0 };
 
@@ -29,6 +37,18 @@ function onMotion(e: DeviceMotionEvent) {
   if (DEBUG) return;
   const a = e.acceleration;
   const g = e.accelerationIncludingGravity;
+  if (g && g.x !== null) {
+    S.gx = g.x ?? 0;
+    S.gy = g.y ?? 0;
+    S.gz = g.z ?? 0;
+    S.hasGravity = true;
+  }
+  const rr = e.rotationRate;
+  if (rr) {
+    S.rotA = rr.alpha ?? 0;
+    S.rotB = rr.beta ?? 0;
+    S.rotG = rr.gamma ?? 0;
+  }
   let x = a?.x ?? null;
   let y = a?.y ?? null;
   let z = a?.z ?? null;
@@ -231,4 +251,44 @@ export function mountDebugPanel() {
   };
   loop();
   caps.motion = caps.orientation = caps.mic = true;
+}
+
+// ---------------------------------------------------------------- device frame -> screen frame
+
+function screenAngle(): number {
+  const o = (screen as Screen & { orientation?: { angle: number } }).orientation;
+  if (o && typeof o.angle === 'number') return o.angle;
+  const w = (window as unknown as { orientation?: number }).orientation;
+  return typeof w === 'number' ? (w + 360) % 360 : 0;
+}
+
+/** A device-frame in-plane vector (x right, y toward the top edge) in screen axes (x right, y down),
+ * whichever way the page is rotated. */
+export function toScreen(x: number, y: number): [number, number] {
+  let sx = x;
+  let sy = y;
+  switch (screenAngle()) {
+    case 90:
+      sx = -y;
+      sy = x;
+      break;
+    case 180:
+      sx = -x;
+      sy = -y;
+      break;
+    case 270:
+      sx = y;
+      sy = -x;
+      break;
+  }
+  return [sx, -sy];
+}
+
+/** Which way is down across the screen, in m/s² (screen axes, y down): tilt the phone and the dice
+ * slide that way. From the gravity vector when there is one, else from the tilt angles. */
+export function screenGravity(): [number, number] {
+  if (S.hasGravity) return toScreen(-S.gx, -S.gy);
+  const b = (S.beta * Math.PI) / 180;
+  const g = (S.gamma * Math.PI) / 180;
+  return toScreen(9.81 * Math.sin(g) * Math.cos(b), -9.81 * Math.sin(b));
 }

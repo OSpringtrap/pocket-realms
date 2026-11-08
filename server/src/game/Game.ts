@@ -13,6 +13,8 @@ import {
   sanitizeText,
   scoreRune,
   validPhysical,
+  sanitizeThrow,
+  type ThrowInfo,
   type Character,
   type ChoiceOption,
   type DieSides,
@@ -542,7 +544,7 @@ export class Game {
     return values;
   }
 
-  private completeRoll(p: Pending, physicalValues: number[] | undefined, physical: boolean) {
+  private completeRoll(p: Pending, physicalValues: number[] | undefined, physical: boolean, thrown?: ThrowInfo) {
     if (!this.pending.has(p.id)) return;
     const req = p.rollReq!;
     const values = physicalValues ?? req.faces.map((f) => this.rng.die(f));
@@ -567,14 +569,15 @@ export class Game {
       crit: isD20 && kept === 20,
       fumble: isD20 && kept === 1,
       physical,
+      throw: thrown,
     });
     this.resolvePending(p, values);
   }
 
-  rollThrow(playerId: string, id: string): string | null {
+  rollThrow(playerId: string, id: string, thrown?: unknown): string | null {
     const p = this.pending.get(id);
     if (!p || p.playerId !== playerId || !p.rollReq) return 'That roll has expired.';
-    this.completeRoll(p, undefined, false);
+    this.completeRoll(p, undefined, false, sanitizeThrow(thrown));
     return null;
   }
 

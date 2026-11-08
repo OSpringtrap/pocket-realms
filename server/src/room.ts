@@ -191,7 +191,7 @@ export class Room {
       case 'answer':
         return err(g.answer(pid, String(msg.id), msg.value));
       case 'roll:throw':
-        return err(g.rollThrow(pid, String(msg.id)));
+        return err(g.rollThrow(pid, String(msg.id), msg.throw));
       case 'roll:physical':
         return err(g.rollPhysical(pid, String(msg.id), msg.values));
       case 'input:result':

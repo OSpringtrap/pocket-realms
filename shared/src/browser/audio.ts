@@ -88,6 +88,19 @@ export class Sfx {
     src.stop(t + dur + 0.05);
   }
 
+  /** One die hitting a wall or the table; `v` 0..1 is how hard. Throttled so a cupful of dice
+   * rattles rather than roars. */
+  clack(v: number) {
+    if (!this.ctx || v < 0.04) return;
+    const now = performance.now();
+    if (now - this.lastClack < 28) return;
+    this.lastClack = now;
+    const g = Math.min(0.45, 0.08 + v * 0.4);
+    this.noise(0.03 + v * 0.03, { freq: 1800 + Math.random() * 2600, q: 5, gain: g });
+    if (v > 0.35) this.tone(260 + Math.random() * 160, 0.05, { type: 'triangle', gain: g * 0.35 });
+  }
+  private lastClack = 0;
+
   play(name: string) {
     if (!this.ctx) return;
     const n = (f: number, d: number, o: Parameters<Sfx['tone']>[2] = {}) => this.tone(f, d, o);

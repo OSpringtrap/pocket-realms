@@ -263,6 +263,26 @@ export interface PhoneView extends PublicView {
 
 // ---------------------------------------------------------------- transient fx (both screens)
 
+/** How the dice left the phone: through which edge, where along it (0..1, left-to-right or
+ * top-to-bottom), heading (radians, screen axes, y down), speed in phone-short-sides per second and
+ * spin (rad/s). The main screen brings them in through the opposite edge, as if the phone sat there. */
+export interface ThrowInfo {
+  edge: 'top' | 'bottom' | 'left' | 'right';
+  pos: number;
+  angle: number;
+  speed: number;
+  spin: number;
+}
+
+export function sanitizeThrow(t: unknown): ThrowInfo | undefined {
+  if (!t || typeof t !== 'object') return undefined;
+  const o = t as Record<string, unknown>;
+  const num = (v: unknown, lo: number, hi: number, d: number) => (typeof v === 'number' && Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d);
+  const edge = o.edge === 'top' || o.edge === 'bottom' || o.edge === 'left' || o.edge === 'right' ? o.edge : undefined;
+  if (!edge) return undefined;
+  return { edge, pos: num(o.pos, 0, 1, 0.5), angle: num(o.angle, -Math.PI, Math.PI, -Math.PI / 2), speed: num(o.speed, 0, 40, 4), spin: num(o.spin, 0, 80, 20) };
+}
+
 export type Fx =
   | {
       kind: 'roll';
@@ -281,6 +301,7 @@ export type Fx =
       crit?: boolean;
       fumble?: boolean;
       physical?: boolean;
+      throw?: ThrowInfo;
     }
   | { kind: 'damage'; target: string; amount: number; dmg: string; crit?: boolean; weak?: boolean; resist?: boolean }
   | { kind: 'heal'; target: string; amount: number }
@@ -332,7 +353,7 @@ export type C2S =
   | { t: 'character:create'; draft: unknown }
   | { t: 'ready'; ready: boolean }
   | { t: 'answer'; id: string; value: unknown }
-  | { t: 'roll:throw'; id: string; intensity?: number }
+  | { t: 'roll:throw'; id: string; intensity?: number; throw?: ThrowInfo }
   | { t: 'roll:physical'; id: string; values: number[] }
   | { t: 'input:result'; id: string; data: unknown }
   | { t: 'intent'; intent: Intent }

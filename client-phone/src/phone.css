@@ -96,3 +96,16 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .modal { backdrop-filter: blur(2px); }
 .modal .card { max-height: 88vh; overflow-y: auto; }
 .foe-ic { font-size: 1.5em; color: var(--ink-dark-2); }
+/* dice box: the whole phone screen is the tray the dice live in */
+.phonebox { position: fixed; inset: 0; z-index: 400; background: radial-gradient(ellipse at 50% 45%, #3f5a3a 0%, #2b3f28 70%, #1f2e1d 100%); box-shadow: inset 0 0 0 6px #5a4326, inset 0 0 28px rgba(0, 0, 0, 0.6); touch-action: none; user-select: none; -webkit-user-select: none; }
+.phonebox canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.phonebox .boxhead { position: absolute; left: 0; right: 0; top: 0; padding: calc(env(safe-area-inset-top, 0px) + 14px) 18px 10px; text-align: center; color: var(--bone, #f4ead2); pointer-events: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6); font-size: 1.1em; }
+.phonebox .boxhead .prompt-head { color: inherit; }
+.phonebox .boxfoot { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 14px calc(env(safe-area-inset-bottom, 0px) + 12px); color: var(--bone, #f4ead2); }
+.phonebox .boxhint { text-align: center; font-size: 0.9em; opacity: 0.85; pointer-events: none; margin-bottom: 6px; }
+.phonebox .boxfoot button { color: var(--bone, #f4ead2); border-color: rgba(244, 234, 210, 0.4); }
+.rollresult { position: fixed; left: 50%; top: 38%; transform: translate(-50%, -50%); z-index: 450; background: var(--panel, #f4ead2); border: 2px solid #5a4326; border-radius: 14px; padding: 12px 22px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); animation: rrpop 0.25s; min-width: 60vw; }
+@keyframes rrpop { from { opacity: 0; transform: translate(-50%, -46%) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+.rollresult .res { font-family: var(--font-title); font-size: 2.2em; }
+.rollresult .res.crit { color: #a8731a; } .rollresult .res.fumble { color: var(--red); }
+.rollresult.out { opacity: 0; transition: opacity 0.35s; }

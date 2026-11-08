@@ -1,61 +1,56 @@
 import { monsterArt } from '../../shared/src/browser/glyphs.js';
 import { sfx } from '../../shared/src/browser/audio.js';
-import { DiceTray, dieName } from '../../shared/src/browser/dice3d.js';
+import { dieName, expandFaces } from '../../shared/src/browser/dice3d.js';
+import { DiceWorld } from '../../shared/src/browser/dicephys.js';
 import { h, clear } from '../../shared/src/browser/dom.js';
 import { renderHexMap } from '../../shared/src/browser/hexmap.js';
 import { content } from '../../shared/src/content/index.js';
-import type { ChoiceOption, Fx, Prompt } from '../../shared/src/protocol.js';
+import type { ChoiceOption, Fx, Prompt, ThrowInfo } from '../../shared/src/protocol.js';
 import { drawPad } from './creation.js';
 import type { App } from './main.js';
 import { playMinigame } from './minigames.js';
-import { S, haptic, requestMotion } from './sensors.js';
+import { S, haptic, requestMotion, screenGravity, toScreen } from './sensors.js';
 
 const C = content();
 
 // ------------------------------------------------------------ dice
 
-interface ActiveRoll {
-  id: string;
-  tray: DiceTray;
-  el: HTMLElement;
-  res: HTMLElement;
-  faces: number[];
-  thrown: boolean;
-}
-let activeRoll: ActiveRoll | undefined;
+/**
+ * The phone is a box with the dice inside. Tilt it and they slide downhill, shake it and they lag
+ * behind and rattle off the walls, twist it and they swing round, jerk it and they hop and tumble.
+ * Throw them: flick the phone (or swipe) and they fly out through an edge; the main screen picks
+ * them up at the matching edge. The server still decides every value.
+ */
 
-function rollOverlay(id: string, faces: number[], title: string): ActiveRoll {
-  activeRoll?.el.remove();
-  const canvas = h('canvas');
-  const res = h('div', { class: 'res' });
-  const el = h('div', { class: 'modal', style: 'position:fixed;inset:0;background:rgba(43,29,14,0.35);display:flex;align-items:center;justify-content:center;z-index:500' }, h('div', { class: 'card dicebox', style: 'width:min(560px,94vw)' }, h('div', { class: 'center prompt-head' }, title), canvas, res));
-  document.body.appendChild(el);
-  const tray = new DiceTray(canvas);
-  activeRoll = { id, tray, el, res, faces, thrown: false };
-  return activeRoll;
+interface ThrowState {
+  id: string;
+  sentAt: number;
+}
+let lastThrow: ThrowState | undefined;
+let resultCard: HTMLElement | undefined;
+
+function showResult(f: Extract<Fx, { kind: 'roll' }>) {
+  resultCard?.remove();
+  const base = f.kept ?? f.values.reduce((a, b) => a + b, 0);
+  const text = `${f.crit ? '🌟 NAT 20! ' : f.fumble ? '💀 Nat 1… ' : ''}${base}${f.bonus ? ` ${f.bonus > 0 ? '+' : '−'} ${Math.abs(f.bonus)}` : ''} = ${f.total}${f.dc !== undefined ? (f.success ? ' ✔' : ' ✖') : ''}`;
+  const card = h('div', { class: 'rollresult' }, h('div', { class: 'small muted' }, f.label), h('div', { class: `res ${f.crit ? 'crit' : f.fumble ? 'fumble' : ''}` }, text), h('div', { class: 'small muted' }, `🎲 ${f.values.join(' · ')}`));
+  document.body.appendChild(card);
+  resultCard = card;
+  setTimeout(() => {
+    card.classList.add('out');
+    setTimeout(() => card.remove(), 400);
+  }, 2600);
 }
 
 export function onRollFx(f: Extract<Fx, { kind: 'roll' }>) {
-  let ar = activeRoll && activeRoll.id === f.id ? activeRoll : undefined;
-  if (!ar) {
-    // auto-rolled (timeout) or physical: still show the result
-    ar = rollOverlay(f.id, f.faces, f.label);
-    ar.tray.throw(f.faces);
-  }
-  const roll = ar;
-  const highlights = f.faces.length === 2 && f.faces.every((x) => x === 20) ? f.values.map((v) => (v === f.kept ? 'kept' : 'dropped')) : f.values.map((v, i) => (f.faces[i] === 20 && v === 20 ? 'crit' : f.faces[i] === 20 && v === 1 ? 'fumble' : undefined));
-  void roll.tray.settle(f.values, highlights as never).then(() => {
+  const mine = lastThrow?.id === f.id;
+  // the dice are on the main screen now; the phone answers with the number and a buzz
+  setTimeout(() => {
     sfx.play('diceLand');
-    const base = f.kept ?? f.values.reduce((a, b) => a + b, 0);
-    roll.res.textContent = `${f.crit ? '🌟 NAT 20! ' : f.fumble ? '💀 Nat 1… ' : ''}${base}${f.bonus ? ` ${f.bonus > 0 ? '+' : '−'} ${Math.abs(f.bonus)}` : ''} = ${f.total}${f.dc !== undefined ? (f.success ? ' ✔' : ' ✖') : ''}`;
-    roll.res.className = `res ${f.crit ? 'crit' : f.fumble ? 'fumble' : ''}`;
-    haptic(f.crit ? [80, 40, 80, 40, 200] : 60);
+    haptic(f.crit ? [80, 40, 80, 40, 200] : f.fumble ? [200] : 50);
     if (f.crit) sfx.play('crit');
-    setTimeout(() => {
-      roll.el.remove();
-      if (activeRoll === roll) activeRoll = undefined;
-    }, 2600);
-  });
+    showResult(f);
+  }, mine ? 1700 : 300);
 }
 
 function diceText(faces: number[], bonus: number) {
@@ -63,6 +58,131 @@ function diceText(faces: number[], bonus: number) {
   for (const f of faces) counts.set(f, (counts.get(f) ?? 0) + 1);
   const parts = [...counts.entries()].map(([f, n]) => `${n}${dieName(f)}`);
   return `${parts.join(' + ')}${bonus ? ` ${bonus > 0 ? '+' : '−'} ${Math.abs(bonus)}` : ''}`;
+}
+
+/** Box scale: as if the screen were a 30 cm wide tray (a real 7 cm one would fling the dice out on
+ * every shake). */
+const BOX_M = 0.3;
+
+function diceBox(app: App, p: Extract<Prompt, { kind: 'roll' }>, wrap: HTMLElement) {
+  const canvas = h('canvas') as HTMLCanvasElement;
+  const head = h('div', { class: 'boxhead' }, h('div', { class: 'prompt-head' }, `🎲 ${p.title}`), h('div', null, diceText(p.faces, p.bonus), p.dc !== undefined ? h('span', { class: 'muted' }, `  (need ${p.dc})`) : null, p.adv === 1 ? h('span', { class: 'badge' }, 'advantage') : p.adv === -1 ? h('span', { class: 'badge' }, 'disadvantage') : null));
+  const hint = h('div', { class: 'boxhint' }, 'Shake to rattle them. Flick the phone (or swipe) toward the screen to throw!');
+  const auto = h('button', { class: 'ghost small' }, 'Throw for me');
+  const real = h('button', { class: 'ghost small', onclick: () => app.send({ t: 'intent', intent: { kind: 'physicalDice', on: true } }) }, '🎲 Real dice');
+  const box = h('div', { class: 'phonebox' }, canvas, head, h('div', { class: 'boxfoot' }, hint, h('div', { class: 'row' }, auto, h('span', { class: 'grow' }), real)));
+  document.body.appendChild(box);
+
+  const world = new DiceWorld(canvas);
+  world.fit();
+  const W = world.width;
+  const H = world.height;
+  const short = Math.min(W, H);
+  const pxPerM = short / BOX_M;
+  world.dieSize = Math.max(16, Math.min(46, short * 0.085));
+  world.tableG = 9.81 * pxPerM;
+  const kinds = expandFaces(p.faces);
+  const color = '#f4ead2';
+  kinds.forEach((k, i) => world.add(k, { group: p.id, x: W / 2 + (i - (kinds.length - 1) / 2) * world.dieSize * 2.4, y: H * 0.55, vx: (Math.random() - 0.5) * 200, vy: (Math.random() - 0.5) * 200, z: world.dieSize, vz: 0, color, spin: 6 }));
+
+  const opened = performance.now();
+  let exit: ThrowInfo | undefined;
+  let sent = false;
+  let lastBuzz = 0;
+  world.onHit = (_b, v) => {
+    sfx.clack(v);
+    const now = performance.now();
+    if (v > 0.25 && now - lastBuzz > 70) {
+      lastBuzz = now;
+      haptic(Math.round(6 + v * 18));
+    }
+  };
+  const send = () => {
+    if (sent) return;
+    sent = true;
+    lastThrow = { id: p.id, sentAt: performance.now() };
+    app.send({ t: 'roll:throw', id: p.id, intensity: Math.min(2, (exit?.speed ?? 4) / 4), throw: exit });
+    setTimeout(close, 250);
+  };
+  world.onExit = (b, e) => {
+    if (!exit) {
+      exit = { edge: e.edge, pos: e.pos, angle: Math.atan2(e.vy, e.vx), speed: Math.hypot(e.vx, e.vy) / short, spin: Math.hypot(...b.w) };
+      sfx.play('dice');
+      haptic(30);
+      // the others follow the first out of the box
+      world.escapeSpeed = 0;
+      for (const o of world.bodies) if (!o.exited) (o.vx = e.vx * (0.85 + Math.random() * 0.3)), (o.vy = e.vy * (0.85 + Math.random() * 0.3));
+      setTimeout(send, 450);
+    }
+    if (world.bodies.every((o) => o.exited || o === b)) send();
+  };
+  const fling = (vx: number, vy: number) => {
+    for (const o of world.bodies) {
+      o.vx = vx * (0.85 + Math.random() * 0.3);
+      o.vy = vy * (0.85 + Math.random() * 0.3);
+      o.vz = world.dieSize * 25;
+    }
+    world.escapeSpeed = short * 1.2;
+  };
+  auto.addEventListener('click', () => {
+    sfx.unlock();
+    fling((Math.random() - 0.5) * short * 2, -short * 6);
+  });
+
+  // swipe: drag across the box and let go; the dice take the finger's speed and direction
+  let trail: { x: number; y: number; t: number }[] = [];
+  canvas.addEventListener('pointerdown', (e) => {
+    sfx.unlock();
+    void requestMotion();
+    trail = [{ x: e.clientX, y: e.clientY, t: performance.now() }];
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!trail.length) return;
+    trail.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+    if (trail.length > 12) trail.shift();
+  });
+  canvas.addEventListener('pointerup', (e) => {
+    const now = performance.now();
+    const pts = [...trail, { x: e.clientX, y: e.clientY, t: now }].filter((q) => now - q.t < 120);
+    trail = [];
+    if (pts.length < 2) {
+      // a tap: rattle the dice up off the table
+      for (const o of world.bodies) (o.vz = world.dieSize * (14 + Math.random() * 8)), (o.vx += (Math.random() - 0.5) * 300), (o.vy += (Math.random() - 0.5) * 300);
+      return;
+    }
+    const a = pts[0]!;
+    const b = pts[pts.length - 1]!;
+    const dt = Math.max(0.016, (b.t - a.t) / 1000);
+    const vx = (b.x - a.x) / dt;
+    const vy = (b.y - a.y) / dt;
+    if (Math.hypot(vx, vy) > short * 1.5) fling(vx * 1.4, vy * 1.4);
+  });
+
+  // sensors -> forces, every frame
+  const tick = () => {
+    if (sent) return;
+    if (!wrap.isConnected) return close();
+    const [gx, gy] = screenGravity();
+    world.gravity = [gx * pxPerM, gy * pxPerM];
+    // the phone accelerating one way pushes the dice the other way (capped: sensors spike)
+    const [lx, ly] = toScreen(S.accelX, S.accelY);
+    const cap = (v: number) => Math.max(-45, Math.min(45, v));
+    world.push = [-cap(lx) * pxPerM, -cap(ly) * pxPerM];
+    // dropping the phone fast lifts the dice off the table; tipping it sharply tosses them
+    const tip = (Math.abs(S.rotB) + Math.abs(S.rotG)) * (Math.PI / 180);
+    world.lift = Math.max(0, -cap(S.accelZ)) * pxPerM + tip * world.dieSize * 60;
+    world.frameSpin = (S.rotA * Math.PI) / 180;
+    // a throw needs a deliberate flick, and not in the first instant
+    if (!exit && world.escapeSpeed !== short * 1.2) world.escapeSpeed = performance.now() - opened < 500 ? Infinity : 2.2 * pxPerM;
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+  function close() {
+    world.stop();
+    box.remove();
+  }
+  return box;
 }
 
 function renderRoll(app: App, p: Extract<Prompt, { kind: 'roll' }>) {
@@ -91,42 +211,11 @@ function renderRoll(app: App, p: Extract<Prompt, { kind: 'roll' }>) {
     );
     return wrap;
   }
-  const canvas = h('canvas');
-  const tray = new DiceTray(canvas);
-  const btn = h('button', { class: 'primary mgbig' }, '🎲 Tap or shake to roll!');
-  wrap.append(
-    canvas,
-    btn,
-    h('div', { class: 'small muted center' }, 'Fair rolls: the game server rolls the dice.'),
-    h('button', { class: 'ghost small', onclick: () => app.send({ t: 'intent', intent: { kind: 'physicalDice', on: true } }) }, '🎲 I want to roll my real dice'),
-  );
-  let thrown = false;
-  const doThrow = (intensity: number) => {
-    if (thrown) return;
-    thrown = true;
-    sfx.unlock();
-    sfx.play('dice');
-    haptic(40);
-    const ar = rollOverlay(p.id, p.faces, p.title);
-    ar.thrown = true;
-    ar.tray.throw(p.faces, { intensity });
-    app.send({ t: 'roll:throw', id: p.id, intensity });
-  };
-  btn.addEventListener('click', () => {
-    void requestMotion();
-    doThrow(1);
+  wrap.append(h('div', { class: 'small muted center' }, 'Your dice are in your hands. Throw them at the screen!'));
+  // the box goes on top of everything (fixed, full screen) once this card is on the page
+  requestAnimationFrame(() => {
+    if (wrap.isConnected) diceBox(app, p, wrap);
   });
-  // idle wobble + shake detection
-  setTimeout(() => tray.throw(p.faces, { intensity: 0.4 }), 30);
-  let hot = 0;
-  const watch = () => {
-    if (thrown || !wrap.isConnected) return;
-    if (S.accel > 17) hot++;
-    else hot = Math.max(0, hot - 1);
-    if (hot > 3) doThrow(Math.min(2, S.accel / 15));
-    requestAnimationFrame(watch);
-  };
-  requestAnimationFrame(watch);
   return wrap;
 }
 

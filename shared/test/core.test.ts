@@ -149,3 +149,27 @@ describe('name generators', () => {
     expect(new Set(got).size).toBe(40);
   });
 });
+
+describe('dice throw hand-off', () => {
+  it('sanitizes what a phone sends', async () => {
+    const { sanitizeThrow } = await import('../src/protocol.js');
+    expect(sanitizeThrow({ edge: 'top', pos: 3, angle: 99, speed: -1, spin: 'x' })).toEqual({ edge: 'top', pos: 1, angle: Math.PI, speed: 0, spin: 20 });
+    expect(sanitizeThrow({ edge: 'sideways' })).toBeUndefined();
+    expect(sanitizeThrow(null)).toBeUndefined();
+  });
+  it('brings dice in through the opposite edge, heading inward', async () => {
+    const { entryFromThrow } = await import('../src/browser/dicephys.js');
+    const up = entryFromThrow({ edge: 'top', pos: 0.25, angle: -Math.PI / 2, speed: 6, spin: 20 }, 1920, 1080, 40);
+    expect(up.edge).toBe('bottom');
+    expect(up.x).toBeCloseTo(480);
+    expect(up.y).toBeGreaterThan(1080);
+    expect(up.vy).toBeLessThan(0);
+    const right = entryFromThrow({ edge: 'right', pos: 0.5, angle: 0.2, speed: 6, spin: 20 }, 1920, 1080, 40);
+    expect(right.edge).toBe('left');
+    expect(right.x).toBeLessThan(0);
+    expect(right.vx).toBeGreaterThan(0);
+    // a heading that would leave the screen again is bent inward
+    const skim = entryFromThrow({ edge: 'top', pos: 0.5, angle: Math.PI / 2, speed: 6, spin: 20 }, 1920, 1080, 40);
+    expect(skim.vy).toBeLessThan(0);
+  });
+});

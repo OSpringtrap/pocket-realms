@@ -463,72 +463,126 @@ export class DiceTray {
   }
 
   private drawDie(d: DieAnim, size: number) {
-    const ctx = this.ctx;
-    const light = norm([-0.3, -0.2, 1]);
-    const proj = (v: V3): [number, number] => {
-      const persp = CAM / (CAM - v[2]);
-      return [d.x + v[0] * size * persp, d.y + v[1] * size * persp];
-    };
-    const rv = d.shape.verts.map((v) => qrot(d.q, v));
-    // Perspective back-face test: a face is visible when it faces the camera
-    // point, not merely +z (that test dropped faces near the silhouette).
-    const faces = d.shape.faces
-      .map((f, fi) => ({ f, fi, n: qrot(d.q, f.normal), c: qrot(d.q, f.center), u: qrot(d.q, f.up) }))
-      .filter((x) => dot(x.n, sub([0, 0, CAM], x.c)) > 1e-4)
-      .sort((a, b) => a.c[2] - b.c[2]);
-    // shadow
-    ctx.save();
-    ctx.globalAlpha = 0.18;
-    ctx.fillStyle = this.ink;
+    drawDie(this.ctx, d, d.x, d.y, size, this.ink, { shadowX: d.x + size * 0.12, shadowY: d.targetY + size * 1.02, flatShadow: true });
+  }
+}
+
+export interface DieLook {
+  kind: DieKind;
+  q: Q;
+  color: string;
+  done?: boolean;
+  highlight?: 'crit' | 'fumble' | 'kept' | 'dropped';
+}
+
+/** Draw one die centred at (x, y), `size` pixels per die radius. The shadow sits at (shadowX, shadowY):
+ * under the die for a top-down table, or on the tray floor for the side-on tray. */
+export function drawDie(ctx: CanvasRenderingContext2D, d: DieLook, x: number, y: number, size: number, ink: string, o: { shadowX?: number; shadowY?: number; flatShadow?: boolean; shadowAlpha?: number } = {}) {
+  const shape = SHAPES[d.kind === 1000 || d.kind === 100 ? 10 : d.kind]!;
+  const light = norm([-0.3, -0.2, 1]);
+  const proj = (v: V3): [number, number] => {
+    const persp = CAM / (CAM - v[2]);
+    return [x + v[0] * size * persp, y + v[1] * size * persp];
+  };
+  const rv = shape.verts.map((v) => qrot(d.q, v));
+  // Perspective back-face test: a face is visible when it faces the camera
+  // point, not merely +z (that test dropped faces near the silhouette).
+  const faces = shape.faces
+    .map((f, fi) => ({ f, fi, n: qrot(d.q, f.normal), c: qrot(d.q, f.center), u: qrot(d.q, f.up) }))
+    .filter((v) => dot(v.n, sub([0, 0, CAM], v.c)) > 1e-4)
+    .sort((a, b) => a.c[2] - b.c[2]);
+  // shadow
+  ctx.save();
+  ctx.globalAlpha = o.shadowAlpha ?? 0.18;
+  ctx.fillStyle = ink;
+  ctx.beginPath();
+  if (o.flatShadow) ctx.ellipse(o.shadowX ?? x, o.shadowY ?? y, size * 0.8, size * 0.18, 0, 0, Math.PI * 2);
+  else ctx.arc(o.shadowX ?? x, o.shadowY ?? y, size * 0.95, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  for (const { f, fi, n, c, u } of faces) {
+    const shade = 0.55 + 0.45 * Math.max(0, dot(n, light));
     ctx.beginPath();
-    ctx.ellipse(d.x + size * 0.12, d.targetY + size * 1.02, size * 0.8, size * 0.18, 0, 0, Math.PI * 2);
+    f.idx.forEach((vi, k) => {
+      const [px, py] = proj(rv[vi]!);
+      if (k === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    ctx.closePath();
+    ctx.fillStyle = shadeColor(d.color, shade);
     ctx.fill();
-    ctx.restore();
-    for (const { f, fi, n, c, u } of faces) {
-      const shade = 0.55 + 0.45 * Math.max(0, dot(n, light));
-      ctx.beginPath();
-      f.idx.forEach((vi, k) => {
-        const [x, y] = proj(rv[vi]!);
-        if (k === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.closePath();
-      ctx.fillStyle = shadeColor(d.color, shade);
-      ctx.fill();
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = Math.max(1.5, size * 0.045);
-      ctx.strokeStyle = this.ink;
-      ctx.stroke();
-      if (n[2] > 0.3) {
-        const label = labelFor(d.kind, fi);
-        const w = cross(n, u);
-        const s = 0.32 * (d.shape.faces.length > 12 ? 0.75 : d.shape.faces.length >= 10 ? 0.85 : 1);
-        const p0 = proj(c);
-        const pu = proj(add(c, mul(u, s)));
-        const pw = proj(add(c, mul(w, s)));
-        ctx.save();
-        ctx.setTransform(pw[0] - p0[0], pw[1] - p0[1], -(pu[0] - p0[0]), -(pu[1] - p0[1]), p0[0], p0[1]);
-        ctx.fillStyle = this.ink;
-        ctx.globalAlpha = Math.min(1, (n[2] - 0.3) * 3);
-        ctx.font = `bold ${label.length > 1 ? 0.75 : 1}px Georgia, serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(label, 0, 0.05);
-        if (label === '6' || label === '9') ctx.fillRect(-0.25, 0.42, 0.5, 0.06);
-        ctx.restore();
-      }
-    }
-    if (d.done && d.highlight) {
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(1.5, size * 0.045);
+    ctx.strokeStyle = ink;
+    ctx.stroke();
+    if (n[2] > 0.3) {
+      const label = labelFor(d.kind, fi);
+      const w = cross(n, u);
+      const s = 0.32 * (shape.faces.length > 12 ? 0.75 : shape.faces.length >= 10 ? 0.85 : 1);
+      const p0 = proj(c);
+      const pu = proj(add(c, mul(u, s)));
+      const pw = proj(add(c, mul(w, s)));
       ctx.save();
-      ctx.lineWidth = size * 0.08;
-      ctx.strokeStyle = d.highlight === 'crit' ? '#d4a017' : d.highlight === 'fumble' ? '#a93226' : d.highlight === 'dropped' ? 'rgba(80,60,40,0.35)' : '#2e7d32';
-      ctx.beginPath();
-      ctx.arc(d.x, d.y, size * RING, 0, Math.PI * 2);
-      ctx.stroke();
+      ctx.transform(pw[0] - p0[0], pw[1] - p0[1], -(pu[0] - p0[0]), -(pu[1] - p0[1]), p0[0], p0[1]);
+      ctx.fillStyle = ink;
+      ctx.globalAlpha = Math.min(1, (n[2] - 0.3) * 3);
+      ctx.font = `bold ${label.length > 1 ? 0.75 : 1}px Georgia, serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, 0, 0.05);
+      if (label === '6' || label === '9') ctx.fillRect(-0.25, 0.42, 0.5, 0.06);
       ctx.restore();
     }
   }
+  if (d.done && d.highlight) {
+    ctx.save();
+    ctx.lineWidth = size * 0.08;
+    ctx.strokeStyle = d.highlight === 'crit' ? '#d4a017' : d.highlight === 'fumble' ? '#a93226' : d.highlight === 'dropped' ? 'rgba(80,60,40,0.35)' : '#2e7d32';
+    ctx.beginPath();
+    ctx.arc(x, y, size * RING, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
 }
+
+/** The orientation that shows value v to the camera, label upright. */
+export function restingQuat(kind: DieKind, v: number): Q {
+  const shape = SHAPES[kind === 1000 || kind === 100 ? 10 : kind]!;
+  const face = shape.faces[faceForValue(kind, v) % shape.faces.length]!;
+  const q1 = qfromTo(face.normal, [0, 0, 1]);
+  const up1 = qrot(q1, face.up);
+  const ang = Math.atan2(up1[0], -up1[1]);
+  return qmul(qaxis([0, 0, 1], -ang), q1);
+}
+
+/** The die's own-frame normal of the face showing value v. */
+export function faceNormalFor(kind: DieKind, v: number): V3 {
+  const shape = SHAPES[kind === 1000 || kind === 100 ? 10 : kind]!;
+  return shape.faces[faceForValue(kind, v) % shape.faces.length]!.normal;
+}
+
+/** d100 is drawn as a tens die and a units die. */
+export function expandFaces(faces: number[]): DieKind[] {
+  const out: DieKind[] = [];
+  for (const f of faces) {
+    if (f === 100) out.push(1000, 100);
+    else out.push(f as DieKind);
+  }
+  return out;
+}
+
+/** Values per drawn die, matching expandFaces (both halves of a d100 carry the d100's value). */
+export function expandValues(faces: number[], values: number[]): number[] {
+  const out: number[] = [];
+  faces.forEach((f, i) => {
+    out.push(values[i] ?? 1);
+    if (f === 100) out.push(values[i] ?? 1);
+  });
+  return out;
+}
+
+export { qaxis, qfromTo, qmul, qnorm, qslerp, qrot, DIE_EXTENT };
+export type { Q, V3 };
 
 function shadeColor(hex: string, f: number): string {
   const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);

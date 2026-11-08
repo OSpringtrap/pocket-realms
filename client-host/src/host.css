@@ -156,11 +156,6 @@ body { overflow: hidden; font-size: calc(17px * var(--scale)); }
 .anim.shadow, .anim.smoke { background: radial-gradient(circle, rgba(40,40,40,0.6), transparent 70%); animation: floatUp 1s forwards; }
 
 /* dice overlay */
-.diceov { position: absolute; left: 50%; top: 8%; transform: translateX(-50%); width: min(720px, 80vw); z-index: 50; padding: 14px 18px; text-align: center; animation: pop 0.3s; }
-.diceov canvas { width: 100%; height: 220px; display: block; }
-.diceov .who { font-family: var(--font-title); font-weight: 400; font-size: 1.35em; }
-.diceov .res { font-family: var(--font-title); font-size: 2.3em; font-weight: 400; min-height: 1.2em; }
-.diceov .res.ok { color: var(--green); } .diceov .res.no { color: var(--red); } .diceov .res.crit { color: #a8731a; text-shadow: 0 0 12px rgba(201, 160, 80, 0.55); }
 
 .banner { position: absolute; left: 0; right: 0; top: 36%; text-align: center; z-index: 60; pointer-events: none; font-family: var(--font-title); font-size: 4.2em; font-weight: 400; text-transform: uppercase; letter-spacing: 0.04em; animation: pop 0.5s; color: var(--bone); text-shadow: 0 3px 0 rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 0, 0, 0.8); padding: 14px 0; background: linear-gradient(90deg, transparent, rgba(22, 18, 14, 0.88) 18%, rgba(22, 18, 14, 0.88) 82%, transparent); }
 .banner { transition: opacity 0.3s; } .banner.out { opacity: 0; }
@@ -197,3 +192,15 @@ body { overflow: hidden; font-size: calc(17px * var(--scale)); }
 .savedel { padding: 0 14px; font-size: 1em; color: var(--red); }
 .savedel:hover:not(:disabled) { background: rgba(162, 72, 44, 0.12); }
 .credits { text-align: center; font-size: 0.7em; color: var(--bone-3); margin-top: 18px; }
+
+/* dice thrown from the phones roll over the whole screen; no tray, no card */
+.dicelayer { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 58; }
+/* their totals show in the log strip under the board for a few seconds */
+.rolllog { display: flex; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 4px; }
+.rolllog:empty { display: none; }
+.rollline { display: inline-flex; align-items: baseline; gap: 10px; padding: 3px 14px; border: 1px solid var(--edge-soft); background: rgba(0, 0, 0, 0.3); animation: pop 0.25s; transition: opacity 0.45s; }
+.rollline .who { font-family: var(--font-title); }
+.rollline .lbl { color: var(--ink-2); font-size: 0.85em; }
+.rollline .sum { font-family: var(--font-title); font-size: 1.35em; color: var(--bone); }
+.rollline.ok .sum { color: #a9c98f; } .rollline.no .sum { color: #e08a6a; } .rollline.crit .sum { color: #e3b75a; text-shadow: 0 0 10px rgba(201, 160, 80, 0.55); } .rollline.fumble .sum { color: #e08a6a; }
+.rollline.out { opacity: 0; }
