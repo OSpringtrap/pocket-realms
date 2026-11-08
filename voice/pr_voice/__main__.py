@@ -35,6 +35,10 @@ def main():
         from .tts_mlx import MlxTts
         tts = MlxTts(args.model)
     elif backend == "torch":
+        # ROCm: pass kernel arguments in device memory, which cuts the launch latency of the many
+        # small kernels a TTS frame is made of (AMD's advice for latency-bound inference). Must be
+        # set before HIP starts; CUDA and CPU ignore it.
+        os.environ.setdefault("HIP_FORCE_DEV_KERNARG", "1")
         from .tts_torch import TorchTts
         tts = TorchTts(args.model, args.device)
     else:
