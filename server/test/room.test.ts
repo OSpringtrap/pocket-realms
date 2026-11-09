@@ -6,6 +6,7 @@ import { instantClock } from '../src/clock.js';
 import { Game } from '../src/game/Game.js';
 import { installHandlers, toTitle } from '../src/game/director.js';
 import { JoinGuard, Room, clientAddress } from '../src/room.js';
+import { toInt16Frame } from '../src/voice/speech.js';
 
 /** just enough of a ws socket for Room: messages in, sent frames recorded */
 class FakeWs extends EventEmitter {
@@ -98,7 +99,7 @@ describe('room: watch screens', () => {
   it('voices go to the host and to watch screens, never to phones', () => {
     const { room, connect } = setup();
     const host = connect({ role: 'host', key: 'hostkey1' });
-    const watch = connect({ role: 'host' });
+    const watch = connect({ role: 'host', code: 'TEST' });
     const phone = new FakeWs();
     room.attach(phone as unknown as WebSocket);
     expect(room.screenCount()).toBe(2);
@@ -116,7 +117,7 @@ describe('room: watch screens', () => {
   it('the host screen sets the speech pace; a watch screen only when no host is connected', () => {
     const { room, played, connect } = setup();
     const host = connect({ role: 'host', key: 'hostkey1' });
-    const watch = connect({ role: 'host' });
+    const watch = connect({ role: 'host', code: 'TEST' });
     watch.msg({ t: 'speech:played', sid: 1 }); // muted watch screen: would rush the game
     expect(played).toEqual([]);
     host.msg({ t: 'speech:played', sid: 1 });
@@ -129,10 +130,62 @@ describe('room: watch screens', () => {
 
   it('a watch screen cannot run host commands', () => {
     const { room, connect } = setup();
-    const watch = connect({ role: 'host', key: 'wrong' });
+    const watch = connect({ role: 'host', key: 'wrong', code: 'test' });
     watch.msg({ t: 'host', command: { cmd: 'newCampaign', settings: {} } });
     expect(watch.sent).toContainEqual({ t: 'error', msg: 'Only the main screen can do that.' });
     expect(room.game.state.phase).toBe('title');
     room.close();
+  });
+});
+
+describe('room: the room code stays secret', () => {
+  const types = (ws: FakeWs) => ws.sent.map((m) => (m as { t: string }).t);
+
+  it('a watch screen without the room code gets no state (the state holds the code)', () => {
+    const { room, connect } = setup();
+    const nosy = connect({ role: 'host' });
+    expect(nosy.sent).toEqual([{ t: 'error', msg: 'Enter the room code (on the main screen) to watch this game.' }]);
+    const wrong = connect({ role: 'host', code: 'ABCD' });
+    expect(wrong.sent).toEqual([{ t: 'error', msg: 'Wrong room code — check the main screen.' }]);
+    expect(room.screenCount()).toBe(0);
+    room.sendScreens({ t: 'speechStop' });
+    expect(types(nosy)).not.toContain('speechStop');
+    // asking again with the code (the code box on the watch screen) lets it in
+    nosy.msg({ t: 'hello', v: PROTOCOL_VERSION, role: 'host', code: 'test' });
+    expect(types(nosy)).toContain('welcome');
+    expect(room.screenCount()).toBe(1);
+    room.close();
+  });
+
+  it('watch-screen guesses count toward the same lockout as phone joins', () => {
+    const { room } = setup();
+    const ws = new FakeWs();
+    room.attach(ws as unknown as WebSocket, '203.0.113.9');
+    for (let i = 0; i < JoinGuard.MAX_FAILS; i++) ws.msg({ t: 'hello', v: PROTOCOL_VERSION, role: 'host', code: 'ZZZZ' });
+    ws.msg({ t: 'join', v: PROTOCOL_VERSION, code: 'TEST', name: 'Eve' });
+    expect(ws.sent.at(-1)).toEqual({ t: 'error', msg: 'Too many wrong room codes. Try again in 5 min.' });
+    expect(room.checkCode('203.0.113.9', 'TEST')).toBe('Too many wrong room codes. Try again in 5 min.');
+    expect(room.checkCode('198.51.100.2', '')).not.toBeNull(); // no code: refused, but not a guess
+    expect(room.joinGuard.locked('198.51.100.2')).toBe(0);
+    room.close();
+  });
+});
+
+describe('voice frames', () => {
+  it('are sent as int16, half the size, same header', () => {
+    const n = 4;
+    const f = Buffer.alloc(24 + 4 * n);
+    f.writeUInt32LE(0x30445541, 0); // AUD0
+    f.writeUInt32LE(7, 4);
+    f.writeUInt32LE(24000, 12);
+    f.writeUInt32LE(n, 16);
+    [0, 0.5, -1, 2].forEach((x, i) => f.writeFloatLE(x, 24 + 4 * i));
+    const o = toInt16Frame(f);
+    expect(o.length).toBe(24 + 2 * n);
+    expect(o.readUInt32LE(0)).toBe(0x31445541); // AUD1
+    expect([o.readUInt32LE(4), o.readUInt32LE(12), o.readUInt32LE(16)]).toEqual([7, 24000, n]);
+    expect([0, 1, 2, 3].map((i) => o.readInt16LE(24 + 2 * i))).toEqual([0, 16384, -32768, 32767]); // clipped
+    const junk = Buffer.alloc(10);
+    expect(toInt16Frame(junk)).toBe(junk);
   });
 });

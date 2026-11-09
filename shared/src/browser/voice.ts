@@ -1,11 +1,12 @@
 /**
  * Voice playback on the main screen (ported from solo-dm's Player): sentences arrive as AUD0
- * frames (mono float32), are scheduled back to back with a small jitter buffer before each
+ * frames (mono int16 AUD1; float32 AUD0 also works), are scheduled back to back with a small jitter buffer before each
  * sentence and a pause between different speakers, and each sentence is reported once heard.
  */
 import type { Sfx } from './audio.js';
 
-const AUDIO_MAGIC = 0x30445541; // "AUD0" little-endian
+const AUD0 = 0x30445541; // "AUD0" little-endian: float32 samples
+const AUD1 = 0x31445541; // "AUD1": int16 samples (what the server sends)
 const HEADER = 24;
 
 interface Sentence {
@@ -51,16 +52,25 @@ export class VoicePlayer {
 
   frame(buf: ArrayBuffer) {
     const v = new DataView(buf);
-    if (buf.byteLength < HEADER || v.getUint32(0, true) !== AUDIO_MAGIC) return;
+    if (buf.byteLength < HEADER) return;
+    const magic = v.getUint32(0, true);
+    const bytes = magic === AUD1 ? 2 : magic === AUD0 ? 4 : 0;
+    if (!bytes) return;
     const job = v.getUint32(4, true);
     const sampleRate = v.getUint32(12, true);
     const n = v.getUint32(16, true);
     const s = this.byJob.get(job);
     const out = this.out();
-    if (!s || !out || buf.byteLength !== HEADER + 4 * n || !n) return;
+    if (!s || !out || buf.byteLength !== HEADER + bytes * n || !n) return;
     const ctx = out.context as AudioContext;
     const ab = ctx.createBuffer(1, n, sampleRate);
-    ab.copyToChannel(new Float32Array(buf, HEADER, n), 0);
+    if (bytes === 4) ab.copyToChannel(new Float32Array(buf, HEADER, n), 0);
+    else {
+      const pcm = new Int16Array(buf, HEADER, n);
+      const f = new Float32Array(n);
+      for (let i = 0; i < n; i++) f[i] = pcm[i] / 32768;
+      ab.copyToChannel(f, 0);
+    }
     const src = ctx.createBufferSource();
     src.buffer = ab;
     src.connect(out);

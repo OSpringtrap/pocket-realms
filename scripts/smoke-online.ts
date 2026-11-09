@@ -8,11 +8,25 @@
 import { PROTOCOL_VERSION } from '../shared/src/index.js';
 import { Client, assert, sleep } from './lib/wsclient.js';
 
+const CODE = process.env.ROOM_CODE ?? 'TEST';
+const BASE = `https://127.0.0.1:${process.env.PORT ?? 9443}`;
+
+// the room code must not leak to someone who only has the address
+const nosy = new Client('nosy');
+await nosy.open();
+nosy.send({ t: 'hello', v: PROTOCOL_VERSION, role: 'host' });
+await sleep(300);
+assert(!nosy.view && nosy.errors.some((e) => /room code/i.test(e)), 'a watch screen without the code gets no state');
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+assert((await fetch(`${BASE}/api/info`)).status === 403, '/api/info needs the code or host key');
+assert((await fetch(`${BASE}/api/qr.svg`)).status === 403, 'the QR needs the code or host key');
+assert((await fetch(`${BASE}/api/qr.svg?room=${CODE}`)).ok, 'the QR with the code works');
+
 const watch = new Client('watch');
 const host = new Client('host');
 await watch.open();
 await host.open();
-watch.send({ t: 'hello', v: PROTOCOL_VERSION, role: 'host' });
+watch.send({ t: 'hello', v: PROTOCOL_VERSION, role: 'host', code: CODE });
 host.send({ t: 'hello', v: PROTOCOL_VERSION, role: 'host', key: process.env.HOST_KEY ?? 'testkey' });
 await sleep(400);
 const pub = (c: Client) => (c.view as unknown as { publicUrl?: string; scene: { kind: string } } | undefined);
@@ -31,7 +45,7 @@ assert(pub(watch)?.scene.kind === 'lobby', 'watch screen follows into the lobby'
 
 const phone = new Client('Remote');
 await phone.open();
-phone.send({ t: 'join', v: PROTOCOL_VERSION, code: process.env.ROOM_CODE ?? 'TEST', name: 'Remote' });
+phone.send({ t: 'join', v: PROTOCOL_VERSION, code: CODE, name: 'Remote' });
 await sleep(400);
 assert(!!phone.playerId, 'remote phone joins');
 assert((pub(watch) as unknown as { players: unknown[] }).players.length === 1, 'watch screen sees the new player');

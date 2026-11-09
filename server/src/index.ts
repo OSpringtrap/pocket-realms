@@ -75,11 +75,20 @@ function main() {
   const hostDir = path.join(ROOT, 'dist', 'client-host');
   const phoneDir = path.join(ROOT, 'dist', 'client-phone');
   if (!fs.existsSync(hostDir) || !fs.existsSync(phoneDir)) console.warn('⚠️  Built clients not found — run `bun run build` (`bun start` does this for you).');
-  app.get('/api/qr.svg', async (_req, res) => {
+  /**
+   * The QR and /api/info contain the room code, and online anyone with the tunnel address can reach
+   * them, so they need the host key or the code itself (counted by the same wrong-guess lockout).
+   */
+  const mayKnowCode = (req: express.Request): boolean => {
+    if (req.query.key === hostKey) return true;
+    return room.checkCode(clientAddress(req.socket.remoteAddress, req.headers), req.query.room) === null;
+  };
+  app.get('/api/qr.svg', async (req, res) => {
+    if (!mayKnowCode(req)) return void res.status(403).type('text/plain').send('room code or host key required');
     const svg = await QRCode.toString(joinUrl(), { type: 'svg', margin: 1, color: { dark: '#2b1d0e', light: '#00000000' } });
     res.type('image/svg+xml').setHeader('Cache-Control', 'no-cache').send(svg);
   });
-  app.get('/api/info', (_req, res) => res.json({ code, joinUrl: joinUrl(), lanUrl, publicUrl: game.opts.publicUrl ?? null }));
+  app.get('/api/info', (req, res) => (mayKnowCode(req) ? res.json({ code, joinUrl: joinUrl(), lanUrl, publicUrl: game.opts.publicUrl ?? null }) : res.status(403).json({ error: 'room code or host key required' })));
   app.get('/healthz', (_req, res) => res.send('ok'));
   app.use('/host', express.static(hostDir, { index: 'index.html', maxAge: '1h' }));
   app.use('/', express.static(phoneDir, { index: 'index.html', maxAge: '1h' }));
@@ -128,7 +137,7 @@ function main() {
     const line = '─'.repeat(64);
     console.log(`${line}\n  🌍  ONLINE: send these to players who are not in the room\n${line}`);
     console.log(`  📱 Phone:        ${url}/?room=${code}`);
-    console.log(`  📺 Watch screen: ${url}/host/      (follows the game, no controls)`);
+    console.log(`  📺 Watch screen: ${url}/host/?room=${code}      (follows the game, no controls)`);
     if (!verified) console.log(`\n  (It has not answered from here yet. If a link won't open, wait a minute and retry.)`);
     console.log(`\n  Keep the host link above to yourself: it controls the game.`);
     console.log(`${line}\n`);

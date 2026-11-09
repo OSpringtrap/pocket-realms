@@ -23,13 +23,19 @@ Each entry: **decision** — why.
   in testing, so a link sent right away failed. The server polls `/healthz` through the tunnel first.
 - **Voices go to every screen; the host screen sets their pace.** Watch screens get the same speech and audio
   frames, but their `speech:played` reports count only when no host screen is connected: a muted or
-  not-yet-clicked tab reports each sentence at once and would rush the game. Audio is float32 at 24 kHz
-  (about 0.8 Mbit/s per watch screen while someone speaks); fine for home internet, so not compressed.
+  not-yet-clicked tab reports each sentence at once and would rush the game. The worker's float32 audio
+  goes out as int16 (AUD1 frames, about 0.4 Mbit/s per screen while someone speaks): each watch screen
+  is another upload from the host's home connection, and 16-bit loses nothing audible for speech.
   A watch screen in the same room as the host echoes; mute that tab.
 - **Wrong room codes are rate limited per address** (8 in 10 min, then 5 min locked out). A 4-letter code
   is only ~330k guesses. Tunnel traffic all arrives from `127.0.0.1`, so the address is Cloudflare's
   `CF-Connecting-IP`, trusted only on loopback connections so a LAN device can't choose its own address.
   Tokens (128-bit) and the host key (64-bit) need no limit.
+- **Everything that reveals the room code needs it (or the host key).** Watch screens get the code in
+  their state, and the QR / `/api/info` contain it, so without this anyone with the tunnel address
+  could read the code and skip the lockout. A watch screen sends the code in `hello` (from `?room=` in
+  the printed link, or typed in); the QR and `/api/info` take `?key=` or `?room=`. All of them go
+  through `Room.checkCode`, so the same wrong-guess limit applies.
 - **State sync = full state once, then structural JSON diffs** (`state:patch`) per connection, with sequence
   numbers; a gap makes the client reconnect for a fresh full state. Transient things (dice results, damage
   numbers, sounds, banners, haptics) travel as `fx` messages.

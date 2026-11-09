@@ -82,13 +82,14 @@ The terminal says the tunnel was created, then waits until the new address answe
 
 ```
 📱 Phone:        https://some-random-words.trycloudflare.com/?room=QWRT
-📺 Watch screen: https://some-random-words.trycloudflare.com/host/
+📺 Watch screen: https://some-random-words.trycloudflare.com/host/?room=QWRT
 ```
 
 - **Phone link:** the remote player opens it on their phone and joins as usual. Players in the room
   can keep using the local address; the QR code on the main screen switches to the online one,
   which works everywhere.
 - **Watch screen:** open it on the remote player's computer or TV and click once to turn on sound.
+  It needs the room code (the link includes it; otherwise it asks), like a phone does.
   It shows the same main screen (map, combat, dice, narration, sounds and voices) but has no
   controls. Only your host link (with `?key=`) runs the game, so don't share that one. Your own
   screen sets the pace of the voices; a muted watch screen doesn't speed anything up.

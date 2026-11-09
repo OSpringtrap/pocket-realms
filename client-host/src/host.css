@@ -188,6 +188,9 @@ body { overflow: hidden; font-size: calc(17px * var(--scale)); }
 body.spectator .title-grid { display: none; }
 .topbar .watching { font-family: var(--font-title); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-2); border: 1px solid currentColor; padding: 2px 8px; opacity: 0.8; }
 .unlock { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at center, #3a352f, #1c1916); flex-direction: column; gap: 16px; cursor: pointer; font-family: var(--font-title); font-size: 2.2em; font-weight: 400; text-transform: uppercase; letter-spacing: 0.08em; color: var(--bone); }
+.codegate { position: fixed; inset: 0; z-index: 150; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: radial-gradient(ellipse at center, #3a352f, #1c1916); font-family: var(--font-title); font-size: 2em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--bone); }
+.codegate .small { font-family: var(--font-body); letter-spacing: 0; text-transform: none; font-style: italic; }
+.codegate input { font: inherit; width: 5.5em; text-align: center; letter-spacing: 0.3em; text-transform: uppercase; }
 .unlock .small { font-family: var(--font-body); font-variant: normal; letter-spacing: 0; font-weight: 400; font-style: italic; }
 
 .saverow { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: stretch; }

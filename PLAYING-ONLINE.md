@@ -49,7 +49,7 @@ main screen if they want to see the map and the fights. They install nothing.
    ```
    🌍  ONLINE: send these to players who are not in the room
    📱 Phone:        https://some-random-words.trycloudflare.com/?room=QWRT
-   📺 Watch screen: https://some-random-words.trycloudflare.com/host/
+   📺 Watch screen: https://some-random-words.trycloudflare.com/host/?room=QWRT
    ```
 
    The links only appear once they work, so waiting here is normal.
@@ -101,7 +101,8 @@ optional, for the main screen.
 
 ### The watch screen (recommended)
 
-1. Open the **📺 Watch screen** link on a computer or TV browser.
+1. Open the **📺 Watch screen** link on a computer or TV browser. The link carries the room code;
+   if the screen asks for it, type the 4 letters from the main screen.
 2. **Click anywhere once.** Browsers keep sound off until you do.
 3. Press **F11** (or the browser's fullscreen option) for the full view.
 4. "👁 Watching" in the top bar means this screen follows the game; the host controls it.
@@ -134,8 +135,8 @@ The game has no voice chat, so use a call (Discord, FaceTime, WhatsApp…) to ta
 | "Safari can't open the page because your iPhone is not connected to the internet" | The phone has no internet right now. Check Wi-Fi/mobile data. On iPhone: *Settings → Cellular* and make sure **Safari** is allowed to use mobile data. |
 | "Safari can't find the server" / "This site can't be reached" | The link is new and isn't known everywhere yet (wait a minute and retry), **or** it's from an older session. Ask the host for today's link. |
 | A Cloudflare page saying "Tunnel error" | The host's game isn't running (closed, or the computer went to sleep). Host: start it again and send the new links. |
-| "Wrong room code" | Use the room code shown on the main screen (4 letters). The phone link fills it in for you. |
-| "Too many wrong room codes. Try again in 5 min." | 8 wrong codes in a row locks that connection out for 5 minutes, to keep strangers out. Wait, then use the phone link so the code is filled in. |
+| "Wrong room code" | Use the room code shown on the main screen (4 letters). The phone and watch-screen links fill it in for you. |
+| "Too many wrong room codes. Try again in 5 min." | 8 wrong codes in a row locks that connection out for 5 minutes, to keep strangers out. Wait, then use the phone or watch-screen link so the code is filled in. |
 | Watch screen shows everything but there's no sound | Click the watch screen once. Check the tab isn't muted. Voices need the host to have them installed (`bun run voice:setup`). |
 | The host terminal says the tunnel stopped and is restarting | The internet link dropped. A new pair of links is printed a moment later; everyone opens the new ones. |
 | A certificate warning on the phone | You opened the local address (numbers like `192.168…`), not the online link. That works too on the host's Wi-Fi; just tap *Advanced → Proceed* once. Remote players should use the online link. |

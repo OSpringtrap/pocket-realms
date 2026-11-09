@@ -116,7 +116,7 @@ export class Net<V extends PublicView | PhoneView> {
     if (this.ws?.readyState === 1) this.ws.send(JSON.stringify(msg));
   }
 
-  hello(role: 'host', key?: string) {
-    this.send({ t: 'hello', v: PROTOCOL_VERSION, role, key });
+  hello(role: 'host', key?: string, code?: string) {
+    this.send({ t: 'hello', v: PROTOCOL_VERSION, role, key, code });
   }
 }

@@ -46,7 +46,7 @@ async function main() {
   const watch = new Host('watch');
   watch.silent = true;
   await watch.open();
-  watch.send({ t: 'hello', v: PROTOCOL_VERSION, role: 'host' }); // no key: a remote watch screen
+  watch.send({ t: 'hello', v: PROTOCOL_VERSION, role: 'host', code: process.env.ROOM_CODE ?? 'TEST' }); // no key: a remote watch screen
   await sleep(300);
   for (let i = 0; i < 120 && host.view?.voice?.state !== 'ready'; i++) await sleep(1000);
   assert(host.view?.voice?.state === 'ready', `voice worker ready (${JSON.stringify(host.view?.voice)})`);

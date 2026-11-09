@@ -15,6 +15,9 @@ import type { Character, Monster } from '../../shared/src/types.js';
 
 const params = new URLSearchParams(location.search);
 const hostKey = params.get('key') ?? undefined;
+/** a watch screen (no host key) needs the room code: from the link (?room=) or typed in */
+let roomCode = (params.get('room') ?? '').trim().toUpperCase() || undefined;
+let welcomed = false;
 const C = content();
 
 let view: PublicView | undefined;
@@ -56,8 +59,13 @@ voice.onSpeaking = (who) => {
 };
 
 const net = new Net<PublicView>({
-  onOpen: (n) => n.hello('host', hostKey),
+  onOpen: (n) => {
+    welcomed = false;
+    n.hello('host', hostKey, roomCode);
+  },
   onWelcome: (m) => {
+    welcomed = true;
+    codeGate.remove();
     role = m.role;
     document.body.classList.toggle('spectator', role !== 'host');
     if (role !== 'host') toast('Watch screen: it follows the game, and the host controls it. Play on your phone.', 'info', 6000);
@@ -73,9 +81,38 @@ const net = new Net<PublicView>({
     else voice.stop();
   },
   onAudio: (buf) => voice.frame(buf),
-  onError: (msg) => toast(msg, 'error'),
+  // refused before a welcome: a watch screen without (the right) room code
+  onError: (msg) => (welcomed ? toast(msg, 'error') : askRoomCode(msg)),
   onStatus: () => renderTop(true),
 });
+
+const codeInput = h('input', { maxlength: 4, autocomplete: 'off', autocapitalize: 'characters', spellcheck: false, placeholder: 'ABCD' }) as HTMLInputElement;
+const codeMsg = h('div', { class: 'small muted' });
+const codeGate = h(
+  'form',
+  { class: 'codegate' },
+  h('div', { style: 'font-size:2.4em;color:var(--ochre)' }, '❖'),
+  'Watch this game',
+  codeMsg,
+  codeInput,
+  h('button', { type: 'submit' }, 'Watch'),
+);
+codeGate.addEventListener('submit', (e) => {
+  e.preventDefault();
+  roomCode = codeInput.value.trim().toUpperCase() || undefined;
+  if (!roomCode) return;
+  // keep it in the address so a reload (or reconnect) does not ask again
+  const u = new URL(location.href);
+  u.searchParams.set('room', roomCode);
+  history.replaceState(null, '', u);
+  net.hello('host', hostKey, roomCode);
+});
+function askRoomCode(msg: string) {
+  codeMsg.textContent = msg;
+  codeInput.value = '';
+  if (!codeGate.isConnected) document.body.appendChild(codeGate);
+  codeInput.focus();
+}
 
 /** In-page confirmation (native confirm() is unreliable in fullscreen and can blank the page). */
 function askConfirm(text: string, okLabel: string, onOk: () => void) {
@@ -283,12 +320,13 @@ function renderLobby() {
       { class: 'card joinbox' },
       h('h2', null, '📱 Join on your phone'),
       // the query changes with the address, so a new tunnel link is not served from cache
-      h('img', { src: `/api/qr.svg?u=${encodeURIComponent(joinAddress(v))}`, alt: 'QR code to join' }),
+      // the QR holds the room code, so the server wants the host key (or, on a watch screen, the code)
+      h('img', { src: `/api/qr.svg?u=${encodeURIComponent(joinAddress(v))}&${hostKey && role === 'host' ? `key=${encodeURIComponent(hostKey)}` : `room=${v.code}`}`, alt: 'QR code to join' }),
       h('div', { class: 'url' }, joinAddress(v)),
       h('div', null, 'Room code'),
       h('div', { class: 'bigcode' }, v.code),
       v.publicUrl
-        ? h('div', { class: 'tip' }, '🌍 Online: this address works from anywhere, on any Wi-Fi or mobile data. Remote players can also open ', h('b', null, `${v.publicUrl.replace('https://', '')}/host/`), ' on a computer to watch this screen.')
+        ? h('div', { class: 'tip' }, '🌍 Online: this address works from anywhere, on any Wi-Fi or mobile data. Remote players can also open ', h('b', null, `${v.publicUrl.replace('https://', '')}/host/`), ' on a computer (with the room code) to watch this screen.')
         : h('div', { class: 'tip' }, '🔒 First time? Your phone will warn about the certificate. Tap Advanced → Proceed (Chrome) or Show Details → visit this website (Safari). It is your own computer. Same Wi-Fi required.'),
     ),
     h(

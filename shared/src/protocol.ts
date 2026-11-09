@@ -345,7 +345,7 @@ export type HostCommand =
   | { cmd: 'addBot' };
 
 export type C2S =
-  | { t: 'hello'; v: number; role: 'host'; key?: string }
+  | { t: 'hello'; v: number; role: 'host'; key?: string; /** room code: a watch screen (no host key) needs it */ code?: string }
   | { t: 'join'; v: number; code: string; name: string; token?: string }
   | { t: 'resume'; v: number; token: string }
   | { t: 'claim'; charId: string }
@@ -369,7 +369,7 @@ export type S2C =
   | { t: 'fx'; fx: Fx[] }
   | { t: 'error'; msg: string; fatal?: boolean }
   | { t: 'pong'; at: number }
-  // Voice (main screen only). Audio follows as binary AUD0 frames tagged with `job`.
+  // Voice (main screen only). Audio follows as binary AUD1 frames (int16; AUD0 = float32 also accepted) tagged with `job`.
   | { t: 'speech'; sid: number; job: number; who: string; voice: string }
   | { t: 'speechEnd'; sid: number }
   | { t: 'speechStop' };

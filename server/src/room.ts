@@ -152,6 +152,24 @@ export class Room {
     ws.on('error', () => {});
   }
 
+  /**
+   * The one place a room code is checked (phone joins, watch screens, the QR/info endpoints), so the
+   * wrong-guess lockout covers every way of learning or using the code. Returns an error, or null.
+   * An empty code is not counted as a guess (a watch screen opened without one is asked for it).
+   */
+  checkCode(addr: string, code: unknown, emptyMsg = 'Enter the room code from the main screen.'): string | null {
+    const wait = this.joinGuard.locked(addr);
+    if (wait) return `Too many wrong room codes. Try again in ${Math.ceil(wait / 60_000)} min.`;
+    const c = String(code ?? '').trim().toUpperCase();
+    if (!c) return emptyMsg;
+    if (c !== this.code) {
+      this.joinGuard.fail(addr);
+      return 'Wrong room code — check the main screen.';
+    }
+    this.joinGuard.ok(addr);
+    return null;
+  }
+
   hostCount(): number {
     return [...this.conns].filter((c) => c.role === 'host' && c.ws.readyState === 1).length;
   }
@@ -206,6 +224,11 @@ export class Room {
       case 'ping':
         return this.send(conn, { t: 'pong', at: Number(msg.at) || 0 });
       case 'hello': {
+        // No host key: a watch screen. It sees the room code in the state, so it must know it already.
+        if (msg.key !== this.hostKey) {
+          const bad = this.checkCode(conn.addr, msg.code, 'Enter the room code (on the main screen) to watch this game.');
+          if (bad) return err(bad);
+        }
         conn.role = msg.key === this.hostKey ? 'host' : 'spectator';
         conn.last = undefined;
         this.send(conn, { t: 'welcome', v: PROTOCOL_VERSION, role: conn.role, code: this.code });
@@ -217,13 +240,8 @@ export class Room {
         return this.bindPlayer(conn, p.id);
       }
       case 'join': {
-        const wait = this.joinGuard.locked(conn.addr);
-        if (wait) return err(`Too many wrong room codes. Try again in ${Math.ceil(wait / 60_000)} min.`);
-        if (String(msg.code ?? '').trim().toUpperCase() !== this.code) {
-          this.joinGuard.fail(conn.addr);
-          return err('Wrong room code — check the TV screen.');
-        }
-        this.joinGuard.ok(conn.addr);
+        const bad = this.checkCode(conn.addr, msg.code);
+        if (bad) return err(bad);
         const byToken = msg.token ? g.findByToken(String(msg.token)) : undefined;
         if (byToken) return this.bindPlayer(conn, byToken.id);
         if (g.state.phase === 'title') return err('The host is still on the title screen — ask them to start a campaign!');

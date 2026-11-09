@@ -10,6 +10,29 @@ import type { TtsWorker } from './worker.js';
  * it played (or after its length plus a margin, if no report comes).
  */
 
+const AUD0 = 0x30445541; // "AUD0": float32 samples, as the worker sends them
+const AUD1 = 0x31445541; // "AUD1": the same frame with int16 samples
+const HEADER = 24;
+
+/**
+ * Halve the audio before it goes out: float32 at 24 kHz is ~0.8 Mbit/s per screen, which online
+ * (one upload per watch screen, from the host's home connection) adds up. 16-bit is plenty for speech.
+ * Same header, new magic; anything that is not a well-formed AUD0 frame passes through untouched.
+ */
+export function toInt16Frame(buf: Buffer): Buffer {
+  if (buf.length < HEADER || buf.readUInt32LE(0) !== AUD0) return buf;
+  const n = buf.readUInt32LE(16);
+  if (buf.length !== HEADER + 4 * n) return buf;
+  const out = Buffer.allocUnsafe(HEADER + 2 * n);
+  buf.copy(out, 0, 0, HEADER);
+  out.writeUInt32LE(AUD1, 0);
+  for (let i = 0; i < n; i++) {
+    const f = Math.max(-1, Math.min(1, buf.readFloatLE(HEADER + 4 * i) || 0));
+    out.writeInt16LE(Math.round(f < 0 ? f * 32768 : f * 32767), HEADER + 2 * i);
+  }
+  return out;
+}
+
 export interface SpeechSink {
   /** connected screens that play speech (host and watch screens) */
   hosts(): number;
@@ -128,7 +151,7 @@ export class SpeechQueue implements VoiceHooks {
       const job = ++this.job;
       const entry: { job: number; synthDone: boolean; timer?: NodeJS.Timeout } = { job, synthDone: false };
       const ok = this.worker.synth(job, it.text, it.voice, {
-        frame: (buf) => this.sink.binary(buf),
+        frame: (buf) => this.sink.binary(toInt16Frame(buf)),
         end: (status, info) => {
           this.sink.json({ t: 'speechEnd', sid: it.sid });
           entry.synthDone = true;
