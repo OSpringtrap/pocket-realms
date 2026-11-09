@@ -66,6 +66,8 @@ Tip: typing `http://<ip>:8080` on a phone redirects to the HTTPS address.
 
 ### Playing online (friends in another house)
 
+**Step-by-step guide for the host and the players: [PLAYING-ONLINE.md](PLAYING-ONLINE.md).**
+
 The game still runs on your computer; a free Cloudflare quick tunnel gives it a public `https://`
 address, so remote players need nothing installed and get no certificate warning. Install
 [`cloudflared`](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/)
