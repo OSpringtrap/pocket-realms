@@ -7,6 +7,8 @@ interface Conn {
   ws: WebSocket;
   id: number;
   role: 'pending' | 'host' | 'spectator' | 'phone';
+  /** remote address (the real one for tunnel connections), for the wrong-code guard */
+  addr: string;
   playerId?: string;
   last?: unknown;
   seq: number;
@@ -19,6 +21,56 @@ const MAX_MSGS_PER_SEC = 40;
 const ROOM_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 const BAD = /^(FUCK|SHIT|CUNT|DICK|COCK|PISS|TWAT|SLUT|FAGS|NAZI|RAPE|KKKK)$/;
 
+/**
+ * Online, the 4-letter room code (~330k codes) is the only thing between a stranger and the party,
+ * so wrong guesses are counted per address: after MAX_FAILS in FAIL_WINDOW_MS, joins from that
+ * address are refused for LOCK_MS. Generous enough for typos on a phone keyboard.
+ */
+export class JoinGuard {
+  static MAX_FAILS = 8;
+  static FAIL_WINDOW_MS = 10 * 60_000;
+  static LOCK_MS = 5 * 60_000;
+  private fails = new Map<string, { count: number; first: number; lockedUntil: number }>();
+
+  constructor(private now: () => number = Date.now) {}
+
+  /** milliseconds this address must still wait, or 0 */
+  locked(addr: string): number {
+    const f = this.fails.get(addr);
+    return f ? Math.max(0, f.lockedUntil - this.now()) : 0;
+  }
+
+  fail(addr: string) {
+    const now = this.now();
+    let f = this.fails.get(addr);
+    if (!f || now - f.first > JoinGuard.FAIL_WINDOW_MS) f = { count: 0, first: now, lockedUntil: 0 };
+    if (++f.count >= JoinGuard.MAX_FAILS) {
+      f.lockedUntil = now + JoinGuard.LOCK_MS;
+      f.count = 0;
+      f.first = now;
+    }
+    this.fails.set(addr, f);
+    if (this.fails.size > 1000) for (const [k, v] of this.fails) if (now - v.first > JoinGuard.FAIL_WINDOW_MS && v.lockedUntil < now) this.fails.delete(k);
+  }
+
+  ok(addr: string) {
+    this.fails.delete(addr);
+  }
+}
+
+const LOOPBACK = /^(127\.\d+\.\d+\.\d+|::1|::ffff:127\.\d+\.\d+\.\d+)$/;
+
+/**
+ * Who is connecting. Through the online tunnel every socket comes from cloudflared on this machine,
+ * so the real address is Cloudflare's CF-Connecting-IP header; it is trusted only on loopback
+ * connections, so a device on the LAN cannot pick its own address with it.
+ */
+export function clientAddress(remote: string | undefined, headers: Record<string, string | string[] | undefined>): string {
+  const cf = headers['cf-connecting-ip'];
+  if (remote && LOOPBACK.test(remote) && typeof cf === 'string' && cf.trim()) return cf.trim();
+  return remote ?? 'unknown';
+}
+
 export function makeRoomCode(): string {
   for (;;) {
     let s = '';
@@ -30,6 +82,7 @@ export function makeRoomCode(): string {
 export class Room {
   conns = new Set<Conn>();
   private nextId = 1;
+  joinGuard = new JoinGuard();
   /** main screen reported a sentence as played (voice) */
   onSpeechPlayed?: (sid: number) => void;
   private flushTimer?: NodeJS.Timeout;
@@ -65,8 +118,8 @@ export class Room {
     }
   }
 
-  attach(ws: WebSocket) {
-    const conn: Conn = { ws, id: this.nextId++, role: 'pending', seq: 0, alive: true, msgCount: 0, windowStart: Date.now() };
+  attach(ws: WebSocket, addr = 'unknown') {
+    const conn: Conn = { ws, id: this.nextId++, role: 'pending', addr, seq: 0, alive: true, msgCount: 0, windowStart: Date.now() };
     this.conns.add(conn);
     ws.on('pong', () => (conn.alive = true));
     ws.on('message', (data, isBinary) => {
@@ -99,13 +152,19 @@ export class Room {
     ws.on('error', () => {});
   }
 
-  /** Speech goes to the main screen(s) only. */
   hostCount(): number {
     return [...this.conns].filter((c) => c.role === 'host' && c.ws.readyState === 1).length;
   }
-  sendHosts(msg: S2C | Buffer) {
+  /** Screens that play voices: the host and every watch screen (remote players' main screens). Phones never do. */
+  private isScreen(c: Conn): boolean {
+    return (c.role === 'host' || c.role === 'spectator') && c.ws.readyState === 1;
+  }
+  screenCount(): number {
+    return [...this.conns].filter((c) => this.isScreen(c)).length;
+  }
+  sendScreens(msg: S2C | Buffer) {
     for (const c of this.conns) {
-      if (c.role !== 'host' || c.ws.readyState !== 1) continue;
+      if (!this.isScreen(c)) continue;
       try {
         if (Buffer.isBuffer(msg)) c.ws.send(msg, { binary: true });
         else c.ws.send(JSON.stringify(msg));
@@ -140,7 +199,9 @@ export class Room {
     if ('v' in msg && msg.v !== PROTOCOL_VERSION) return this.send(conn, { t: 'error', msg: 'The game was updated — please refresh this page.', fatal: true });
     switch (msg.t) {
       case 'speech:played':
-        if (conn.role === 'host') this.onSpeechPlayed?.(Number(msg.sid));
+        // The host screen sets the pace. A watch screen that is muted or not clicked yet reports every
+        // sentence at once, which would rush the game, so watch screens count only when no host is here.
+        if (conn.role === 'host' || (conn.role === 'spectator' && this.hostCount() === 0)) this.onSpeechPlayed?.(Number(msg.sid));
         return;
       case 'ping':
         return this.send(conn, { t: 'pong', at: Number(msg.at) || 0 });
@@ -156,7 +217,13 @@ export class Room {
         return this.bindPlayer(conn, p.id);
       }
       case 'join': {
-        if (String(msg.code ?? '').trim().toUpperCase() !== this.code) return err('Wrong room code — check the TV screen.');
+        const wait = this.joinGuard.locked(conn.addr);
+        if (wait) return err(`Too many wrong room codes. Try again in ${Math.ceil(wait / 60_000)} min.`);
+        if (String(msg.code ?? '').trim().toUpperCase() !== this.code) {
+          this.joinGuard.fail(conn.addr);
+          return err('Wrong room code — check the TV screen.');
+        }
+        this.joinGuard.ok(conn.addr);
         const byToken = msg.token ? g.findByToken(String(msg.token)) : undefined;
         if (byToken) return this.bindPlayer(conn, byToken.id);
         if (g.state.phase === 'title') return err('The host is still on the title screen — ask them to start a campaign!');

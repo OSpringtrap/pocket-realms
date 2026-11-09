@@ -13,6 +13,8 @@ import { renderTab, type TabId } from './tabs.js';
 
 const C = content();
 const params = new URLSearchParams(location.search);
+/** opened through the online address (a domain name) rather than the host's LAN IP or localhost */
+const ONLINE = !/^(\d{1,3}(\.\d{1,3}){3}|localhost|\[[0-9a-f:]+\])$/i.test(location.hostname);
 const LS = {
   get: (k: string) => {
     try {
@@ -124,13 +126,16 @@ function renderJoin() {
     h('div', { class: 'logo' }, '🏰 Pocket Realms'),
     h('div', { class: 'center muted' }, 'Your phone is your hero: sheet, wand, sword and dice.'),
     h('div', { class: 'card col' }, h('b', null, 'Room code (on the TV)'), code, h('b', null, 'Your name'), name, go),
-    h(
-      'div',
-      { class: 'card tip' },
-      h('b', null, '🔒 Saw a certificate warning?'),
-      h('div', null, 'That is expected: the game runs on your friend\'s computer, not the internet. On Chrome tap "Advanced" → "Proceed". On Safari tap "Show Details" → "visit this website". You only do this once.'),
-      h('div', { style: 'margin-top:6px' }, '📶 Make sure you are on the same Wi-Fi as the main screen.'),
-    ),
+    // joined through the online address (a real domain, not an IP): no certificate warning, any network
+    ONLINE
+      ? null
+      : h(
+          'div',
+          { class: 'card tip' },
+          h('b', null, '🔒 Saw a certificate warning?'),
+          h('div', null, 'That is expected: the game runs on your friend\'s computer, not the internet. On Chrome tap "Advanced" → "Proceed". On Safari tap "Show Details" → "visit this website". You only do this once.'),
+          h('div', { style: 'margin-top:6px' }, '📶 Make sure you are on the same Wi-Fi as the main screen.'),
+        ),
     DEBUG ? h('div', { class: 'tip center' }, '🧪 Debug mode: simulated sensors (button bottom-right).') : null,
   ];
 }

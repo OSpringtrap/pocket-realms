@@ -59,7 +59,8 @@ const net = new Net<PublicView>({
   onOpen: (n) => n.hello('host', hostKey),
   onWelcome: (m) => {
     role = m.role;
-    if (role !== 'host') toast('Spectator mode (no host key in the URL). Use the link printed in the terminal to control the game.', 'info', 6000);
+    document.body.classList.toggle('spectator', role !== 'host');
+    if (role !== 'host') toast('Watch screen: it follows the game, and the host controls it. Play on your phone.', 'info', 6000);
   },
   onState: (v) => {
     view = v;
@@ -91,6 +92,11 @@ function cmd(command: HostCommand) {
 }
 
 // ------------------------------------------------------------ helpers
+
+/** where phones join: the internet address when the game is online (it works on the LAN too) */
+function joinAddress(v: PublicView): string {
+  return v.publicUrl ?? v.lanUrl;
+}
 
 function avatar(c: Character | undefined, fallback = '🙂'): HTMLElement {
   if (c?.portrait) return h('img', { src: c.portrait, alt: c.name });
@@ -139,7 +145,7 @@ function render() {
   stage.dataset.scene = sc.kind;
   const fullScenes = ['title', 'lobby', 'ending', 'jackbox'];
   main.classList.toggle('full', fullScenes.includes(sc.kind));
-  stageSlot.render(hash([sc, view.world && sc.kind === 'overworld' ? [view.world.tiles.length, view.world.party, view.world.tiles.map((t) => t.reachable ?? '-').join(''), view.world.fogReach?.length, view.world.doom, view.world.objective.keys] : 0, sc.kind === 'lobby' || sc.kind === 'title' ? [view.players, Object.keys(view.chars)] : 0, sc.kind === 'combat' ? view.chars : 0, sc.kind === 'event' ? view.waiting.length : 0]), () => renderStage(sc));
+  stageSlot.render(hash([sc, view.world && sc.kind === 'overworld' ? [view.world.tiles.length, view.world.party, view.world.tiles.map((t) => t.reachable ?? '-').join(''), view.world.fogReach?.length, view.world.doom, view.world.objective.keys] : 0, sc.kind === 'lobby' || sc.kind === 'title' ? [view.players, Object.keys(view.chars), view.publicUrl] : 0, sc.kind === 'combat' ? view.chars : 0, sc.kind === 'event' ? view.waiting.length : 0]), () => renderStage(sc));
   if (!fullScenes.includes(sc.kind)) sideSlot.render(hash([view.chars, view.players, view.world?.doom, view.world?.objective, view.world?.quests, view.party.gold, view.world?.time, view.world?.weather, (sc as { combat?: { current?: string } }).combat?.current]), renderSide);
   else sideSlot.render('none', () => null);
   renderNarration();
@@ -158,11 +164,12 @@ function render() {
 function renderTop(force = false) {
   if (!view) return;
   if (force) topSlot.invalidate();
-  topSlot.render(hash([view.code, view.campaign?.name, view.world?.kingdomName, view.party.name, net.status, role, view.paused, view.scene.kind]), () => [
+  topSlot.render(hash([view.code, view.campaign?.name, view.world?.kingdomName, view.party.name, net.status, role, view.paused, view.scene.kind, view.publicUrl]), () => [
     h('div', { class: 'logo' }, h('span', { class: 'glyph' }, '❖'), 'Pocket Realms'),
     view!.campaign && view!.scene.kind !== 'title' ? h('div', { class: 'small muted' }, `${view!.party.name ? `${view!.party.name} — ` : ''}${view!.world?.kingdomName ?? ''} — seed ${view!.campaign.seed}`) : null,
     h('div', { class: 'spacer' }),
-    h('div', { class: 'code' }, 'Room ', h('b', null, view!.code), h('span', { class: 'small muted' }, ` — ${view!.lanUrl.replace('https://', '')}`)),
+    role !== 'host' ? h('span', { class: 'watching small', title: 'This screen follows the game; the host screen controls it.' }, '👁 Watching') : null,
+    h('div', { class: 'code' }, 'Room ', h('b', null, view!.code), h('span', { class: 'small muted' }, ` — ${joinAddress(view!).replace('https://', '')}`)),
     h('span', { class: `status-dot${net.status === 'open' ? '' : ' off'}`, title: net.status }),
     role === 'host' && view!.scene.kind !== 'title' ? h('button', { onclick: () => cmd({ cmd: 'skip' }), title: 'Auto-resolve everything we are waiting on' }, '⏩ Skip') : null,
     h('button', { onclick: () => ((modal = 'journal'), renderModal()) }, '📖 Journal'),
@@ -257,7 +264,7 @@ function renderTitle(saves: { id: string; name: string; updated: number; day: nu
           : h('div', { class: 'muted' }, 'No saved campaigns yet. Campaigns autosave at the end of every scene.'),
       ),
     ),
-    role !== 'host' ? h('div', { class: 'center muted' }, 'This screen is a spectator. Open the host link from the terminal to control the game.') : null,
+    role !== 'host' ? h('div', { class: 'center muted' }, 'This is a watch screen: it follows the game, and the host starts it. (Hosting? Open the host link from the terminal.)') : null,
     h('div', { class: 'credits' }, 'Monster art by Lorc, Delapouite, Skoll, Caro Asercion, Cathelineau, Carl Olsen & others from game-icons.net, CC BY 3.0. Full list in CREDITS.md.'),
   );
 }
@@ -275,11 +282,14 @@ function renderLobby() {
       'div',
       { class: 'card joinbox' },
       h('h2', null, '📱 Join on your phone'),
-      h('img', { src: '/api/qr.svg', alt: 'QR code to join' }),
-      h('div', { class: 'url' }, v.lanUrl.replace('https://', 'https://')),
+      // the query changes with the address, so a new tunnel link is not served from cache
+      h('img', { src: `/api/qr.svg?u=${encodeURIComponent(joinAddress(v))}`, alt: 'QR code to join' }),
+      h('div', { class: 'url' }, joinAddress(v)),
       h('div', null, 'Room code'),
       h('div', { class: 'bigcode' }, v.code),
-      h('div', { class: 'tip' }, '🔒 First time? Your phone will warn about the certificate. Tap Advanced → Proceed (Chrome) or Show Details → visit this website (Safari). It is your own computer. Same Wi-Fi required.'),
+      v.publicUrl
+        ? h('div', { class: 'tip' }, '🌍 Online: this address works from anywhere, on any Wi-Fi or mobile data. Remote players can also open ', h('b', null, `${v.publicUrl.replace('https://', '')}/host/`), ' on a computer to watch this screen.')
+        : h('div', { class: 'tip' }, '🔒 First time? Your phone will warn about the certificate. Tap Advanced → Proceed (Chrome) or Show Details → visit this website (Safari). It is your own computer. Same Wi-Fi required.'),
     ),
     h(
       'div',

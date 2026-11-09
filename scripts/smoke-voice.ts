@@ -11,6 +11,8 @@ const KEY = process.env.HOST_KEY ?? 'testkey';
 const PLAY_MS = Number(process.env.PLAY_MS ?? 90000);
 
 class Host extends Client {
+  /** a watch screen that never reports playback (muted tab): the host alone must pace the game */
+  silent = false;
   speeches: { sid: number; job: number; who: string; voice: string }[] = [];
   samples = new Map<number, number>(); // job -> samples received
   ended = 0;
@@ -23,6 +25,7 @@ class Host extends Client {
       this.sentAt.set(m.job, Date.now());
     } else if (m.t === 'speechEnd') {
       this.ended++;
+      if (this.silent) return;
       // Pretend to play it: report once its audio would have finished.
       const s = this.speeches.find((x) => x.sid === m.sid);
       const secs = s ? (this.samples.get(s.job) ?? 0) / 24000 : 0;
@@ -40,6 +43,10 @@ async function main() {
   const host = new Host('host');
   await host.open();
   host.send({ t: 'hello', v: PROTOCOL_VERSION, role: 'host', key: KEY });
+  const watch = new Host('watch');
+  watch.silent = true;
+  await watch.open();
+  watch.send({ t: 'hello', v: PROTOCOL_VERSION, role: 'host' }); // no key: a remote watch screen
   await sleep(300);
   for (let i = 0; i < 120 && host.view?.voice?.state !== 'ready'; i++) await sleep(1000);
   assert(host.view?.voice?.state === 'ready', `voice worker ready (${JSON.stringify(host.view?.voice)})`);
@@ -74,6 +81,10 @@ async function main() {
   assert(host.ended >= host.speeches.length - 2, 'every sentence finished synthesis');
   assert(stalls < 4, `the game kept moving (longest quiet stretch ${stalls * 5}s)`);
   assert(host.errors.length === 0, `no errors (${host.errors.join('; ')})`);
+  const watchAudioS = [...watch.samples.values()].reduce((a, b) => a + b, 0) / 24000;
+  console.log(`watch screen: speeches ${watch.speeches.length}, audio ${watchAudioS.toFixed(1)}s`);
+  assert(watch.speeches.length === host.speeches.length, 'the watch screen got every sentence the host got');
+  assert(Math.abs(watchAudioS - audioS) < 0.01, 'and the same audio');
   console.log('✅ voice smoke passed');
   process.exit(0);
 }

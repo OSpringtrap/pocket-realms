@@ -13,7 +13,8 @@ import { realClock } from './clock.js';
 import { Game } from './game/Game.js';
 import { installHandlers, toTitle } from './game/director.js';
 import { lanIps, openBrowser } from './net.js';
-import { Room, makeRoomCode } from './room.js';
+import { Room, clientAddress, makeRoomCode } from './room.js';
+import { Tunnel, waitUntilReachable } from './tunnel.js';
 import { SpeechQueue } from './voice/speech.js';
 import { TtsWorker } from './voice/worker.js';
 
@@ -24,6 +25,10 @@ const args = new Set(process.argv.slice(2));
 const PORT = Number(process.env.PORT ?? 8443);
 const HTTP_PORT = Number(process.env.HTTP_PORT ?? 8080);
 const NO_OPEN = args.has('--no-open') || process.env.NO_OPEN === '1';
+/** your own tunnel / reverse proxy address (Tailscale Funnel, a named Cloudflare tunnel...) */
+const PUBLIC_URL = /^https:\/\/[^\s/?#]+$/.test(process.env.PUBLIC_URL?.replace(/\/+$/, '') ?? '') ? process.env.PUBLIC_URL!.replace(/\/+$/, '') : undefined;
+/** start a Cloudflare quick tunnel (needs cloudflared) */
+const ONLINE = !PUBLIC_URL && (args.has('--online') || process.env.ONLINE === '1');
 
 function main() {
   // Fail loudly on bad content before anything else
@@ -40,17 +45,20 @@ function main() {
   const { key, cert } = ensureCert(path.join(ROOT, '.certs'), ips);
   const code = process.env.ROOM_CODE && /^[A-Z]{4}$/.test(process.env.ROOM_CODE) ? process.env.ROOM_CODE : makeRoomCode();
   const hostKey = process.env.HOST_KEY && /^[a-z0-9]{6,64}$/i.test(process.env.HOST_KEY) ? process.env.HOST_KEY : randomBytes(8).toString('hex');
-  const joinUrl = `https://${ip}:${PORT}/?room=${code}`;
+  const lanUrl = `https://${ip}:${PORT}`;
   const hostUrl = `https://localhost:${PORT}/host/?key=${hostKey}`;
+  if (process.env.PUBLIC_URL && !PUBLIC_URL) console.warn(`⚠️  Ignoring PUBLIC_URL=${process.env.PUBLIC_URL}: expected something like https://my-game.example.com`);
 
-  const game = new Game({ clock: realClock, code, lanUrl: `https://${ip}:${PORT}`, savesDir: path.join(ROOT, 'saves'), log: (m) => console.log(m) });
+  const game = new Game({ clock: realClock, code, lanUrl, publicUrl: PUBLIC_URL, savesDir: path.join(ROOT, 'saves'), log: (m) => console.log(m) });
+  /** phones join through the internet address when there is one (it works on the LAN too) */
+  const joinUrl = () => `${game.opts.publicUrl ?? lanUrl}/?room=${code}`;
   installHandlers(game);
   toTitle(game);
   const room = new Room(game, code, hostKey);
 
-  // Optional voices: narrator and characters, spoken on the main screen.
+  // Optional voices: narrator and characters, spoken on the main screen and on watch screens.
   const tts = new TtsWorker(ROOT);
-  const speech = new SpeechQueue(tts, { hosts: () => room.hostCount(), json: (m) => room.sendHosts(m as never), binary: (b) => room.sendHosts(b) });
+  const speech = new SpeechQueue(tts, { hosts: () => room.screenCount(), json: (m) => room.sendScreens(m as never), binary: (b) => room.sendScreens(b) });
   tts.onStatus = () => game.dirty();
   room.onSpeechPlayed = (sid) => speech.played(sid);
   game.voice = speech;
@@ -68,10 +76,10 @@ function main() {
   const phoneDir = path.join(ROOT, 'dist', 'client-phone');
   if (!fs.existsSync(hostDir) || !fs.existsSync(phoneDir)) console.warn('⚠️  Built clients not found — run `bun run build` (`bun start` does this for you).');
   app.get('/api/qr.svg', async (_req, res) => {
-    const svg = await QRCode.toString(joinUrl, { type: 'svg', margin: 1, color: { dark: '#2b1d0e', light: '#00000000' } });
-    res.type('image/svg+xml').send(svg);
+    const svg = await QRCode.toString(joinUrl(), { type: 'svg', margin: 1, color: { dark: '#2b1d0e', light: '#00000000' } });
+    res.type('image/svg+xml').setHeader('Cache-Control', 'no-cache').send(svg);
   });
-  app.get('/api/info', (_req, res) => res.json({ code, joinUrl, lanUrl: `https://${ip}:${PORT}` }));
+  app.get('/api/info', (_req, res) => res.json({ code, joinUrl: joinUrl(), lanUrl, publicUrl: game.opts.publicUrl ?? null }));
   app.get('/healthz', (_req, res) => res.send('ok'));
   app.use('/host', express.static(hostDir, { index: 'index.html', maxAge: '1h' }));
   app.use('/', express.static(phoneDir, { index: 'index.html', maxAge: '1h' }));
@@ -79,7 +87,7 @@ function main() {
 
   const server = https.createServer({ key, cert }, app);
   const wss = new WebSocketServer({ server, path: '/ws', maxPayload: 256 * 1024 });
-  wss.on('connection', (ws) => room.attach(ws));
+  wss.on('connection', (ws, req) => room.attach(ws, clientAddress(req.socket.remoteAddress, req.headers)));
 
   // Plain HTTP on another port just redirects to HTTPS (easier to type on a phone)
   const redirect = http.createServer((req, res) => {
@@ -104,10 +112,43 @@ function main() {
     if (ips.length > 1) console.log(`     other addresses: ${ips.slice(1).join(', ')}`);
     console.log(`\n  First time on each device: your browser warns about the self-signed`);
     console.log(`  certificate. Tap "Advanced" → "Proceed" (Chrome) or "Show Details" →`);
-    console.log(`  "visit this website" (Safari). Everything stays on your local network.`);
+    if (game.opts.publicUrl || ONLINE) console.log(`  "visit this website" (Safari). Online players get no warning.`);
+    else console.log(`  "visit this website" (Safari). Everything stays on your local network.`);
     console.log(`${line}\n`);
+    if (game.opts.publicUrl) printOnline(game.opts.publicUrl);
+    else if (ONLINE) {
+      console.log('🌍 Opening the online tunnel (cloudflared)...');
+      tunnel?.start();
+    }
     if (!NO_OPEN) openBrowser(hostUrl);
   });
+
+  /** what to send a remote player: their phone link and a watch-only main screen */
+  function printOnline(url: string, verified = true) {
+    const line = '─'.repeat(64);
+    console.log(`${line}\n  🌍  ONLINE: send these to players who are not in the room\n${line}`);
+    console.log(`  📱 Phone:        ${url}/?room=${code}`);
+    console.log(`  📺 Watch screen: ${url}/host/      (follows the game, no controls)`);
+    if (!verified) console.log(`\n  (It has not answered from here yet. If a link won't open, wait a minute and retry.)`);
+    console.log(`\n  Keep the host link above to yourself: it controls the game.`);
+    console.log(`${line}\n`);
+  }
+
+  const tunnel = ONLINE ? new Tunnel(PORT) : undefined;
+  if (tunnel) {
+    tunnel.onUrl = (url) => {
+      console.log(`🌍 Tunnel created; waiting until ${url.replace('https://', '')} answers from the internet...`);
+      void waitUntilReachable(url, { stillCurrent: () => tunnel.url === url }).then((ok) => {
+        if (tunnel.url !== url) return; // restarted meanwhile; the new address reports itself
+        game.setPublicUrl(url);
+        printOnline(url, ok);
+      });
+    };
+    tunnel.onLog = (m) => {
+      if (!tunnel.url) game.setPublicUrl(undefined);
+      console.log(m);
+    };
+  }
 
   const shutdown = () => {
     console.log('\nSaving and shutting down...');
@@ -118,9 +159,13 @@ function main() {
     }
     room.close();
     tts.stop();
+    tunnel?.stop();
     process.exit(0);
   };
-  process.on('exit', () => tts.stop());
+  process.on('exit', () => {
+    tts.stop();
+    tunnel?.stop();
+  });
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
   process.on('uncaughtException', (e) => console.error('[uncaught]', e));

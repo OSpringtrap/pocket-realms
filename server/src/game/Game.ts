@@ -146,6 +146,8 @@ export interface GameOptions {
   clock: Clock;
   code: string;
   lanUrl: string;
+  /** internet address when playing online; can arrive (or change) after start, see setPublicUrl */
+  publicUrl?: string;
   savesDir?: string;
   /** bots answer instantly (simulator) */
   instantBots?: boolean;
@@ -204,6 +206,12 @@ export class Game {
   }
   log(msg: string) {
     this.opts.log?.(msg);
+  }
+  /** the online address arrived or changed (tunnel restarted); screens show it and the QR follows */
+  setPublicUrl(url: string | undefined) {
+    if (this.opts.publicUrl === url) return;
+    this.opts.publicUrl = url;
+    this.dirty();
   }
 
   // ------------------------------------------------------------ change notification
@@ -794,6 +802,7 @@ export class Game {
       v: PROTOCOL_VERSION,
       code: this.opts.code,
       lanUrl: this.opts.lanUrl,
+      publicUrl: this.opts.publicUrl,
       settings: s.settings,
       players: [...this.players.values()].map((p) => ({
         id: p.id,

@@ -64,6 +64,41 @@ Tip: typing `http://<ip>:8080` on a phone redirects to the HTTPS address.
 - **iPhone sensors:** iOS asks for motion permission the first time you tap a sensor game. If you
   decline, every minigame falls back to touch.
 
+### Playing online (friends in another house)
+
+The game still runs on your computer; a free Cloudflare quick tunnel gives it a public `https://`
+address, so remote players need nothing installed and get no certificate warning. Install
+[`cloudflared`](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/)
+once (`sudo pacman -S cloudflared`, `brew install cloudflared`, …), then:
+
+```bash
+bun run online        # = bun start, plus the tunnel (or: ONLINE=1 bun start)
+```
+
+The terminal says the tunnel was created, then waits until the new address answers from the internet
+(a fresh address takes up to about a minute to reach everyone). Then it prints two links for remote players:
+
+```
+📱 Phone:        https://some-random-words.trycloudflare.com/?room=QWRT
+📺 Watch screen: https://some-random-words.trycloudflare.com/host/
+```
+
+- **Phone link:** the remote player opens it on their phone and joins as usual. Players in the room
+  can keep using the local address; the QR code on the main screen switches to the online one,
+  which works everywhere.
+- **Watch screen:** open it on the remote player's computer or TV and click once to turn on sound.
+  It shows the same main screen (map, combat, dice, narration, sounds and voices) but has no
+  controls. Only your host link (with `?key=`) runs the game, so don't share that one. Your own
+  screen sets the pace of the voices; a muted watch screen doesn't speed anything up.
+- The address is new every time the tunnel starts. If it drops, the server restarts it and prints
+  the new links.
+- Strangers can't guess their way in: after 8 wrong room codes from one address, that address has to
+  wait 5 minutes.
+- Using your own tunnel or domain instead (Tailscale Funnel, a named Cloudflare tunnel, a reverse
+  proxy)? Point it at `https://127.0.0.1:8443` (self-signed, so turn off certificate checks
+  for the origin) and start with `PUBLIC_URL=https://your.address bun start`, so the QR code and the
+  links show that address.
+
 ## How to play
 
 **Overworld.** Each turn a rotating **leader** picks where the party goes (on their phone or by
@@ -167,6 +202,8 @@ bun scripts/smoke-clients.ts            # 6 phones join, drop, rejoin, auto-play
 bun scripts/smoke-continue.ts start     # then restart the server and:
 bun scripts/smoke-continue.ts resume
 bun scripts/smoke-voice.ts              # with voices installed: narrator + monster lines, audio flows
+bun scripts/smoke-online.ts             # start the server with PUBLIC_URL=https://example.test (or --online):
+                                        # the address reaches every screen; a watch screen can't run the game
 ```
 
 ### Project layout

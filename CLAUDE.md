@@ -9,6 +9,7 @@ Pocket Realms: a local-multiplayer fantasy RPG ("5e-lite"). One shared main scre
 ```bash
 bun install
 bun start                 # build everything, run server (dist/server/index.js), open main screen
+bun run online            # same + Cloudflare quick tunnel (needs cloudflared); prints phone + watch-screen links
 bun run dev               # bun --watch of the server only; run `bun run build` once first so the clients exist
 bun run build:host | build:phone | build:server   # individual builds (Vite x2, `bun build`)
 bun run typecheck         # tsc --noEmit over all workspaces
@@ -18,7 +19,7 @@ bun run sim               # bot balance simulator (--runs N --difficulty heroic 
 bun run ci                # typecheck + tests + sim:ci (balance gates)
 ```
 
-Smoke tests run against a live server (`HOST_KEY=testkey ROOM_CODE=TEST PORT=9443 HTTP_PORT=9080 bun dist/server/index.js --no-open &`, then `bun scripts/smoke-clients.ts`; also `smoke-continue.ts`, `smoke-voice.ts`). Env switches: `PORT`, `HTTP_PORT`, `ROOM_CODE`, `HOST_KEY`, `NO_OPEN=1`, `VOICE=0`, `VOICE_BACKEND=mlx|torch|fake`. Phone URL `?debug=1` shows a sensor simulator.
+Smoke tests run against a live server (`HOST_KEY=testkey ROOM_CODE=TEST PORT=9443 HTTP_PORT=9080 bun dist/server/index.js --no-open &`, then `bun scripts/smoke-clients.ts`; also `smoke-continue.ts`, `smoke-voice.ts`, `smoke-online.ts` (needs `PUBLIC_URL` or `--online`)). Env switches: `PORT`, `HTTP_PORT`, `ROOM_CODE`, `HOST_KEY`, `NO_OPEN=1`, `VOICE=0`, `VOICE_BACKEND=mlx|torch|fake`, `ONLINE=1` / `--online` (tunnel), `PUBLIC_URL=https://…` (own tunnel/proxy), `CLOUDFLARED=path` (binary; tests use a fake). Phone URL `?debug=1` shows a sensor simulator.
 
 ## Architecture
 

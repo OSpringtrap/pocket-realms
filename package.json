@@ -20,6 +20,7 @@
     "build:server": "bun build server/src/index.ts --outdir dist/server --target bun --sourcemap=linked",
     "start": "bun run build && bun dist/server/index.js",
     "serve": "bun dist/server/index.js",
+    "online": "bun run build && bun dist/server/index.js --online",
     "voice:setup": "bun scripts/voice-setup.mjs",
     "dev": "bun --watch server/src/index.ts --dev",
     "test": "bun test",

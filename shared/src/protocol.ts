@@ -222,6 +222,8 @@ export interface PublicView {
   v: number;
   code: string;
   lanUrl: string;
+  /** internet address (tunnel) when the game is also online */
+  publicUrl?: string;
   settings: Settings;
   players: PlayerPublic[];
   chars: Record<string, Character>; // public sheets (portraits included)

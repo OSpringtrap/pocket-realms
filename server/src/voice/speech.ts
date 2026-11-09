@@ -11,7 +11,7 @@ import type { TtsWorker } from './worker.js';
  */
 
 export interface SpeechSink {
-  /** connected main screens */
+  /** connected screens that play speech (host and watch screens) */
   hosts(): number;
   json(msg: unknown): void;
   binary(buf: Buffer): void;
