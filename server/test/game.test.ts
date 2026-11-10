@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'bun:test';
 import { instantClock } from '../src/clock.js';
 import { Game } from '../src/game/Game.js';
-import { hostCommand, installHandlers, playerIntent, startNewCampaign } from '../src/game/director.js';
+import { content } from '@pr/shared';
+import { createHero, hostCommand, installHandlers, playerIntent, startNewCampaign } from '../src/game/director.js';
 
 async function runToEnd(g: Game, ms = 20000) {
   const t0 = Date.now();
@@ -17,6 +18,12 @@ function newGame(seed: string, bots: number, settings = {}) {
 }
 
 describe('server game flow', () => {
+  it('villains met as lesser bosses go by their run names, not the content ones', () => {
+    const g = newGame('NAMES', 0);
+    g.state.world = { antagonist: { id: 'ashmaw', name: 'Pyraxis', baseName: 'Ashmaw' }, bossNames: { grizzlefang: 'Skrazz' } } as never;
+    expect(g.renameAntagonist('Grizzlefang, the Goblin King: "Bow before Grizzlefang!" Ashmaw roars.')).toBe('Skrazz, the Goblin King: "Bow before Skrazz!" Pyraxis roars.');
+  });
+
   it('the narrator calls titled heroes by their title, now and then', () => {
     const g = newGame('EPI', 0);
     g.state.chars.h1 = { id: 'h1', name: 'Doob', titles: ['the Bold'] } as never;
@@ -43,6 +50,17 @@ describe('server game flow', () => {
     const p = g.addPlayer('Human');
     expect(typeof p).toBe('object');
     expect(hostCommand(g, { cmd: 'start' })).toMatch(/hero|Waiting/);
+  });
+
+  it('heroes keep the dice they picked; bots get a random set', () => {
+    const g = newGame('DICE', 1);
+    const bot = Object.values(g.state.chars)[0]!;
+    expect(bot.dice?.material).toBeTruthy();
+    const p = g.addPlayer('Human');
+    if (typeof p === 'string') throw new Error(p);
+    const quirk = content().quirkList.find((q) => !q.species.length && !q.classes.length)!.id;
+    expect(createHero(g, p.id, { name: 'Ada', species: 'elf', cls: 'wizard', quirks: [quirk], personality: '', dice: { material: 'galaxy', palette: 'nebula', font: 'cinzel', bold: true, light: true, size: 1.1, nat20: 'choir' } })).toBeNull();
+    expect(g.state.chars[p.id]!.dice).toEqual({ material: 'galaxy', palette: 'nebula', font: 'cinzel', bold: true, light: true, size: 1.1, nat20: 'choir' });
   });
 
   it('plays complete one-shot runs for 1, 2, 4 and 6 bot heroes', async () => {

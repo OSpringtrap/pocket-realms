@@ -10,10 +10,7 @@ import type { Game, Speaker } from './Game.js';
 const NPC_FALLBACK = 'man';
 
 export function npcSpeaker(npc: Npc): Speaker {
-  if (npc.voice) return { name: npc.name, voice: npc.voice };
-  const arche = content().npcs.find((a) => a.id === npc.archetypeId);
-  const i = arche ? arche.names.indexOf(npc.name) : -1;
-  return { name: npc.name, voice: (i >= 0 && arche?.voices?.[i]) || NPC_FALLBACK };
+  return { name: npc.name, voice: npc.voice || NPC_FALLBACK };
 }
 
 /** An NPC's reaction after the party's approach, from the archetype's `pleased`/`displeased` lines. */

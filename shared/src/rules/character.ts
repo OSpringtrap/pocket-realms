@@ -14,6 +14,7 @@ import {
   type SpeciesId,
 } from '../types.js';
 import { makeItem } from './items.js';
+import { sanitizeDiceStyle, type DiceStyle } from '../dicestyle.js';
 import { MAX_LEVEL, XP_TABLE, levelForXp, maxHp, maxSp, resourceMax } from './stats.js';
 
 export interface CharacterDraft {
@@ -25,6 +26,7 @@ export interface CharacterDraft {
   portrait?: string;
   ancestry?: string;
   extraSkill?: Skill;
+  dice?: DiceStyle;
 }
 
 export interface FateResult {
@@ -89,7 +91,7 @@ export function validateDraft(raw: unknown): CharacterDraft | string {
   }
   let extraSkill: Skill | undefined;
   if (species === 'human') extraSkill = SKILLS.includes(r.extraSkill as Skill) ? (r.extraSkill as Skill) : 'perception';
-  return { name, species, cls, quirks, personality, portrait, ancestry, extraSkill };
+  return { name, species, cls, quirks, personality, portrait, ancestry, extraSkill, dice: sanitizeDiceStyle(r.dice) };
 }
 
 export function baseScores(species: SpeciesId, cls: ClassId, fate?: FateResult): AbilityScores {
@@ -154,6 +156,7 @@ export function createCharacter(id: string, draft: CharacterDraft, rng: Rng, fat
     quirks: [...draft.quirks],
     personality: draft.personality,
     portrait: draft.portrait,
+    dice: draft.dice,
     sp: 0,
     maxSp: 0,
     resources: {},

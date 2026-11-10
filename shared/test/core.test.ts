@@ -246,3 +246,22 @@ describe('dice throw hand-off', () => {
     expect(skim.vy).toBeLessThan(0);
   });
 });
+
+describe('dice styles', () => {
+  it('cleans what a phone sends and fills in anything unknown', async () => {
+    const { sanitizeDiceStyle, DEFAULT_DICE } = await import('../src/dicestyle.js');
+    expect(sanitizeDiceStyle(undefined)).toEqual(DEFAULT_DICE);
+    expect(sanitizeDiceStyle({ material: 'glass', palette: 'aurora', font: 'rubik', bold: true, light: true, size: 9, nat20: 'harp' })).toEqual({ material: 'glass', palette: 'aurora', font: 'rubik', bold: true, light: true, size: 1.3, nat20: 'harp' });
+    // no bold for a face that has none; unknown values fall back
+    const s = sanitizeDiceStyle({ material: 'marble', palette: 'x', font: 'tiny5', bold: true, size: 'big', nat20: 'gong' });
+    expect(s).toEqual({ ...DEFAULT_DICE, font: 'tiny5' });
+  });
+  it('random sets are always valid', async () => {
+    const { randomDiceStyle, sanitizeDiceStyle } = await import('../src/dicestyle.js');
+    for (let i = 0; i < 200; i++) {
+      const s = randomDiceStyle();
+      expect(sanitizeDiceStyle(s)).toEqual(s);
+      expect(s.nat20).not.toBe('none');
+    }
+  });
+});

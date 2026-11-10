@@ -197,7 +197,6 @@ function crossCheck(c: Content) {
     need(!!c.monsters[b.id] || families.has(b.id), `barks ${b.id}: not a monster id or family`);
     need(!!b.silent || !!b.voice, `barks ${b.id}: needs a voice (or silent: true)`);
   }
-  for (const n of c.npcs) if (n.voices) need(n.voices.length === n.names.length, `npc ${n.id}: voices must match names one to one`);
   if (errs.length) throw new ContentError(`Content cross-reference errors:\n  - ${errs.join('\n  - ')}`);
 }
 

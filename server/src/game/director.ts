@@ -5,6 +5,7 @@ import {
   allowedQuirks,
   content,
   createCharacter,
+  randomDiceStyle,
   equipItem,
   generateWorld,
   healUnit,
@@ -200,7 +201,7 @@ export function hostCommand(g: Game, cmd: HostCommand): string | null {
       const taken = new Set(Object.values(g.state.chars).map((c) => c.cls));
       const free = CLASSES.filter((c) => !taken.has(c));
       const cls = free.length ? g.rng.pick(free) : g.rng.pick(CLASSES);
-      const draft: CharacterDraft = { name: p.name.replace('🤖 ', ''), species, cls, quirks: [g.rng.pick(allowedQuirks(species, cls))], personality: g.rng.pick(content().names.personalities) };
+      const draft: CharacterDraft = { name: p.name.replace('🤖 ', ''), species, cls, quirks: [g.rng.pick(allowedQuirks(species, cls))], personality: g.rng.pick(content().names.personalities), dice: randomDiceStyle() };
       finishCreation(g, p, draft);
       return null;
     }

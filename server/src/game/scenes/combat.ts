@@ -1,6 +1,7 @@
 import {
   FAMILY_CULTURE,
   NameBook,
+  antagonistName,
   Rng,
   humanName,
   monsterName,
@@ -439,7 +440,14 @@ function nameMonsters(g: Game, monsters: Monster[]) {
     nameBooks.set(g, (book = new NameBook([...(w?.npcs.map((n) => n.name) ?? []), ...Object.values(g.state.chars).map((c) => c.name)])));
   }
   const rng = new Rng((Math.random() * 2 ** 32) >>> 0);
+  const w = g.state.world;
   for (const m of monsters) {
+    // Another villain met as a lesser boss gets a name of its own for this run, kept if met again.
+    const other = m.boss && w ? content().antagonists.find((a) => a.bossId === m.defId && a.id !== w.antagonist.id) : undefined;
+    if (other && !w!.bossNames?.[other.id]) {
+      const fresh = antagonistName(rng, other.id);
+      if (fresh) (w!.bossNames ??= {})[other.id] = book.take(() => antagonistName(rng, other.id) ?? fresh);
+    }
     m.name = g.renameAntagonist(m.name);
     if (m.boss || m.dead) continue;
     if (m.family === 'companion') {

@@ -1,3 +1,4 @@
+import { draftDice } from './creation.js';
 import { monsterArt } from '../../shared/src/browser/glyphs.js';
 import { sfx } from '../../shared/src/browser/audio.js';
 import { dieName, expandFaces } from '../../shared/src/browser/dice3d.js';
@@ -83,7 +84,9 @@ function diceBox(app: App, p: Extract<Prompt, { kind: 'roll' }>, wrap: HTMLEleme
   world.tableG = 9.81 * pxPerM;
   const kinds = expandFaces(p.faces);
   const color = '#f4ead2';
-  kinds.forEach((k, i) => world.add(k, { group: p.id, x: W / 2 + (i - (kinds.length - 1) / 2) * world.dieSize * 2.4, y: H * 0.55, vx: (Math.random() - 0.5) * 200, vy: (Math.random() - 0.5) * 200, z: world.dieSize, vz: 0, color, spin: 6 }));
+  // the hero's own dice (during creation, the set picked a step earlier)
+  const style = app.view?.chars[app.view.me.id]?.dice ?? draftDice();
+  kinds.forEach((k, i) => world.add(k, { group: p.id, x: W / 2 + (i - (kinds.length - 1) / 2) * world.dieSize * 2.4, y: H * 0.55, vx: (Math.random() - 0.5) * 200, vy: (Math.random() - 0.5) * 200, z: world.dieSize, vz: 0, color, style, spin: 6 }));
 
   const opened = performance.now();
   let exit: ThrowInfo | undefined;

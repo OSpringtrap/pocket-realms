@@ -200,13 +200,11 @@ export function generateWorld(opts: WorldGenOptions): WorldState {
   const archetypes = rng.shuffle([...content().npcs]);
   for (let i = 0; i < (campaign ? 14 : 8) && i < archetypes.length; i++) {
     const a = archetypes[i]!;
-    rng.pick(a.names); // keeps the world stream where it was before names were generated
-    // Half the time one of the archetype's hand-written names (with its matching voice), otherwise a
-    // fresh one, matched to a voice of the same gender.
-    const vi = nrng.int(0, a.names.length - 1);
-    const voice = a.voices?.[vi];
+    rng.int(0, 3); // keeps the world stream where it was when archetypes carried hand-written names
+    // Every NPC gets a fresh name, matched to the gender of one of the archetype's voices.
+    const voice = a.voices?.length ? nrng.pick(a.voices) : undefined;
     const gender: Gender = VOICE_GENDER[voice ?? ''] ?? (nrng.chance(0.5) ? 'f' : 'm');
-    const name = nrng.chance(0.5) && !book.used.has(a.names[vi]!) ? book.take(() => a.names[vi]!) : book.take(() => npcName(nrng, a.id, gender));
+    const name = book.take(() => npcName(nrng, a.id, gender));
     npcs.push({
       id: `npc${i}`,
       name,

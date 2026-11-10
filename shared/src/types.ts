@@ -242,6 +242,8 @@ export interface Character {
   quirks: string[];
   personality: string;
   portrait?: string; // small PNG data URL
+  /** how this hero's dice look and sound (heroes from older saves have none: the default ivory dice) */
+  dice?: import('./dicestyle.js').DiceStyle;
   sp: number;
   maxSp: number;
   resources: Record<string, ResourcePool>;
@@ -434,6 +436,8 @@ export interface WorldState {
   doomEvents: number[]; // thresholds already triggered
   /** `name` may be generated per run; `baseName` is the content's name, which text in content still uses */
   antagonist: { id: string; name: string; baseName?: string; title: string; emoji: string; bossId: string; desc: string };
+  /** generated names for the other villains when they turn up as lesser bosses, by antagonist id */
+  bossNames?: Record<string, string>;
   objective: { text: string; fortress: { q: number; r: number }; keysNeeded: number; keys: number; keyName: string };
   factions: Faction[];
   npcs: Npc[];

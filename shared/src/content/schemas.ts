@@ -447,7 +447,6 @@ export const zNpcArchetype = z.object({
   id: z.string(),
   title: z.string(),
   emoji: z.string(),
-  names: z.array(z.string()).min(2),
   motivations: z.array(z.string()).min(1),
   faction: z.string().optional(),
   greet: z.array(z.string()).min(1),

@@ -7,6 +7,8 @@ import { Rng } from '../../shared/src/rng.js';
 import { ABILITIES, CLASSES, SKILLS, SPECIES, type ClassId, type Skill, type SpeciesId } from '../../shared/src/types.js';
 import type { CreationView } from '../../shared/src/protocol.js';
 import type { App } from './main.js';
+import { DICE_FONTS, DICE_MATERIAL_NAMES, DICE_PALETTES, NAT20_SOUNDS, randomDiceStyle, type DiceStyle } from '../../shared/src/dicestyle.js';
+import { diceForge } from './diceforge.js';
 
 const C = content();
 
@@ -19,6 +21,7 @@ interface Draft {
   quirks: string[];
   personality: string;
   portrait?: string;
+  dice: DiceStyle;
 }
 
 export const creationFlags = { skipClaim: false };
@@ -31,9 +34,15 @@ const rollName = (species?: SpeciesId) => {
   const n = speciesName(nameRng, species ?? 'human');
   return n.length <= 24 ? n : n.split(' ')[0]!;
 };
-let draft: Draft = { name: rollName(), quirks: [], personality: '' };
+// every hero starts with a random set of dice, so a table that skips the step still looks varied
+let draft: Draft = { name: rollName(), quirks: [], personality: '', dice: randomDiceStyle() };
 
-const STEPS = ['species', 'ancestry', 'class', 'quirks', 'personality', 'fate', 'portrait', 'review'] as const;
+/** The dice picked so far (the fate roll, a step later, already uses them). */
+export function draftDice(): DiceStyle {
+  return draft.dice;
+}
+
+const STEPS = ['species', 'ancestry', 'class', 'quirks', 'personality', 'dice', 'fate', 'portrait', 'review'] as const;
 
 function visibleSteps() {
   return STEPS.filter((s) => s !== 'ancestry' || draft.species === 'dragonborn' || draft.species === 'human');
@@ -62,6 +71,7 @@ function stepDots() {
 export function renderCreation(app: App) {
   const cr: CreationView | undefined = app.view?.me.creation;
   const s = STEPS[step]!;
+  if (s === 'dice') return [diceForge({ get: () => draft.dice, set: (d) => (draft.dice = d), back: () => go(app, -1), next: () => go(app, 1) })];
   const out: HTMLElement[] = [stepDots()];
   if (cr?.error) out.push(h('div', { class: 'card', style: 'border-color:var(--red)' }, `⚠️ ${cr.error}`));
   switch (s) {
@@ -229,6 +239,7 @@ export function renderCreation(app: App) {
           scores ? h('div', { class: 'sheet-grid' }, ...ABILITIES.map((a) => h('div', { class: 'card stat' }, h('span', { class: 'small' }, a), h('b', null, scores[a]), h('span', { class: 'small' }, `${mod(scores[a]) >= 0 ? '+' : ''}${mod(scores[a])}`)))) : null,
           h('div', null, h('b', null, 'Quirks: '), draft.quirks.map((q) => C.quirks[q]?.name).join(', ')),
           h('div', { class: 'muted' }, `“${draft.personality || 'Mysterious and quiet.'}”`),
+          h('div', { class: 'small' }, h('b', null, 'Dice: '), `${DICE_MATERIAL_NAMES[draft.dice.material]}, ${DICE_PALETTES.find((p) => p.id === draft.dice.palette)?.name}, ${DICE_FONTS.find((f) => f.id === draft.dice.font)?.name} — nat 20: ${NAT20_SOUNDS.find((x) => x.id === draft.dice.nat20)?.name}`),
           h('div', { class: 'small' }, h('b', null, 'Starting powers: '), (cl?.startAbilities ?? []).map((a) => C.abilities[a]?.name).join(', ')),
         ),
         h('div', { class: 'row' }, h('button', { onclick: () => go(app, -1) }, '← Back'), h('span', { class: 'grow' }), h('button', { class: 'good', style: 'font-size:1.2em', onclick: () => app.send({ t: 'character:create', draft: { ...draft, personality: draft.personality || 'Mysterious and quiet.' } }) }, '✅ Create hero!')),

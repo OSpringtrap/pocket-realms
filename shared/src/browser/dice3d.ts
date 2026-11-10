@@ -1,3 +1,4 @@
+import { diceColours, diceFont, hexRgb, mixHex, type DiceMaterial, type DiceStyle } from '../dicestyle.js';
 /**
  * Lightweight 3D dice on a 2D canvas: convex polyhedra, back-face culling,
  * flat shading, numbers mapped onto faces with an affine transform.
@@ -473,11 +474,14 @@ export interface DieLook {
   color: string;
   done?: boolean;
   highlight?: 'crit' | 'fumble' | 'kept' | 'dropped';
+  /** the hero's chosen dice; without one the die is drawn plain in `color` */
+  style?: DiceStyle;
 }
 
 /** Draw one die centred at (x, y), `size` pixels per die radius. The shadow sits at (shadowX, shadowY):
  * under the die for a top-down table, or on the tray floor for the side-on tray. */
 export function drawDie(ctx: CanvasRenderingContext2D, d: DieLook, x: number, y: number, size: number, ink: string, o: { shadowX?: number; shadowY?: number; flatShadow?: boolean; shadowAlpha?: number } = {}) {
+  if (d.style) return drawStyledDie(ctx, d, x, y, size, d.style, o);
   const shape = SHAPES[d.kind === 1000 || d.kind === 100 ? 10 : d.kind]!;
   const light = norm([-0.3, -0.2, 1]);
   const proj = (v: V3): [number, number] => {
@@ -593,4 +597,254 @@ function shadeColor(hex: string, f: number): string {
 
 export function dieName(f: number) {
   return f === 100 ? 'd%' : `d${f}`;
+}
+
+// ------------------------------------------------------------------ styled dice (a hero's own set)
+
+const rnd = (seed: number) => () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+function noise2(seed: number) {
+  const r = rnd(seed);
+  const N = 64;
+  const g = Array.from({ length: N * N }, () => r());
+  const at = (x: number, y: number) => g[(((y % N) + N) % N) * N + (((x % N) + N) % N)]!;
+  const sm = (t: number) => t * t * (3 - 2 * t);
+  return (x: number, y: number) => {
+    const xi = Math.floor(x);
+    const yi = Math.floor(y);
+    const xf = sm(x - xi);
+    const yf = sm(y - yi);
+    const a = at(xi, yi);
+    const b = at(xi + 1, yi);
+    const c = at(xi, yi + 1);
+    const d = at(xi + 1, yi + 1);
+    return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
+  };
+}
+const fbm = (n: (x: number, y: number) => number, x: number, y: number) => n(x, y) * 0.5 + n(x * 2, y * 2) * 0.25 + n(x * 4, y * 4) * 0.125 + n(x * 8, y * 8) * 0.0625;
+
+/** Galaxy and metal are one big picture laid over each whole face (no repeats, so no seams);
+ * glitter is fine enough to tile. */
+const TEX: Partial<Record<DiceMaterial, { size: number; span: number; tile: boolean }>> = {
+  galaxy: { size: 512, span: 2.6, tile: false },
+  metal: { size: 512, span: 2.6, tile: false },
+  glitter: { size: 256, span: 1.4, tile: true },
+};
+const texCache = new Map<string, HTMLCanvasElement>();
+function texture(m: DiceMaterial, a: string, b: string): HTMLCanvasElement | null {
+  const spec = TEX[m];
+  if (!spec || typeof document === 'undefined') return null;
+  const key = `${m}|${a}|${b}`;
+  const hit = texCache.get(key);
+  if (hit) return hit;
+  const S = spec.size;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = S;
+  const c = cv.getContext('2d')!;
+  const img = c.createImageData(S, S);
+  const A = hexRgb(a);
+  const B = hexRgb(b);
+  const n = noise2(m.length * 97 + 7);
+  const n2 = noise2(1234);
+  const r = rnd(42);
+  const put = (i: number, t: number, extra = 0) => {
+    for (let k = 0; k < 3; k++) img.data[i * 4 + k] = Math.max(0, Math.min(255, A[k]! + (B[k]! - A[k]!) * t + extra));
+    img.data[i * 4 + 3] = 255;
+  };
+  for (let y = 0; y < S; y++)
+    for (let x = 0; x < S; x++) {
+      const i = y * S + x;
+      const u = (x / S) * 4;
+      const v = (y / S) * 4;
+      if (m === 'galaxy') {
+        const cloud = Math.max(0, fbm(n, u * 0.9 + 3, v * 0.9) - 0.38) * 2.2;
+        const wisp = Math.max(0, fbm(n2, u * 1.8, v * 1.8 + 5) - 0.5) * 2.5;
+        const dust = Math.max(0, 0.55 - fbm(n2, u * 2.4 + 9, v * 2.4)) * 0.9;
+        const core = Math.max(0, 1 - Math.hypot(x / S - 0.55, y / S - 0.45) * 2.2) * 0.35;
+        put(i, Math.min(1, Math.max(0, cloud + wisp * 0.6 + core - dust)), wisp * 40);
+      } else if (m === 'metal') put(i, 0.15 + (n(u * 0.15, v * 40) * 0.5 + n(u * 0.4, v * 90) * 0.3) * 0.45);
+      else {
+        const f = r();
+        put(i, f > 0.93 ? 1 : f > 0.86 ? 0.55 : 0.04, f > 0.985 ? 90 : 0);
+      }
+    }
+  c.putImageData(img, 0, 0);
+  if (m === 'galaxy') {
+    for (let k = 0; k < 420; k++) {
+      const sx = r() * S;
+      const sy = r() * S;
+      if (r() > 0.94) {
+        const g = c.createRadialGradient(sx, sy, 0, sx, sy, 6);
+        g.addColorStop(0, 'rgba(255,255,255,0.95)');
+        g.addColorStop(0.3, `rgba(${B.join(',')},0.5)`);
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+        c.fillStyle = g;
+        c.fillRect(sx - 6, sy - 6, 12, 12);
+      } else {
+        c.fillStyle = `rgba(255,255,255,${0.35 + r() * 0.65})`;
+        const d = r() > 0.7 ? 1.6 : 1;
+        c.fillRect(sx, sy, d, d);
+      }
+    }
+  }
+  texCache.set(key, cv);
+  return cv;
+}
+
+/** Canvas text never asks for a web font by itself: load each face the first time it is used. */
+const fontsAsked = new Set<string>();
+function wantFont(spec: string) {
+  if (typeof document === 'undefined' || !document.fonts || fontsAsked.has(spec)) return;
+  fontsAsked.add(spec);
+  void document.fonts.load(spec, '0123456789');
+}
+
+const LIGHT = norm([-0.3, -0.2, 1]);
+const HALF = norm([-0.15, -0.35, 1.6]);
+const rgba = (hex: string, a: number) => `rgba(${hexRgb(hex).join(',')},${a})`;
+
+function drawStyledDie(ctx: CanvasRenderingContext2D, d: DieLook, x: number, y: number, size: number, st: DiceStyle, o: { shadowX?: number; shadowY?: number; flatShadow?: boolean; shadowAlpha?: number }) {
+  const kind = d.kind === 1000 || d.kind === 100 ? 10 : d.kind;
+  const shape = SHAPES[kind]!;
+  const col = diceColours(st);
+  const font = diceFont(st);
+  const glass = st.material === 'glass';
+  const proj = (v: V3): [number, number] => {
+    const p = CAM / (CAM - v[2]);
+    return [x + v[0] * size * p, y + v[1] * size * p];
+  };
+  const rv = shape.verts.map((v) => qrot(d.q, v));
+  // glass shows the far side through the near one, so it draws every face, back to front
+  const faces = shape.faces
+    .map((f, fi) => {
+      const n = qrot(d.q, f.normal);
+      const c = qrot(d.q, f.center);
+      return { f, fi, n, c, u: qrot(d.q, f.up), front: dot(n, sub([0, 0, CAM], c)) > 1e-4 };
+    })
+    .filter((v) => glass || v.front)
+    .sort((a, b) => Number(a.front) - Number(b.front) || a.c[2] - b.c[2]);
+
+  // shadow; glass casts a tinted one with a bright caustic in it
+  ctx.save();
+  const sa = o.shadowAlpha ?? 0.22;
+  ctx.fillStyle = glass ? rgba(col.body, sa * 1.6) : `rgba(0,0,0,${sa * 1.4})`;
+  ctx.beginPath();
+  if (o.flatShadow) ctx.ellipse(o.shadowX ?? x, o.shadowY ?? y, size * 0.8, size * 0.18, 0, 0, Math.PI * 2);
+  else ctx.arc(o.shadowX ?? x, o.shadowY ?? y, size * 0.95, 0, Math.PI * 2);
+  ctx.fill();
+  if (glass) {
+    // light focused through the glass: a small bright smear inside the shadow
+    ctx.fillStyle = rgba(mixHex(col.accent, '#ffffff', 0.3), sa * 1.2);
+    ctx.beginPath();
+    if (o.flatShadow) ctx.ellipse(o.shadowX ?? x, o.shadowY ?? y, size * 0.3, size * 0.06, 0, 0, Math.PI * 2);
+    else ctx.ellipse(o.shadowX ?? x, o.shadowY ?? y, size * 0.32, size * 0.22, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  const tex = texture(st.material, col.body, col.accent);
+  const tspec = TEX[st.material];
+  const weight = st.bold && font.bold ? 700 : 400;
+  for (const { f, fi, n, c, u, front } of faces) {
+    const w = cross(n, u);
+    const p0 = proj(c);
+    const pu = proj(add(c, u));
+    const pw = proj(add(c, w));
+    // face space -> screen: (1,0) = w, (0,1) = -u
+    const M = new DOMMatrix([pw[0] - p0[0], pw[1] - p0[1], -(pu[0] - p0[0]), -(pu[1] - p0[1]), p0[0], p0[1]]);
+    const path = new Path2D();
+    f.idx.forEach((vi, k) => {
+      const [px, py] = proj(rv[vi]!);
+      if (k === 0) path.moveTo(px, py);
+      else path.lineTo(px, py);
+    });
+    path.closePath();
+    const diffuse = Math.max(0, dot(n, LIGHT));
+    const spec = Math.pow(Math.max(0, dot(n, HALF)), st.material === 'metal' ? 18 : glass ? 26 : 60);
+
+    ctx.save();
+    ctx.clip(path);
+    if (glass) {
+      if (!front) {
+        ctx.fillStyle = rgba(col.body, 0.3);
+        ctx.fill(path);
+      } else {
+        const g = ctx.createLinearGradient(M.e - M.c * 0.9, M.f - M.d * 0.9, M.e + M.c * 0.9, M.f + M.d * 0.9);
+        g.addColorStop(0, rgba(mixHex(col.body, '#ffffff', 0.35), 0.42));
+        g.addColorStop(1, rgba(col.body, 0.28));
+        ctx.fillStyle = g;
+        ctx.fill(path);
+        ctx.fillStyle = `rgba(255,255,255,${0.05 + spec * 0.85})`;
+        ctx.fill(path);
+        ctx.lineWidth = Math.max(2, size * 0.07);
+        ctx.strokeStyle = rgba(mixHex(col.accent, '#ffffff', 0.5), 0.22 + diffuse * 0.25);
+        ctx.stroke(path);
+      }
+    } else {
+      if (tex && tspec) {
+        const pat = ctx.createPattern(tex, 'repeat')!;
+        const k = tspec.span / tspec.size;
+        const spread = tspec.tile ? tspec.size : 0.3 * tspec.size;
+        const jx = (((fi * 37) % 17) / 16 - 0.5) * spread;
+        const jy = (((fi * 53) % 13) / 12 - 0.5) * spread;
+        pat.setTransform(M.scale(k, k).translate(-tspec.size / 2 + jx, -tspec.size / 2 + jy));
+        ctx.fillStyle = pat;
+      } else if (st.material === 'resin') {
+        const g = ctx.createLinearGradient(M.e - M.c * 0.9, M.f - M.d * 0.9, M.e + M.c * 0.9, M.f + M.d * 0.9);
+        g.addColorStop(0, col.body);
+        g.addColorStop(0.55, mixHex(col.body, col.accent, 0.5));
+        g.addColorStop(1, col.accent);
+        ctx.fillStyle = g;
+      } else ctx.fillStyle = col.body;
+      ctx.fill(path);
+      ctx.fillStyle = `rgba(0,0,0,${(1 - (0.5 + 0.5 * diffuse)) * (st.material === 'metal' ? 1.1 : 0.85)})`;
+      ctx.fill(path);
+      if (st.material !== 'solid' && st.material !== 'glitter') {
+        ctx.fillStyle = `rgba(255,255,255,${spec * (st.material === 'metal' ? 0.75 : 0.5)})`;
+        ctx.fill(path);
+      }
+    }
+    ctx.restore();
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(glass ? 1 : 1.5, size * (glass ? 0.03 : 0.045));
+    ctx.strokeStyle = glass ? rgba(col.edge, front ? 0.75 : 0.3) : col.edge;
+    ctx.stroke(path);
+
+    // number (glass also shows the far side's, faint and mirrored)
+    const vis = front ? Math.min(1, (n[2] - 0.3) * 3) : glass && n[2] < -0.3 ? 0.16 : 0;
+    if (vis > 0 && (!front || n[2] > 0.3)) {
+      const label = labelFor(d.kind, fi);
+      const s = 0.32 * (shape.faces.length > 12 ? 0.75 : shape.faces.length >= 10 ? 0.85 : 1);
+      const fs = (label.length > 1 ? 0.75 : 1) * font.scale * st.size;
+      wantFont(`${weight} 20px "${font.css}"`);
+      ctx.save();
+      ctx.transform(M.a * s, M.b * s, M.c * s, M.d * s, M.e, M.f);
+      ctx.globalAlpha *= vis;
+      ctx.font = `${weight} ${fs}px "${font.css}", Georgia, serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (col.glow && front) {
+        ctx.shadowColor = col.ink;
+        ctx.shadowBlur = size * 0.35;
+      }
+      ctx.fillStyle = col.ink;
+      ctx.fillText(label, 0, 0.05);
+      if (col.glow && front) ctx.fillText(label, 0, 0.05);
+      ctx.shadowBlur = 0;
+      if (label === '6' || label === '9') ctx.fillRect(-0.25, 0.42, 0.5, 0.06);
+      ctx.restore();
+    }
+  }
+  if (d.done && d.highlight) {
+    ctx.save();
+    ctx.lineWidth = size * 0.08;
+    ctx.strokeStyle = d.highlight === 'crit' ? '#d4a017' : d.highlight === 'fumble' ? '#a93226' : d.highlight === 'dropped' ? 'rgba(80,60,40,0.35)' : '#2e7d32';
+    if (d.highlight === 'crit') {
+      ctx.shadowColor = '#ffd36a';
+      ctx.shadowBlur = size * 0.5;
+    }
+    ctx.beginPath();
+    ctx.arc(x, y, size * RING, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
 }

@@ -16,16 +16,14 @@ describe('voices', () => {
     }
   });
 
-  it('every NPC name has a voice and reaction lines', () => {
+  it('every NPC archetype has voices and reaction lines', () => {
     for (const a of content().npcs) {
-      expect(a.voices?.length, a.id).toBe(a.names.length);
+      expect(a.voices?.length, a.id).toBeGreaterThan(0);
+      for (const v of a.voices ?? []) expect(VOICE_IDS).toContain(v);
       expect(a.pleased.length, a.id).toBeGreaterThan(0);
       expect(a.displeased.length, a.id).toBeGreaterThan(0);
-      for (const name of a.names) {
-        const sp = npcSpeaker({ id: 'n', name, archetypeId: a.id, emoji: '', title: '', motivation: '', attitude: 0 });
-        expect(VOICE_IDS).toContain(sp.voice);
-      }
     }
+    expect(npcSpeaker({ id: 'n', name: 'Anyone', archetypeId: 'farmer', emoji: '', title: '', motivation: '', attitude: 0 }).voice).toBe('man');
   });
 
   it('every boss speaks', () => {

@@ -12,6 +12,7 @@
  * come to rest.
  */
 import type { ThrowInfo } from '../protocol.js';
+import type { DiceStyle } from '../dicestyle.js';
 import { DIE_EXTENT, drawDie, faceNormalFor, qaxis, qfromTo, qmul, qnorm, qrot, qslerp, type DieKind, type DieLook, type Q, type V3 } from './dice3d.js';
 
 export type Edge = 'top' | 'bottom' | 'left' | 'right';
@@ -100,7 +101,7 @@ export class DiceWorld {
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
-  add(kind: DieKind, o: { group: string; x: number; y: number; vx?: number; vy?: number; z?: number; vz?: number; color: string; spin?: number; entering?: boolean }): Body {
+  add(kind: DieKind, o: { group: string; x: number; y: number; vx?: number; vy?: number; z?: number; vz?: number; color: string; style?: DiceStyle; spin?: number; entering?: boolean }): Body {
     const axis: V3 = [Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5];
     const l = Math.hypot(...axis) || 1;
     const spin = o.spin ?? 12;
@@ -116,6 +117,7 @@ export class DiceWorld {
       vy: o.vy ?? 0,
       vz: o.vz ?? 0,
       color: o.color,
+      style: o.style,
       done: false,
       entering: o.entering,
       born: performance.now(),

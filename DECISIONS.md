@@ -162,10 +162,20 @@ Each entry: **decision** — why.
 - **Written answers must come back.** A vote result is kept only if the game uses it again (kingdom, party
   name, motto, place names on the map, tavern, rumor). The mascot and "local legend" rounds were removed
   because their winners were never mentioned again.
+- **No hand-written personal names.** Every NPC, named monster, squire and villain gets a generated
+  name per run (NPC archetypes keep only their voices). A villain met as a lesser boss in someone else's
+  run gets its own generated name, kept for the run in `world.bossNames`. Villains whose content name is a
+  title rather than a name (The Hollow King, The Iron Colossus, Mother of Webs) keep it.
 - **Titles are said aloud.** The narrator calls a hero by their latest title ("Doob the Bold", "Mira,
   Monster Slayer,") at their first mention in a line, at most once every 4 narration lines per hero
   (`Game.withEpithets`); possessives and the line announcing the title are left alone. The ending names
   every titled hero. Named monsters whose name already ends in an epithet don't also get "the Cultist".
+- **Each hero has their own dice** (`shared/src/dicestyle.ts`): a material (solid, resin, metal, glass,
+  glitter, galaxy), one of 18 colour sets, a typeface (bundled with Fontsource so the game works offline),
+  bold, light glowing or dark numbers, a number size, and a natural-20 sound played on the main screen. It is
+  picked on the phone in a creation step just before the fate roll (that roll already uses it); every
+  draft starts from a random set, bots keep a random one, and heroes from older saves get the old ivory
+  dice. The server only stores a cleaned style; it never affects rolls.
 
 ## Secrets & social
 

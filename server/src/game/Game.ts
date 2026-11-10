@@ -367,11 +367,18 @@ export class Game {
     return this.renameAntagonist(out);
   }
 
-  /** Content (barks, doom narration, the boss's stat block) names the antagonist by its canonical
-   * name; this run's antagonist may have a generated one. */
+  /** Content (barks, doom narration, the boss's stat block) names villains by their canonical
+   * names; in a run they have generated ones: the antagonist's, and those of other villains met as
+   * lesser bosses (`world.bossNames`). */
   renameAntagonist(text: string): string {
-    const a = this.state.world?.antagonist;
-    return a?.baseName && a.baseName !== a.name ? text.split(a.baseName).join(a.name) : text;
+    const w = this.state.world;
+    const a = w?.antagonist;
+    if (a?.baseName && a.baseName !== a.name) text = text.split(a.baseName).join(a.name);
+    for (const [id, name] of Object.entries(w?.bossNames ?? {})) {
+      const base = content().antagonists.find((x) => x.id === id)?.name;
+      if (base && base !== name) text = text.split(base).join(name);
+    }
+    return text;
   }
 
   /** Delay scaled by the text-speed setting (narration pacing). */

@@ -180,6 +180,8 @@ function render() {
   renderTop();
   const sc = view.scene;
   stage.dataset.scene = sc.kind;
+  // the narration strip belongs to the game: the home and lobby screens have none, so it can't cover their buttons
+  narr.hidden = sc.kind === 'title' || sc.kind === 'lobby';
   const fullScenes = ['title', 'lobby', 'ending', 'jackbox'];
   main.classList.toggle('full', fullScenes.includes(sc.kind));
   stageSlot.render(hash([sc, view.world && sc.kind === 'overworld' ? [view.world.tiles.length, view.world.party, view.world.tiles.map((t) => t.reachable ?? '-').join(''), view.world.fogReach?.length, view.world.doom, view.world.objective.keys] : 0, sc.kind === 'lobby' || sc.kind === 'title' ? [view.players, Object.keys(view.chars), view.publicUrl] : 0, sc.kind === 'combat' ? view.chars : 0, sc.kind === 'event' ? view.waiting.length : 0]), () => renderStage(sc));
@@ -763,7 +765,9 @@ dice.onRest = (group) => {
   rollsByGroup.delete(group);
   if (!f) return;
   sfx.play('diceLand');
-  if (f.crit) sfx.play('crit');
+  // a hero's own natural-20 sound (their dice style); the plain chime for anyone else
+  const nat = view?.chars[f.playerId]?.dice?.nat20;
+  if (f.crit) nat ? sfx.nat20(nat) : sfx.play('crit');
   if (f.fumble) sfx.play('fumble');
   showRollInLog(f);
   setTimeout(() => dice.fadeGroup(group), 2600);
@@ -787,6 +791,7 @@ function throwDice(f: Extract<Fx, { kind: 'roll' }>) {
   rollsByGroup.set(f.id, f);
   sfx.play('dice');
   const color = tintFor(f.playerId);
+  const style = view?.chars[f.playerId]?.dice;
   kinds.forEach((kind, i) => {
     // a handful of dice comes in as a loose cluster: side by side across the heading, a beat apart
     const off = (i - (kinds.length - 1) / 2) * r * 1.9;
@@ -800,6 +805,7 @@ function throwDice(f: Extract<Fx, { kind: 'roll' }>) {
         z: dice.dieSize * 3,
         vz: dice.dieSize * 12,
         color,
+        style,
         spin: e.spin,
         entering: true,
       });

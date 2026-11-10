@@ -204,6 +204,96 @@ export class Sfx {
     this.tone(freq, 0.35, { gain: 0.05, attack: 0.05 });
   }
 
+  /** A hero's own natural-20 sound (their dice style). */
+  nat20(id: string) {
+    const c = this.ctx;
+    const out = this.master;
+    if (!c || !out || id === 'none') return;
+    const t = c.currentTime + 0.03;
+    const hz = (m: number) => 440 * Math.pow(2, (m - 69) / 12);
+    const env = (g: GainNode, at: number, a: number, peak: number, d: number) => {
+      g.gain.setValueAtTime(0.0001, at);
+      g.gain.exponentialRampToValueAtTime(peak, at + a);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + a + d);
+    };
+    const tone = (type: OscillatorType, f: number, at: number, a: number, peak: number, d: number, dest: AudioNode = out, detune = 0) => {
+      const o = c.createOscillator();
+      const g = c.createGain();
+      o.type = type;
+      o.frequency.value = f;
+      o.detune.value = detune;
+      env(g, at, a, peak, d);
+      o.connect(g).connect(dest);
+      o.start(at);
+      o.stop(at + a + d + 0.05);
+      return o;
+    };
+    const noise = (at: number, dur: number, type: BiquadFilterType, freq: number, peak: number, q = 1, a = 0.005) => {
+      const s = c.createBufferSource();
+      s.buffer = this.noiseBuf!;
+      const f = c.createBiquadFilter();
+      f.type = type;
+      f.frequency.value = freq;
+      f.Q.value = q;
+      const g = c.createGain();
+      env(g, at, a, peak, dur - a);
+      s.connect(f).connect(g).connect(out);
+      s.start(at, Math.random() * 0.5, dur + 0.05);
+      return f;
+    };
+    if (id === 'fanfare') {
+      const lp = c.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 2600;
+      lp.connect(out);
+      for (const [m, at, d] of [[67, 0, 0.12], [67, 0.13, 0.12], [67, 0.26, 0.12], [72, 0.4, 0.9]] as const) for (const dt of [-7, 0, 7]) tone('sawtooth', hz(m), t + at, 0.02, 0.07, d, lp, dt);
+      for (const m of [64, 67]) for (const dt of [-6, 6]) tone('sawtooth', hz(m), t + 0.4, 0.03, 0.045, 0.9, lp, dt);
+    } else if (id === 'choir') {
+      for (const [m, at] of [[60, 0], [64, 0.05], [67, 0.1], [72, 0.15], [76, 0.2]] as const)
+        for (const formant of [730, 1090]) {
+          const bp = c.createBiquadFilter();
+          bp.type = 'bandpass';
+          bp.frequency.value = formant;
+          bp.Q.value = 5;
+          bp.connect(out);
+          for (const dt of [-9, 0, 9]) tone('sawtooth', hz(m), t + at, 0.35, 0.09, 1.6, bp, dt);
+        }
+    } else if (id === 'chimes') {
+      [84, 88, 91, 96, 100, 103].forEach((m, i) => {
+        tone('sine', hz(m), t + i * 0.09, 0.003, 0.12, 1.4);
+        tone('sine', hz(m) * 2.76, t + i * 0.09, 0.002, 0.04, 0.6);
+        tone('sine', hz(m) * 5.4, t + i * 0.09, 0.002, 0.015, 0.3);
+      });
+    } else if (id === 'chiptune') {
+      [60, 64, 67, 72, 76, 79, 84].forEach((m, i) => tone('square', hz(m), t + i * 0.065, 0.004, 0.06, 0.08));
+      tone('square', hz(84), t + 0.5, 0.004, 0.06, 0.35);
+      tone('square', hz(88), t + 0.5, 0.004, 0.04, 0.35);
+      tone('triangle', hz(48), t + 0.5, 0.004, 0.12, 0.35);
+    } else if (id === 'thunder') {
+      const f = noise(t, 1.45, 'lowpass', 900, 0.6, 0.7, 0.01);
+      f.frequency.setValueAtTime(2400, t);
+      f.frequency.exponentialRampToValueAtTime(120, t + 1.4);
+      tone('sine', 48, t, 0.02, 0.35, 1.2);
+      for (let i = 0; i < 10; i++) tone('sine', 2000 + Math.random() * 3000, t + 0.6 + i * 0.07 + Math.random() * 0.05, 0.002, 0.04, 0.15);
+    } else if (id === 'crowd') {
+      for (let v = 0; v < 6; v++) {
+        const f = noise(t + v * 0.03, 1.45, 'bandpass', 600 + v * 230, 0.12, 3, 0.25);
+        f.frequency.linearRampToValueAtTime(900 + v * 260, t + 1.2);
+      }
+      for (let i = 0; i < 18; i++) noise(t + 0.15 + i * 0.07 + Math.random() * 0.04, 0.05, 'highpass', 1400, 0.25);
+    } else if (id === 'harp') {
+      [60, 62, 64, 67, 69, 72, 74, 76, 79, 81, 84, 86, 88].forEach((m, i) => {
+        tone('triangle', hz(m), t + i * 0.045, 0.003, 0.09, 0.9);
+        tone('sine', hz(m) * 2, t + i * 0.045, 0.003, 0.025, 0.4);
+      });
+      for (const m of [72, 76, 79, 84]) tone('triangle', hz(m), t + 0.65, 0.003, 0.06, 1.3);
+    } else if (id === 'powerup') {
+      tone('sawtooth', 180, t, 0.05, 0.06, 0.75).frequency.exponentialRampToValueAtTime(1500, t + 0.7);
+      tone('square', 182, t, 0.05, 0.035, 0.75).frequency.exponentialRampToValueAtTime(1520, t + 0.7);
+      for (const m of [72, 76, 79, 84]) tone('square', hz(m), t + 0.72, 0.005, 0.045, 0.6, out, 4);
+    }
+  }
+
   play(name: string) {
     if (!this.ctx) return;
     const n = (f: number, d: number, o: Parameters<Sfx['tone']>[2] = {}) => this.tone(f, d, o);
